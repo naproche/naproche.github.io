@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Naproche</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" property="og:description" content="Naproche proof assistant home page" />
+    <!-- <meta property="og:image" content="ABSOLUTE_URL_GOES_HERE"/> -->
+    <style>
+        :root {
+            --highlight: #df061f;
+        }
+
+        body {
+            font-size: 20px;
+        }
+
+        body {
+            max-width: 51rem;
+        }
+
+        header {
+            display: flex;
+            border-bottom: 1px solid black;
+        }
+
+        #header_index {
+            font-size: 2rem;
+            padding-right: 2rem;
+            color: currentcolor;
+        }
+
+        footer ol, nav ol {
+            display: flex;
+            flex-wrap: wrap;
+            list-style-type: none outside none;
+            margin-inline-start: 0;
+            margin: 0;
+            padding-inline-start: 0;
+            column-gap: 0.75rem;
+            padding: 0;
+        }
+
+        nav ol li, footer ol li {
+            display: block;
+            padding: 0 1rem 0.25rem 0;
+        }
+
+        nav ol li a, footer ol li a {
+            text-decoration: "none";
+            color: black;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            border-top: 1px solid black;
+            padding-top: 0.5rem;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--highlight);
+        }
+
+        .youarehere {
+            color: var(--highlight) !important;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        blockquote {
+            background-color: #eee;
+            padding: 1rem;
+            margin: 0;
+        }
+
+        blockquote p:first-child {
+            margin-top: 0;
+        }
+
+        blockquote p:last-child {
+            margin-bottom: 0;
+        }
+
+        footer {
+            border-top: 1px solid black;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <a id="header_index" title="Index page" href="index.html">Naproche</a>
+        <nav>
+            <ol>
+                <li><a href="download.html">Download</a></li>
+                <!-- <li><a href="tutorial.html">Tutorial</a></li> -->
+                <li><a href="try.html">Try online</a></li>
+                <li><a href="documentation.html">Documentation</a></li>
+                <li><a class="youarehere" href="formalizations.html">Formalizations</a></li>
+                <li><a href="history.html">History</a></li>
+                <li><a href="publications.html">Publications</a></li>
+                <!--li><a href="links.html">Links</a></li-->
+                <li><a href="people.html">People</a></li>
+            </ol>
+        </nav>
+    </header>
+    <main>
+
+<h1>Selected formalization projects</h1>
+<p>
+Formalizations in Naproche are often carried out by <!--bachelor and master--> students
+as part of a practical project or a thesis.
+On this page we present some of the larger formalizations projects in Naproche.
+Please note that some formalizations only run in the respective contemporary version of Naproche.
+</p>
+
+<h2>Selection of Wiedijk’s 100 theorems</h2>
+<p>
+In the summer semester of 2023 Peter Koepke, Mateusz Marcol, and Patrick Schäfer
+formalized some of <a href="https://www.cs.ru.nl/~freek/100/">Wiedijk’s 100 theorems</a>
+and compiled them together with existing formalizations into a continuous document.
+The formalization is part of the examples that ship with Naproche in the Isabelle (September 2023) distribution.
+This work was presented at <a href="https://europroofnet.github.io/cambridge-2023/#koepke1">NatFoM 2023</a>.
+You can also find the PDF version <a href="100_theorems.ftl.pdf">here</a> and the LaTeX source file <a href="https://github.com/naproche/naproche/blob/master/examples/100_theorems.ftl.tex">here</a>.
+</p>
+
+<h2>Initial chapters of Rudin’s <i>Principles of Mathematical Analysis</i></h2>
+<p>
+In 2022 ten students formalized the first 5 chapters of <a href="https://en.wikipedia.org/wiki/Principles_of_Mathematical_Analysis"><i>Baby Rudin</i></a> while staying as close to the original text as possible. The formalization is available <a href="https://github.com/naproche/real-analysis">here</a>.
+</p>
+
+<h2>Set theory up to Silver’s theorem</h2>
+<p>
+In 2020 Jan Penquitt formalized set theory in Naproche up to <a href="https://www.sciencedirect.com/science/article/pii/0012365X76900029">Silver’s theorem</a> about the continuum function at singular cardinals of uncountable cofinality.
+This formalization was also
+<a href="https://cicm-conference.org/2020/NFM/paper_1_Koepke_Penquitt_Schuetz_Sturzenhecker.pdf">presented at the NatFoM workshop</a> during CICM 2020.
+</p>
+    </main>
+    <footer>
+        <ol>
+            <li><a href="impressum.html">Impressum</a></li>
+            <li><a href="privacy.html">Privacy</a></li>
+        </ol>
+    </footer>
+</body>
+</html>

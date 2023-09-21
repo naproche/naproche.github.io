@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Naproche</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" property="og:description" content="Naproche proof assistant home page" />
+    <!-- <meta property="og:image" content="ABSOLUTE_URL_GOES_HERE"/> -->
+    <style>
+        :root {
+            --highlight: #df061f;
+        }
+
+        body {
+            font-size: 20px;
+        }
+
+        body {
+            max-width: 51rem;
+        }
+
+        header {
+            display: flex;
+            border-bottom: 1px solid black;
+        }
+
+        #header_index {
+            font-size: 2rem;
+            padding-right: 2rem;
+            color: currentcolor;
+        }
+
+        footer ol, nav ol {
+            display: flex;
+            flex-wrap: wrap;
+            list-style-type: none outside none;
+            margin-inline-start: 0;
+            margin: 0;
+            padding-inline-start: 0;
+            column-gap: 0.75rem;
+            padding: 0;
+        }
+
+        nav ol li, footer ol li {
+            display: block;
+            padding: 0 1rem 0.25rem 0;
+        }
+
+        nav ol li a, footer ol li a {
+            text-decoration: "none";
+            color: black;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            border-top: 1px solid black;
+            padding-top: 0.5rem;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--highlight);
+        }
+
+        .youarehere {
+            color: var(--highlight) !important;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        blockquote {
+            background-color: #eee;
+            padding: 1rem;
+            margin: 0;
+        }
+
+        blockquote p:first-child {
+            margin-top: 0;
+        }
+
+        blockquote p:last-child {
+            margin-bottom: 0;
+        }
+
+        footer {
+            border-top: 1px solid black;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <a id="header_index" title="Index page" href="index.html">Naproche</a>
+        <nav>
+            <ol>
+                <li><a href="download.html">Download</a></li>
+                <!-- <li><a href="tutorial.html">Tutorial</a></li> -->
+                <li><a href="try.html">Try online</a></li>
+                <li><a href="documentation.html">Documentation</a></li>
+                <li><a href="formalizations.html">Formalizations</a></li>
+                <li><a href="history.html">History</a></li>
+                <li><a class="youarehere" href="publications.html">Publications</a></li>
+                <!--li><a href="links.html">Links</a></li-->
+                <li><a href="people.html">People</a></li>
+            </ol>
+        </nav>
+    </header>
+    <main>
+<h1>Publications</h1>
+
+<ol>
+    <li>
+        Adrian De Lon, Peter Koepke, Anton Lorenzen, Adrian Marti, Marcel Schütz, and Makarius Wenzel (2021);<!--br-->
+        <a href="https://link.springer.com/chapter/10.1007/978-3-030-79876-5_36"><i>The Isabelle/Naproche Natural Language Proof Assistant</i></a>;<!--br-->
+        in: André Platzer and Geoff Sutcliffe (eds.);<!--br-->
+        <a href="https://link.springer.com/book/10.1007/978-3-030-79876-5"><i>Automated Deduction – CADE 28</i></a>;
+        12&ndash;15 July 2021, Pittsburgh, USA (virtual conference).
+    </li>
+    <li>
+        Adrian De Lon, Peter Koepke, and Anton Lorenzen (2021);
+        <a href="https://drops.dagstuhl.de/opus/volltexte/2021/13911/pdf/LIPIcs-ITP-2021-16.pdf"><i>A Natural Formalization of the Mutilated Checkerboard Problem in Naproche</i></a>;
+        in: Liron Cohen and Cezary Kaliszyk (eds.);
+        <a href="https://drops.dagstuhl.de/opus/portals/lipics/index.php?semnr=16189"><i>ITP 2021</i></a>;
+        29 June to 1 July 2021, Rome, Italy (virtual conference).
+    </li>
+    <li>
+        Adrian De Lon, Peter Koepke, Anton Lorenzen, Adrian Marti, Marcel Schütz, and Erik Sturzenhecker (2021);
+        <a href="https://link.springer.com/chapter/10.1007/978-3-030-81097-9_2"><i>Beautiful Formalizations in Isabelle/Naproche</i></a>
+        in Fairouz Kamareddine and Claudio Sacerdoti Coen (eds.); <a href="https://link.springer.com/book/10.1007/978-3-030-81097-9"><i>CICM 2021</i></a>.
+    </li>
+    <li>
+        Adrian De Lon, Peter Koepke, and Anton Lorenzen (2020);
+        <a href="https://link.springer.com/chapter/10.1007/978-3-030-53518-6_19"><i>Interpreting Mathematical Texts in Naproche-SAD</i></a>;
+        in Christoph Benzmüller and Bruce Miller (eds.); <a href="https://link.springer.com/book/10.1007/978-3-030-53518-6"><i>CICM 2020</i></a>.
+    </li>
+    <li>
+        Steffen Frerix and Peter Koepke (2018);<!--br-->
+        <a href="http://ceur-ws.org/Vol-2307/paper13.pdf"><i>Automatic Proof-Checking of Ordinary Mathematical Texts</i></a>;<!--br-->
+        in: Osman Hasan et al. (eds.);
+        <a href="http://ceur-ws.org/Vol-2307/"><i>CICM-WS 2018: Proceedings of the
+        Workshop Formal Mathematics for Mathematicians (FMM)</i></a>,
+        Hagenberg, Austria, 13 August 2018; CEUR-WS vol. 2307.
+    </li>
+</ol>
+    </main>
+    <footer>
+        <ol>
+            <li><a href="impressum.html">Impressum</a></li>
+            <li><a href="privacy.html">Privacy</a></li>
+        </ol>
+    </footer>
+</body>
+</html>
