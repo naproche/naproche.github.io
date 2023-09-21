@@ -17,3 +17,10 @@ This will place the generated HTML files in `./build/`.
 ## Automatic rebuilding
 
 If you have `find` and `entr` installed, you can have automatic rebuilds by running `make watch`.
+
+
+## Automatic rebuilding
+
+You can deploy the web page on GitHub Pages by running `make deploy`.
+This will upload the files to the `gh-pages` branch.
+Don't forget to also commit the changes on the regular `main` branch!
