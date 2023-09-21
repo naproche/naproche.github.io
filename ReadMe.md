@@ -5,10 +5,10 @@
 
 A basic build requires just `make` and `sed`.
 
-Optionally, you might want to install `find` + `entr` or `python`.
+The optional automatic rebuilds require `find` + `entr`.
 
 
-## Basic build
+## Building
 
 Run `make` in in this directory to execute the basic build.
 This will place the generated HTML files in `./build/`.
@@ -19,8 +19,8 @@ This will place the generated HTML files in `./build/`.
 If you have `find` and `entr` installed, you can have automatic rebuilds by running `make watch`.
 
 
-## Automatic rebuilding
+## Deployment
 
-You can deploy the web page on GitHub Pages by running `make deploy`.
+You can deploy the web page to GitHub Pages by running `make deploy`.
 This will upload the files to the `gh-pages` branch.
-Don't forget to also commit the changes on the regular `main` branch!
+Don't forget to also commit the changes to the source files on the regular `main` branch!
