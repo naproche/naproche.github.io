@@ -23,4 +23,4 @@ If you have `find` and `entr` installed, you can have automatic rebuilds by runn
 
 You can deploy the web page to GitHub Pages by running `make deploy`.
 This will upload the files to the `gh-pages` branch.
-Don't forget to also commit the changes to the source files on the regular `main` branch!
+Don’t forget to also commit the changes to the source files on the regular `main` branch!
