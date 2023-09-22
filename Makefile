@@ -19,13 +19,14 @@ deploy:
 	cp -rf build/* deploy
 	cd deploy && \
 	  git add --all && \
-	  git commit -m "Deploy to github pages" && \
+	  git commit -m "Deploy to GitHub Pages" && \
 	  git push origin gh-pages
 	git worktree remove deploy
 
-# dev helpers
+# Automatic rebuilds:
 watch:
 	find content resources/header.html resources/footer.html Makefile | entr make
 
+# Local webserver
 serve:
 	python -m http.server -d build
