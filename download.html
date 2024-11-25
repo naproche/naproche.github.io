@@ -100,6 +100,38 @@
             border-top: 1px solid black;
             font-size: 16px;
         }
+
+        ul li:not(:last-of-type) {
+            margin-bottom: 1em;
+        }
+
+        .resources {
+            margin-top: 0.3em;
+        }
+
+        .bibtex {
+            margin-top: 0.3em;
+        }
+
+        .bibtex pre {
+            background-color: lightgray;
+            font-size: 80%;
+            padding: 10px;
+            overflow-x: scroll;
+            border: solid;
+            border-width: 1px;
+        }
+
+        .abstract {
+            margin-top: 0.3em;
+        }
+
+        .abstract div {
+            font-size: 80%;
+            padding: 10px;
+            border: solid;
+            border-width: 1px;
+        }
     </style>
 </head>
 
@@ -114,8 +146,8 @@
                 <li><a href="documentation.html">Documentation</a></li>
                 <li><a href="formalizations.html">Formalizations</a></li>
                 <li><a href="history.html">History</a></li>
-                <li><a href="publications.html">Publications</a></li>
-                <!--li><a href="links.html">Links</a></li-->
+                <li><a href="publications.html">Publications &amp; Talks</a></li>
+                <li><a href="links.html">Links</a></li>
                 <li><a href="people.html">People</a></li>
             </ol>
         </nav>
@@ -131,7 +163,9 @@
 </p>
 <p>
     On macOS, when first opening Isabelle, you may need to control-click the <code>.app</code> bundle and select “Open” to bypass Apple’s Gatekeeper. You will find a short introduction to Naproche in the Examples section of the Documentation panel on the left of the IDE.
-    Opening a ForTheL file in ASCII format (<code>.ftl</code>) or LaTeX format
+    Opening a ForTheL file in ASCII format (<code>.ftl</code>) or
+    L<span style="font-size: 0.75em; vertical-align: 0.25em; margin-left: -0.36em; margin-right: -0.15em; line-height: 1ex;">A</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X
+    format
     (<code>.ftl.tex</code>) in the Isabelle/jEdit editor will automatically
     invoke its continuous checking by Naproche.
 </p>

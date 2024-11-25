@@ -100,6 +100,38 @@
             border-top: 1px solid black;
             font-size: 16px;
         }
+
+        ul li:not(:last-of-type) {
+            margin-bottom: 1em;
+        }
+
+        .resources {
+            margin-top: 0.3em;
+        }
+
+        .bibtex {
+            margin-top: 0.3em;
+        }
+
+        .bibtex pre {
+            background-color: lightgray;
+            font-size: 80%;
+            padding: 10px;
+            overflow-x: scroll;
+            border: solid;
+            border-width: 1px;
+        }
+
+        .abstract {
+            margin-top: 0.3em;
+        }
+
+        .abstract div {
+            font-size: 80%;
+            padding: 10px;
+            border: solid;
+            border-width: 1px;
+        }
     </style>
 </head>
 
@@ -114,49 +146,3218 @@
                 <li><a href="documentation.html">Documentation</a></li>
                 <li><a href="formalizations.html">Formalizations</a></li>
                 <li><a href="history.html">History</a></li>
-                <li><a class="youarehere" href="publications.html">Publications</a></li>
-                <!--li><a href="links.html">Links</a></li-->
+                <li><a class="youarehere" href="publications.html">Publications &amp; Talks</a></li>
+                <li><a href="links.html">Links</a></li>
                 <li><a href="people.html">People</a></li>
             </ol>
         </nav>
     </header>
     <main>
-<h1>Publications</h1>
+<h1>Publications &amp; Talks</h1>
 
-<ol>
-    <li>
-        Adrian De Lon, Peter Koepke, Anton Lorenzen, Adrian Marti, Marcel Schütz, and Makarius Wenzel (2021);<!--br-->
-        <a href="https://link.springer.com/chapter/10.1007/978-3-030-79876-5_36"><i>The Isabelle/Naproche Natural Language Proof Assistant</i></a>;<!--br-->
-        in: André Platzer and Geoff Sutcliffe (eds.);<!--br-->
-        <a href="https://link.springer.com/book/10.1007/978-3-030-79876-5"><i>Automated Deduction – CADE 28</i></a>;
-        12&ndash;15 July 2021, Pittsburgh, USA (virtual conference).
-    </li>
-    <li>
-        Adrian De Lon, Peter Koepke, and Anton Lorenzen (2021);
-        <a href="https://drops.dagstuhl.de/opus/volltexte/2021/13911/pdf/LIPIcs-ITP-2021-16.pdf"><i>A Natural Formalization of the Mutilated Checkerboard Problem in Naproche</i></a>;
-        in: Liron Cohen and Cezary Kaliszyk (eds.);
-        <a href="https://drops.dagstuhl.de/opus/portals/lipics/index.php?semnr=16189"><i>ITP 2021</i></a>;
-        29 June to 1 July 2021, Rome, Italy (virtual conference).
-    </li>
-    <li>
-        Adrian De Lon, Peter Koepke, Anton Lorenzen, Adrian Marti, Marcel Schütz, and Erik Sturzenhecker (2021);
-        <a href="https://link.springer.com/chapter/10.1007/978-3-030-81097-9_2"><i>Beautiful Formalizations in Isabelle/Naproche</i></a>
-        in Fairouz Kamareddine and Claudio Sacerdoti Coen (eds.); <a href="https://link.springer.com/book/10.1007/978-3-030-81097-9"><i>CICM 2021</i></a>.
-    </li>
-    <li>
-        Adrian De Lon, Peter Koepke, and Anton Lorenzen (2020);
-        <a href="https://link.springer.com/chapter/10.1007/978-3-030-53518-6_19"><i>Interpreting Mathematical Texts in Naproche-SAD</i></a>;
-        in Christoph Benzmüller and Bruce Miller (eds.); <a href="https://link.springer.com/book/10.1007/978-3-030-53518-6"><i>CICM 2020</i></a>.
-    </li>
-    <li>
-        Steffen Frerix and Peter Koepke (2018);<!--br-->
-        <a href="http://ceur-ws.org/Vol-2307/paper13.pdf"><i>Automatic Proof-Checking of Ordinary Mathematical Texts</i></a>;<!--br-->
-        in: Osman Hasan et al. (eds.);
-        <a href="http://ceur-ws.org/Vol-2307/"><i>CICM-WS 2018: Proceedings of the
-        Workshop Formal Mathematics for Mathematicians (FMM)</i></a>,
-        Hagenberg, Austria, 13 August 2018; CEUR-WS vol. 2307.
-    </li>
-</ol>
+<h2>2024</h2>
+
+<ul>
+  <li>
+    Adrian De Lon;
+    <a href="https://link.springer.com/chapter/10.1007/978-3-031-63498-7_7"><i>The Naproche-ZF Theorem Prover</i></a>;
+    in: Christoph Benzmüller, Marijn J.H. Heule, Renate A. Schmidt (eds.);
+    <a href="https://link.springer.com/book/10.1007/978-3-031-63498-7"><i>Automated Reasoning. 12th International Joint Conference</i></a>;
+    <a href="https://merz.gitlabpages.inria.fr/2024-ijcar/"><i>IJCAR 2024</i></a>,
+    Nancy, France.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Proceedings: <a href="https://link.springer.com/content/pdf/10.1007/978-3-031-63498-7.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          Naproche-ZF is a new experimental open-source natural theorem prover
+          based on set theory; formalizations in Naproche-ZF are written in a
+          controlled natural language embedded into
+          L<span style="font-size: 0.75em; vertical-align: 0.25em; margin-left: -0.36em; margin-right: -0.15em; line-height: 1ex;">A</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X
+          and proof gaps are filled in with automated theorem provers.
+          Naproche-ZF aims to scale natural theorem proving beyond chapter-sized
+          formalizations. In contrast to the Naproche system, the new system
+          uses an extensible grammar-based approach, has more efficient proof
+          automation, and enables larger interconnected formalizations based on
+          a standard library. 
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{Del2024:TheNapZfThePro,
+  author={De Lon, Adrian},
+  editor={Benzmüller, Christoph and Heule, Marijn J.H. and Schmidt, Renate A.},
+  title={The {Naproche-ZF} Theorem Prover (Short Paper)},
+  booktitle={Automated Reasoning},
+  year={2024},
+  publisher={Springer Nature Switzerland},
+  address={Cham},
+  pages={105--114}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>First-Order Mathematics and Naproche</i>;
+    <a href="https://www.mathematics.uni-bonn.de/him/programs/past/him-trimester-program-prospects-of-formal-mathematics"><i>Prospects of Formal Mathematics</i></a>,
+    Bonn, Germany.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Recording: <a href="https://www.youtube.com/watch?v=shM0KCwBukY">YouTube</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2024:FirOrdMatAndNap,
+  author={Koepke, Peter},
+  title={First-Order Mathematics and {Naproche}},
+  year={2024},
+  howpublished={Recording: \url{https://www.youtube.com/watch?v=shM0KCwBukY}},
+  note={Talk at the \emph{Prospects of Formal Mathematics} trimester program, {Bonn}, {Germany}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>Naproche &ndash; System Introduction</i>;  
+    <a href="https://www.mathematics.uni-bonn.de/him/programs/past/him-trimester-program-prospects-of-formal-mathematics"><i>Prospects of Formal Mathematics</i></a>,
+    Bonn, Germany.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Recording: <a href="https://www.youtube.com/watch?v=PrfNmfKOVpw">YouTube</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2024:NapSysInt,
+  author={Koepke, Peter},
+  title={{Naproche} -- System Introduction},
+  year={2024},
+  howpublished={Recording: \url{https://www.youtube.com/watch?v=PrfNmfKOVpw}},
+  note={Talk at the \emph{Prospects of Formal Mathematics} trimester program, {Bonn}, {Germany}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>A Natural Language Formalization of Perfectoid Rings in Naproche</i>;  
+    <a href="https://www.mathematics.uni-bonn.de/him/programs/past/him-trimester-program-prospects-of-formal-mathematics"><i>Prospects of Formal Mathematics</i></a>,
+    Bonn, Germany.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Recording: <a href="https://www.youtube.com/watch?v=BaboO6m2KyE">YouTube</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2024:ANatLanForOfPerRinInNap,
+  author={Koepke, Peter},
+  title={A Natural Language Formalization of Perfectoid Rings in {Naproche}},
+  year={2024},
+  howpublished={Recording: \url{https://www.youtube.com/watch?v=BaboO6m2KyE}},
+  note={Talk at the \emph{Prospects of Formal Mathematics} trimester program, {Bonn}, {Germany}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Adrian De Lon;
+    <i>Natural Theorem Proving With Naproche-ZF</i>;  
+    <a href="https://www.mathematics.uni-bonn.de/him/programs/past/him-trimester-program-prospects-of-formal-mathematics"><i>Prospects of Formal Mathematics</i></a>,
+    Bonn, Germany.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Recording: <a href="https://www.youtube.com/watch?v=hLrB9fHa1iM&t=1s">YouTube</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Del2024:NatTheProWitNapZf,
+  author={De Lon, Adrian},
+  title={Natural Theorem Proving With {Naproche-ZF}},
+  year={2024},
+  howpublished={Recording: \url{https://www.youtube.com/watch?v=hLrB9fHa1iM&t=1s}},
+  note={Talk at the \emph{Prospects of Formal Mathematics} trimester program, {Bonn}, {Germany}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Shashank Pathak;
+    <i>GFLean: Autoformalisation for Lean via GF</i>;  
+    <a href="https://www.mathematics.uni-bonn.de/him/programs/past/him-trimester-program-prospects-of-formal-mathematics"><i>Prospects of Formal Mathematics</i></a>,
+    Bonn, Germany.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Recording: <a href="https://www.youtube.com/watch?v=tc0WgOIYT9s">YouTube</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Sha2024:GflAutForLeaViaGf,
+  author={Pathak, Shashank},
+  title={{GFLean}: Autoformalisation for Lean via {GF}},
+  year={2024},
+  howpublished={Recording: \url{https://www.youtube.com/watch?v=tc0WgOIYT9s}},
+  note={Talk at the \emph{Prospects of Formal Mathematics} trimester program, {Bonn}, {Germany}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Shashank Pathak;
+    <i>GFLean: Autoformalisation for Lean via Grammatical Framework</i>;  
+    <a href="https://leanprover-community.github.io/lt2024/"><i>Lean Together 2024</i></a>,
+    online.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Recording: <a href="https://www.youtube.com/watch?v=e51SHLZQtws">YouTube</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Sha2024:GflAutForLeaViaGraFra,
+  author={Pathak, Shashank},
+  title={{GFLean}: Autoformalisation for Lean via {Grammatical Framework}},
+  year={2024},
+  howpublished={Recording: \url{https://www.youtube.com/watch?v=e51SHLZQtws}},
+  note={Talk at the \emph{Lean Together} meeting 2024}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Shashank Pathak;
+    <a href="https://arxiv.org/abs/2404.01234#"><i>GFLean: An Autoformalisation Framework for Lean via GF</i></a>.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Prepring: <a href="https://arxiv.org/pdf/2404.01234">PDF</a>, <a href="https://arxiv.org/src/2404.01234"><a href="https://arxiv.org/src/1905.01735">T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X Sources</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          We present an autoformalisation framework for the Lean theorem prover,
+          called GFLean. GFLean uses a high-level grammar writing tool called
+          Grammatical Framework (GF) for parsing and linearisation. GFLean is
+          implemented in Haskell. We explain the functionalities of GFLean, its
+          inner working and discuss its limitations. We also discuss how we can
+          use neural network based translation programs and rule based
+          translation programs together complimenting each other to build robust
+          autoformalisation frameworks. 
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Sha2024:GflAnAutFraForLeaViaGf,
+  author={Pathak, Shashank},
+  title={GFLean: An Autoformalisation Framework for Lean via GF},
+  year={2024},
+  howpublished={arXiv preprint: \url{https://arxiv.org/abs/2404.01234#}}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2023</h2>
+
+<ul>
+  <li>
+    Peter Koepke;
+    <i>Experiences with Natural Language Proof Checking</i>;
+    <a href="https://europroofnet.github.io/cambridge-2023/"><i>NatFoM</i></a>,
+    <a href="https://cicm-conference.org/2023/cicm.php"><i>CICM 2023</i></a>,
+    Cambridge, UK.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://europroofnet.github.io/_pages/WG4/Cambridge23/koepke.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+            The Naproche system (for Natural Proof Checking) [<a href="#ref_398647">1</a>, <a href="#ref_256439">2</a>] interactively
+            proof-checks natural language mathematical texts whilst they are being
+            editing. Input texts are written in the controlled natural language ForTheL
+            (for Formula Theory Language) [<a href="#ref_783657">3</a>] which is intended to approximate the
+            natural mathematical language. Since ForTheL uses a LaTeX format,
+            high-quality typesetting of formalizations is immediately available. Over
+            the last years a number of theorems from non-trivial university mathematics
+            have been formalized in Naproche. Naproche is distributed as part of the
+            Isabelle prover platform which also includes a selection of Naproche
+            formalizations. Some of these texts closely resemble material that could be
+            found in mathematics textbooks.
+        </p>
+        <p>
+            Although Naproche allowed to achieve natural mathematical readability for
+            strictly proof-checked formalizations, the formalization process has been
+            slow and arduous. Users not only have to write a logically correct formal
+            document for the intended mathematical content, but at the same time they
+            have to struggle with the weaknesses of ATPs in dealing with implicit proof
+            tasks; they have to observe the rules of LaTeX and ForTheL; and ideally they
+            should aim for natural readability and mathematical elegance of the typeset
+            document. These simultanuous requirements are becoming even more problematic
+            as formalizations are getting longer, sometimes comprizing twenty or more
+            typeset pages, so that the automated background provers are having
+            difficulties to resolve proof tasks within seconds. But this is incompatible
+            with productive interactive work.
+        </p>
+        <p>
+            In my talk I shall illustrate and analyse the present state of affairs and
+            suggest ways in which natural proof checking could be made usable for a
+            wider mathematical public and for more advanced mathematics. I shall discuss
+            several possible ways forward:
+            <ol type="A">
+            <li>
+                Invest massively in improving all components of the current Naproche
+                system: e.g., with an editor like TeXmacs [<a href="#ref_105821">4</a>] users could directly work on
+                typeset mathematics; comprehensive caching of proofs should accelerate
+                proving times by an order of magnitude; tune or train external provers for
+                the specific proof tasks generated by Naproche; use standard type-checking
+                routines for some Naproche type-checking, etc.
+            </li>
+            <li>
+                Program a new natural system that circumvents weaknesses and
+                complications of Naproche; at the moment, Adrian De Lon is working towards a
+                novel set-theory based natural proof assistant.
+            </li>
+            <li>
+                Combine the natural language approach of Naproche with established
+                systems. Such a project may have some similarities with the introduction of
+                the Mizar-type proof language Isar in Isabelle/HOL [<a href="#ref_906346">5</a>].
+            </li>
+            </ol>
+        </p>
+        <hr>
+        <p>
+            <ul>
+            <li>
+                <span id="ref_398647">[1]</span> <a href="https://naproche.github.io/index.html">https://naproche.github.io/index.html</a>
+            </li>
+            <li>
+                <span id="ref_256439">[2]</span> Adrian De Lon, Peter Koepke, Anton Lorenzen, Adrian Marti, Marcel
+                Schütz, Makarius Wenzel: The Isabelle/Naproche Natural Language Proof
+                Assistant. In: Automated Deduction &ndash; CADE 28: 28th International
+                Conference on Automated Deduction (Proceedings), 2021, pp. 614&ndash;624.
+            </li>
+            <li>
+                <span id="ref_783657">[3]</span> Andrei Paskevich: The syntax and semantics of the ForTheL language.
+                2007. URL: <a href="http://nevidal.org/download/forthel.pdf">http://nevidal.org/download/forthel.pdf</a>
+            </li>
+            <li>
+                <span id="ref_105821">[4]</span> <a href="http://texmacs.org/tmweb/home/welcome.en.html">http://texmacs.org/tmweb/home/welcome.en.html</a>
+            </li>
+            <li>
+                <span id="ref_906346">[5]</span> <a href="https://isabelle.in.tum.de/">https://isabelle.in.tum.de/</a>
+            </li>
+            </ul>
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2023:ExpWitNatLanProChe,
+  author={Koepke, Peter},
+  title={Experiences with Natural Language Proof Checking},
+  year={2023},
+  howpublished={Slides: \url{https://europroofnet.github.io/_pages/WG4/Cambridge23/koepke.pdf}},
+  note={Talk at the \emph{NatFoM} workshop at \emph{CICM 2023}, {Cambridge}, {UK}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke, Mateusz Marcol, Patrick Schäfer;
+    <i>Formalizing Sets, Numbers, and some "Wiedijk Theorems" in Naproche</i>;
+    <a href="https://europroofnet.github.io/cambridge-2023/"><i>NatFoM</i></a>,
+    <a href="https://cicm-conference.org/2023/cicm.php"><i>CICM 2023</i></a>,
+    Cambridge, UK.
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          Freek Wiedijk's webpage "Formalizing 100 Theorems" [<a href="#ref_570934">1</a>] is sometimes
+          considered a benchmark for formalizations in interactive proof systems. It
+          also provides immediate comparisons between proof styles in different
+          systems.
+        </p>
+        <p>
+          In our talk we present a formalization in the Naproche Natural Proof Checker
+          [<a href="#">2</a>, <a href="#">3</a>] of sets, numbers and about 10 theorems from Wiedijk's list. The
+          formalization is part of the Isabelle 2023 release together with a
+          pdf-printout. Naproche formalizations aim at natural mathematical
+          readability: texts are written in a LaTeX source format that compiles to pdf
+          documents which read like standard mathematics. Strong automatic theorem
+          provers are employed to achieve textbook-like proof granularities.
+        </p>
+        <p>
+          Naproche's input language ForTheL [<a href="#">4</a>] (for Formula Theory Language) is a
+          controlled natural language based on patterns of tokens. The Naproche system
+          parses an input text into an incomplete proof tree of first-order
+          statements, where leaves correspond to axiomatic assumptions, and other
+          nodes are supposed to follow logically from premises higher up in the tree.
+          The system reads through the proof tree and checks statements for type
+          correctness and provability from their premises. These checks are mainly
+          done by external ATPs like E or Vampire. In line with the standard
+          foundations of mathematics in first-order logic and set theory, linguistic
+          types like "natural number" or "function" are interpreted as type guards.
+          Sets (and classes) can be formed by abstraction terms, obeying set existence
+          axioms.
+        </p>
+        <p>
+          Naproche is a component of the Isabelle prover platform [<a href="#">5</a>]. After
+          downloading and installing Isabelle, Naproche is immediately available and
+          will automatically check .ftl.tex files opened in the Isabelle editor.
+          Isabelle/Naproche ships with a couple of example files ranging from small
+          demos to larger mathematical developments. The present formalization is
+          included as the example file sets_and_numbers.ftl.tex.
+        </p>
+        <p>
+          In the formalization, set theory is developed up to the well-known theorems
+          of Cantor and Cantor-Schröder-Bernstein which are #63 and #25 on Wiedijk's
+          list. The standard number systems are introduced "top-down": we postulate
+          field axioms for the real numbers and then introduce the subsystems of
+          rational, integer and natural numbers. Interestingly, the principle of
+          mathematical induction (#74) follows from the supremum principle for real
+          numbers. Using induction we prove the summation formulas for finite
+          geometric (#66) and arithmetic series (#68), and the number of subsets of
+          finite sets (#52). After the introduction of division and primes in the
+          natural numbers we prove the correctness of Euclid's algorithm (#69),
+          Bezout's theorem (#60), the irrationality of <math display="inline"><msqrt><mn>2</mn></msqrt></math> (#1) and the
+          infinitude of primes (#11). We conclude with the denumerability of the
+          rational numbers (#3) and the uncountability of the real continuum (#22).
+          Overall, the formalization could be used in a seminar which teaches natural
+          and formal proving with Naproche whilst recapitulating basic and interesting
+          facts about sets and numbers.
+        </p>
+        <hr>
+        <p>
+          <ul>
+          <li>
+            <span id="ref_570934">[1]</span> <a href="https://www.cs.ru.nl/~freek/100/">https://www.cs.ru.nl/~freek/100/</a>
+          </li>
+          <li>
+            <span id="ref_120439">[2]</span> <a href="https://naproche.github.io/index.html">https://naproche.github.io/index.html</a>
+          </li>
+          <li>
+            <span id="ref_852745">[3]</span> Adrian De Lon, Peter Koepke, Anton Lorenzen, Adrian Marti, Marcel
+            Schütz, Makarius Wenzel: The Isabelle/Naproche Natural Language Proof
+            Assistant. In: Automated Deduction &ndash; CADE 28: 28th International
+            Conference on Automated Deduction (Proceedings), 2021, pp. 614&ndash;624.
+          </li>
+          <li>
+            <span id="ref_058345">[4]</span> Andrei Paskevich: The syntax and semantics of the ForTheL language.
+            2007. URL: <a href="http://nevidal.org/download/forthel.pdf">http://nevidal.org/download/forthel.pdf</a>
+          </li>
+          <li>
+            <span id="ref_782545">[5]</span> <a href="https://isabelle.in.tum.de/">https://isabelle.in.tum.de/</a>
+          </li>
+          </ul>
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{KoeMarSch2023:ForSetNumAndSomWieTheInNap,
+  author={Koepke, Peter and Marcol, Mateusz and Schäfer, Patrick},
+  title={Formalizing Sets, Numbers, and some ``{Wiedijk} Theorems'' in {Naproche}},
+  year={2023},
+  note={Talk at the \emph{NatFoM} workshop at \emph{CICM 2023}, {Cambridge}, {UK}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Adrian De Lon;
+    <i>Scaling a Natural Proof Assistant Step by Step</i>;
+    <a href="https://europroofnet.github.io/cambridge-2023/"><i>NatFoM</i></a>,
+    <a href="https://cicm-conference.org/2023/cicm.php"><i>CICM 2023</i></a>,
+    Cambridge, UK.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://europroofnet.github.io/_pages/WG4/Cambridge23/de_lon.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          The Naproche proof assistant checks formalizations written in controlled
+          natural language and fills in gaps in proofs with the help of automated
+          provers such as E and Vampire.
+        </p>
+        <p>
+          Naproche aims to lower the barriers to entry for mathematicians by modelling
+          natural language and informal proof structures, re-using familiar $\LaTeX$
+          syntax, and emphasizing proof automation. It is possible to formalize
+          nontrivial mathematics in Naproche, and students have successfully completed
+          formalizations covering parts of analysis, linear algebra, representation
+          theory, set theory, category theory, and more. However, the current
+          implementation struggles to scale beyond formalizations that span a few
+          chapters of a textbook. The following are some of the issues we are facing:
+        </p>
+        <p>
+          <ul>
+            <li>
+              <b>Check times.</b> Long formalizations take hours to check. Small
+              inefficiencies, increasingly difficult tasks for automated provers, and
+              lack of parallelism add up to a painful experience even on powerful PCs.
+            </li>
+            <li>
+              <b>Libraries.</b> These general performance issues combined with Naproche's
+              limited import mechanism (similar to an include directive) makes it
+              difficult to develop more interconnected formalizations or a standard
+              library that other formalizations can build on.
+            </li>
+            <li>
+              <b>Structures.</b> Naproche has no features dedicated to mathematical structures.
+              This means that users have to set up structures themselves. Moreover,
+              dealing with notation becomes cumbersome, such as having to explicitly
+              annotate which structure an operation belongs to.
+            </li>
+            <li>
+              <b>Surface area for user error.</b> It is still too easy for users of Naproche to
+              set themselves up for problems. Some parts of formalizations, such as some
+              top-level functions, have to be formalized using axioms, which can lead to
+              accidental contradictions. The grammar of the controlled language is in
+              parts overly permissive, leading to unintended results.
+            </li>
+            <li>
+              <b>Stability of formalizations.</b> Adding new theorems in the middle of a
+              formalization (or adding imports) adds additional premises to subsequent
+              tasks exported to automated provers. This makes it more difficult for
+              automated provers to find proofs, which then can break existing proofs in
+              Naproche. When flying too close to the resource limits given to automated
+              provers, formalizations become flaky or fail to be reproducible on other
+              computers.
+            </li>
+          </ul>
+        </p>
+        <p>
+          To address the issues described above, I'm working on a new implementation
+          of Naproche. The new proof assistant is developed in tandem with a more
+          inter-connected and modular "standard library" of mostly undergraduate
+          material, which shall serve as a foundation for future formalizations. Using
+          parallelism and premise selection the new proof assistant is currently
+          roughly ten times faster.
+        </p>
+        <p>
+          In my talk I will present my current progress and discuss the development of
+          the new proof assistant and its standard library. I will talk about how some
+          of the issues described above are mitigated in the new implementation. I
+          will also talk about the following:
+          <ul>
+            <li>
+              <b>Initial user impressions.</b> How does the formalization process compare to
+              the previous implementation? Are there any compromises?
+            </li>
+            <li>
+              <b>Library design.</b> Formalizing a standard library both with readability for
+              humans and granularity for automated proofs in mind.
+            </li>
+            <li>
+              <b>Premise selection.</b> Arguably the biggest contributor to long checking times
+              are increasingly difficult tasks for automated provers. Using premise
+              selection lets automated provers remain effective in large background
+              theories.
+            </li>
+          </ul>
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Del2023:ScaANatProAssSteBySte,
+  author={De Lon, Adrian},
+  title={Scaling a Natural Proof Assistant Step by Step},
+  year={2023},
+  howpublished={Slides: \url{https://europroofnet.github.io/_pages/WG4/Cambridge23/de_lon.pdf}},
+  note={Talk at the \emph{NatFoM} workshop at \emph{CICM 2023}, {Cambridge}, {UK}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Marcel Schütz;
+    <i>Foundational Libraries in Naproche</i>;
+    <a href="https://europroofnet.github.io/cambridge-2023/"><i>NatFoM</i></a>,
+    <a href="https://cicm-conference.org/2023/cicm.php"><i>CICM 2023</i></a>,
+    Cambridge, UK.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://github.com/naproche/Talks/2023/schuetz_foundational-libraries-in-naproche.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          The latest release of the natural language proof assistant Naproche [<a href="#ref_934583">1</a>],
+          developed at the university of Bonn, Germany, which ships as a component of
+          the current Isabelle release [<a href="#ref_937584">2</a>,<a href="#ref_025748">3</a>] comprises new foundational libraries
+          about set and number theory.
+        </p>
+        <p>
+          The Naproche ("Natural Proof Checking") proof assistant is being developed
+          for a high degree of naturalness of accepted proof texts, written in the
+          controlled natural language ForTheL ("Formula Theory Language"). ForTheL is
+          designed to approximate the mathematical vernacular, while at the same time
+          being a completely formal language which allows its translation into formal
+          logics [<a href="#ref_750481">4</a>]. Naproche has a built-in softly typed ontology that can be
+          regarded as a weak fragment of Kelley&ndash;Morse set theory. While this ontology
+          can quite flexibly be extended by a user, it does not provide a sufficient
+          basis on its own to formalize sophisticated mathematics. To overcome this
+          issue, Naproche also provides three foundational libraries about set and
+          number theory on top of its built-in ontology [<a href="#ref_395402">5</a>]:
+          <ol>
+            <li>
+              One library that provides basic set-theoretical notions and operations as
+              well as the most commonly used Kelley&ndash;Morse axioms [<a href="#ref_057493">6</a>].
+            </li>
+            <li>
+              One that extends the first library with more advanced notions from set
+              theory like that of ordinal and cardinal numbers [<a href="#ref_850395">7</a>].
+            </li>
+            <li>
+              One that extends the first library with a new (soft) type of natural
+              numbers together with common arithmetical operations as well as some
+              basic notions of number theory [<a href="#ref_250038">8</a>].
+            </li>
+          </ol>
+        </p>
+        <p>
+          Since these libraries are written in a LaTeX dialect of ForTheL they not
+          only comprise a high degree of human readability but can also be converted
+          directly to PDF. Moreover, their applicability as practically usable
+          foundations for more advanced formalizations in Naproche is demonstrated by
+          using them as a basis for formalizations of some well-known theorems from
+          set and number theory that ship with Naproche, e.g. the
+          Cantor-Schroeder-Bernstein theorem [<a href="#ref_675384">9</a>,<a href="#ref_839204">10</a>] and Furstenberg's proof of the
+          infinitude of primes [<a href="#ref_304384">11</a>,<a href="#ref_075934">12</a>]. However, they also pose some serious problems
+          yet that have to be addressed in future versions of Naproche:
+          <ol>
+            <li>
+              <b>Modularity:</b> Since Naproche lacks a mature module system for organizing
+              formalizations, their reusability is currently fairly limited.
+            </li>
+            <li>
+              <b>Scalability:</b> The proof checking abilities of Naproche do not scale well
+              with the size of the libraries.
+            </li>
+            <li>
+              <b>Time redundancy:</b> Currently Naproche has no mechanisms to provide
+              persistent certificates of the correctness of its libraries so they are
+              rechecked by the system every time they are imported to a ForTheL
+              document.
+            </li>
+            <li>
+              <b>Abstract mathematical structures:</b> Naproche's current abilities of
+              handling abstract mathematical structures (such as groups or topological
+              spaces) in contrast to "concrete" ones like "the" universe of sets or
+              "the" structure of natural numbers are very limited. This demands for an
+              extension of ForTheL that can handle such abstract structures using
+              language constructs that do not differ remarkably from the mathematical
+              vernacular.
+            </li>
+          </ol>
+        </p>
+        <p>
+          Hence, although Naproche appears as a promising basis for dealing with
+          human-readable, formal mathematical libraries, there is much room for
+          further improvement of its capabilities using methods developed in the
+          'intelligent computer mathematics' community.
+        </p>
+        <hr>
+        <p>
+          <ul>
+            <li>
+              <span id="ref_934583">[1]</span> <a href="https://github.com/naproche/naproche">https://github.com/naproche/naproche</a>
+            </li>
+            <li>
+              <span id="ref_937584">[2]</span> <a href="https://isabelle.in.tum.de/website-Isabelle2022/">https://isabelle.in.tum.de/website-Isabelle2022/</a>
+            </li>
+            <li>
+              <span id="ref_025748">[3]</span> De Lon, A., Koepke, P., Lorenzen, A., Marti, A., Schütz, M., Wenzel,
+              M. (2021). The Isabelle/Naproche Natural Language Proof Assistant. In:
+              Platzer, A., Sutcliffe, G. (eds) Automated Deduction &ndash; CADE 28. CADE 2021.
+              Lecture Notes in Computer Science, vol 12699. Springer, Cham.
+              <a href="https://doi.org/10.1007/978-3-030-79876-5_36">https://doi.org/10.1007/978-3-030-79876-5_36</a>
+            </li>
+            <li>
+              <span id="ref_750481">[4]</span> De Lon, A., Koepke, P., Lorenzen, A., Marti, A., Schütz, M.,
+              Sturzenhecker, E. (2021). Beautiful Formalizations in Isabelle/Naproche.
+              In: Kamareddine, F., Sacerdoti Coen, C. (eds) Intelligent Computer
+              Mathematics. CICM 2021. Lecture Notes in Computer Science, vol 12833.
+              Springer, Cham. <a href="https://doi.org/10.1007/978-3-030-81097-9_2">https://doi.org/10.1007/978-3-030-81097-9_2</a>
+            </li>
+            <li>
+              <span id="ref_395402">[5]</span> Schütz, M., De Lon, A., Koepke, P. (2022). Setting up Set-Theoretical
+              Foundations in Naproche. In: Work-in-progress papers presented at the 15th
+              Conference on Intelligent Computer Mathematics, CICM 2022 (Informal
+              Proceedings). <a href="https://www3.risc.jku.at/publications/download/risc_6584/proceedings-CICM2022-informal.pdf">https://www3.risc.jku.at/publications/download/risc_6584/proceedings-CICM2022-informal.pdf</a>
+            </li>
+            <li>
+              <span id="ref_057493">[6]</span> <a href="https://github.com/naproche/naproche/tree/master/examples/foundations">https://github.com/naproche/naproche/tree/master/examples/foundations</a>
+            </li>
+            <li>
+              <span id="ref_850395">[7]</span> <a href="https://github.com/naproche/naproche/tree/master/examples/set-theory">https://github.com/naproche/naproche/tree/master/examples/set-theory</a>
+            </li>
+            <li>
+              <span id="ref_250038">[8]</span> <a href="https://github.com/naproche/naproche/tree/master/examples/arithmetic">https://github.com/naproche/naproche/tree/master/examples/arithmetic</a>
+            </li>
+            <li>
+              <span id="ref_675384">[9]</span> <a href="https://github.com/naproche/naproche/blob/master/examples/zermelo.ftl.tex">https://github.com/naproche/naproche/blob/master/examples/zermelo.ftl.tex</a>
+            </li>
+            <li>
+              <span id="ref_839204">[10]</span> Schröder, B.S.W. The fixed point property for ordered sets. In: Arab.
+              J. Math. 1, 529&ndash;547 (2012). <a href="https://doi.org/10.1007/s40065-012-0049-7">https://doi.org/10.1007/s40065-012-0049-7</a>
+            </li>
+            <li>
+              <span id="ref_304384">[11]</span> <a href="https://github.com/naproche/naproche/blob/master/examples/furstenberg.ftl.tex">https://github.com/naproche/naproche/blob/master/examples/furstenberg.ftl.tex</a>
+            </li>
+            <li>
+              <span id="ref_075934">[12]</span> Furstenberg, H. (1955). On the Infinitude of Primes. In: American
+              Mathematical Monthly 62 (1955): 353.
+            </li>
+          </ul>
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Sch2023:FouLibInNap,
+  author={Schütz, Marcel},
+  title={Foundational Libraries in {Naproche}},
+  howpublished={Slides: \url{https://github.com/naproche/Talks/2023/schuetz_foundational-libraries-in-naproche.pdf}}
+  year={2023},
+  note={Talk at the \emph{NatFoM} workshop at \emph{CICM 2023}, {Cambridge}, {UK}}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2022</h2>
+
+<ul>
+  <li>
+    Anton Lorenzen, Peter Koepke;
+    <i>Web-Naproche</i> (part of <a href="https://link.springer.com/chapter/10.1007/978-3-031-16681-5_24"><i>CICM'22 System Entries</i></a>);
+    in: Kevin Buzzard, Temur Kutsia (eds.);
+    <a href="https://link.springer.com/book/10.1007/978-3-031-16681-5"><i>Intelligent Computer Mathematics. 15th International Conference</i></a>;
+    <a href="https://cicm-conference.org/2022/cicm.php"><i>CICM 2022</i></a>,
+    Tbilisi, Georgia.
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          This consolidated paper gives an overview of new tools and
+          improvements of existing tools in the CICM domain that occurred since
+          the last CICM conference.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{LorKoeShm2022:Cic22SysEnt,
+  author={Koepke, Peter and Lorenzen, Anton and Shminke, Boris},
+  editor={Buzzard, Kevin and Kutsia, Temur},
+  title={{CICM}'22 System Entries},
+  booktitle={Intelligent Computer Mathematics},
+  year={2022},
+  publisher={Springer International Publishing},
+  address={Cham},
+  pages={344--348}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Marcel Schütz, Adrian De Lon, Peter Koepke;
+    <i>Setting up Set-Theoretical Foundations in Naproche</i>;
+    in: Kevin Buzzard, Temur Kutsia (eds.);
+    <i>Work-in-progress papers presented at the 15th Conference on Intelligent Computer Mathematics</i>;
+    <a href="https://cicm-conference.org/2022/cicm.php"><i>CICM 2022</i></a>,
+    Tbilisi, Georgia.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Proceedings: <a href="https://www3.risc.jku.at/publications/download/risc_6584/proceedings-CICM2022-informal.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          Bringing out the potential of interactive theorem provers requires
+          efficient mathematical foundations. The current release of the natural
+          language proof assistant Naproche has become sufficiently stable to
+          allow a broader and principled approach towards libraries of basic
+          mathematical material. We present Naproche's new ontology of objects,
+          classes, maps, etc. and two foundational libraries about basic set
+          theory and number theory. These foundations are then used, e.g., in a
+          formalization of the Cantor&ndash;Schröder&ndash;Bernstein theorem.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{SchDelKoe2022:SetUpSetTheFouInNap,
+  author={Schütz, Marcel and De Lon, Adrian and Koepke, Peter},
+  editor={Buzzard, Kevin and Kutsia, Temur},
+  title={Setting up Set-Theoretical Foundations in {Naproche}},
+  booktitle={Work-in-progress papers presented at the 15th Conference on Intelligent Computer Mathematics, {CICM} 2022 (Informal Proceedings)},
+  year={2022},
+  pages={52--64}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Jan Frederik Schaefer;
+    <i>Implementing ForTheL in GLIF: A Case Study</i>;
+    Master's Project.
+    <details class="resources"></details>
+      <summary><b>Resources</b></summary>
+      Project report: <a href="https://gl.kwarc.info/supervision/projectarchive/-/blob/master/2020/Schaefer_Frederik.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          Software for formal mathematics &ndash; such as proof checkers and
+          theorem provers &ndash; require a formal input language. These input
+          languages tend to be similar to programming languages and very
+          different from the language mathematicians are used to. As a result,
+          it takes a lot of experience to read or even write such documents,
+          raising the entry barrier for potential users. To improve
+          accessibility, the input languages can be designed to be a subset of
+          natural language. We call such languages <i>controlled
+          mathematical languages</i>.
+        </p>
+        <p>
+          Implementing such languages requires creating a parser and a mechanism
+          for transforming the parser output into the desired semantic
+          representation, which might require some reasoning e.g. for
+          disambiguation. Usually, general-purpose programming languages like
+          Haskell or Prolog are used for the implementation. This can be a
+          tricky endeavour as natural language is notoriously complicated. As a
+          result, the controlled mathematical language might be less expressive
+          than desired and extending the language becomes exponentially harder
+          as the complexity grows. There are, however, specialized tools for
+          developing natural language grammars, like the Grammatical Framework
+          GF.
+        </p>
+        <p>
+          As an experiment, we've reimplemented an existing controlled
+          mathematical language, ForTheL, using the Grammatical Logical
+          Inference Framework (GLIF). GLIF is a declarative framework for
+          implementing natural-language understanding pipelines and uses GF for
+          parsing. The goal of the experiment was to learn how suitable GF is
+          for controlled mathematical languages and what challenges GLIF faces
+          when it comes to mathematical language. In this report we will discuss
+          the experiment and the lessons we've learned from it.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Sch2020:ImpForInGliACasStu,
+  author={Schaefer, Jan Frederik},
+  title={Implementing {ForTheL} in {GLIF}: A Case Study},
+  year={2020},
+  howpublished={Project report: \url{https://gl.kwarc.info/supervision/projectarchive/-/blob/master/2020/Schaefer_Frederik.pdf}},
+  note={Master's Project}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2021</h2>
+
+<ul>
+  <li>
+    Adrian De Lon, Peter Koepke, Anton Lorenzen, Adrian Marti, Marcel Schütz, Makarius Wenzel;
+    <a href="https://link.springer.com/chapter/10.1007/978-3-030-79876-5_36"><i>The Isabelle/Naproche Natural Language Proof Assistant</i></a>;
+    in: André Platzer, Geoff Sutcliffe (eds.);
+    <a href="https://link.springer.com/book/10.1007/978-3-030-79876-5"><i>Automated Deduction &ndash; CADE 28</i></a>;
+    <a href="https://www.cs.cmu.edu/~mheule/CADE28/"><i>CADE 2021</i></a>,
+    online.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://link.springer.com/content/pdf/10.1007/978-3-030-79876-5_36.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          Naproche is an emerging natural proof assistant that accepts input in
+          the controlled natural language ForTheL. Naproche is included in the
+          current version of the Isabelle/PIDE which allows comfortable editing
+          and asynchronous proof-checking of ForTheL texts. The <span style="font-family:monospace;">.tex</span>
+          dialect of ForTheL can be typeset by
+          L<span style="font-size: 0.75em; vertical-align: 0.25em; margin-left: -0.36em; margin-right: -0.15em; line-height: 1ex;">A</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X
+          into documents that approximate the language and appearance of
+          ordinary mathematical texts.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{DelKoeLorMarSchWen2021:TheIsaNapNatLanProAss,
+  author={De Lon, Adrian and Koepke, Peter and Lorenzen, Anton and Marti, Adrian and Schütz, Marcel and Wenzel, Makarius},
+  editor={Platzer, André and Sutcliffe, Geoff},
+  title={The {Isabelle}/{Naproche} Natural Language Proof Assistant},
+  booktitle={Automated Deduction -- {CADE} 28},
+  year={2021},
+  publisher={Springer International Publishing},
+  address=Cham,
+  pages={614--624}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Adrian De Lon, Peter Koepke, Anton Lorenzen;
+    <a href="https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ITP.2021.16"><i>A Natural Formalization of the Mutilated Checkerboard Problem in Naproche</i></a>;
+    in: Liron Cohen and Cezary Kaliszyk (eds.);
+    <a href=""><i>12th International Conference on Interactive Theorem Proving</i></a>;
+    <a href="https://easyconferences.eu/itp2021/"><i>ITP 2021</i></a>,
+    online.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://drops.dagstuhl.de/storage/00lipics/lipics-vol193-itp2021/LIPIcs.ITP.2021.16/LIPIcs.ITP.2021.16.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          Naproche is an emerging <i>natural proof assistant</i> that accepts
+          input in a controlled natural language for mathematics, which we have
+          integrated with
+          L<span style="font-size: 0.75em; vertical-align: 0.25em; margin-left: -0.36em; margin-right: -0.15em; line-height: 1ex;">A</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X
+          for ease of learning and to quickly produce high-quality typeset
+          documents. We present a self-contained formalization of the
+          <i>Mutilated Checkerboard Problem</i> in Naproche, following a proof
+          sketch by John McCarthy. The formalization is embedded in detailed
+          literate style comments. We also briefly describe the Naproche
+          approach.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{DelKoeLor2021:ANatForOfTheMutCheProInNap,
+  author={De Lon, Adrian and Koepke, Peter and Lorenzen, Anton},
+  title={A Natural Formalization of the Mutilated Checkerboard Problem in {Naproche}},
+  booktitle={12th International Conference on Interactive Theorem Proving ({ITP} 2021)},
+  pages={16:1--16:11},
+  series={Leibniz International Proceedings in Informatics ({LIPIcs})},
+  year={2021},
+  volume={193},
+  editor={Cohen, Liron and Kaliszyk, Cezary},
+  publisher={Schloss Dagstuhl -- Leibniz-Zentrum für Informatik},
+  address={Dagstuhl, Germany}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Adrian De Lon, Peter Koepke, Anton Lorenzen;
+    <i>Dealing with Soft Types in Naproche's Logical Backend</i>;
+    <a href="https://aitp-conference.org/2021/"><i>AITP 2021</i></a>,
+    Aussoi, France.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Presentation Abstract: <a href="https://aitp-conference.org/2021/abstract/paper_28.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{DelKoeLor2021:DeaWitSofTypInNapLogBac,
+  title={Dealing with Soft Types in {Naproche}'s Logical Backend},
+  author={De Lon, Adrian and Koepke, Peter and Lorenzen, Anton},
+  year={2021}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Adrian De Lon, Peter Koepke, Anton Lorenzen, Adrian Marti, Marcel Schütz, Erik Sturzenhecker;
+    <a href="https://link.springer.com/chapter/10.1007/978-3-030-81097-9_2"><i>Beautiful Formalizations in Isabelle/Naproche</i></a>;
+    in: Fairouz Kamareddine, Claudio Sacerdoti Coen (eds.);
+    <a href="https://link.springer.com/book/10.1007/978-3-030-81097-9"><i>Intelligent Computer Mathematics 14th International Conference</i></a>;
+    <a href="https://cicm-conference.org/2021/cicm.php"><i>CICM 2021</i></a>,
+    Timisoara, Romania.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://www.math.uni-bonn.de/ag/logik/teaching/2022SS/Beautiful_formalizations.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          We present short example formalizations of basic theorems from number
+          theory, set theory, and lattice theory which ship with the new
+          Naproche component in Isabelle 2021. The natural proof assistant
+          Naproche accepts input texts in the mathematical controlled natural
+          language ForTheL. Some ForTheL texts that proof-check in Naproche come
+          close to ordinary mathematical writing. The formalization examples
+          demonstrate the potential to write mathematics in a natural yet
+          completely formal language and to delegate tedious organisatorial
+          details and obvious proof steps to strong automated theorem proving so
+          that mathematical ideas and the "beauty" of proofs become visible.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{DelKoeLorMarSchStu2021:BeaForInIsaNap,
+  author={De Lon, Adrian and Koepke, Peter and Lorenzen, Anton and Marti, Adrian and Schütz, Marcel and Sturzenhecker, Erik},
+  editor={Kamareddine, Fairouz and Sacerdoti Coen, Claudio},
+  title={Beautiful Formalizations in {Isabelle}/{Naproche}},
+  booktitle={Intelligent Computer Mathematics},
+  year={2021},
+  publisher={Springer International Publishing},
+  address={Cham},
+  pages={19--31}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>An Introduction to Naproche, Along a Formalization of Euclid's Proof of the Infinitude of Primes</i>.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://www.math.uni-bonn.de/ag/logik/teaching/2021SS/TUTORIAL.ftl.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Article{Koe2021:AnIntToNapAloAForOfEucProOfTheInfOfPri,
+  title={An Introduction to {Naproche}, Along a Formalization of {Euclid}'s Proof of the Infinitude of Primes},
+  author={Koepke, Peter},
+  year={2021}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2020</h2>
+
+<ul>
+  <li>
+    Adrian De Lon, Peter Koepke, Anton Felix Lorenzen;
+    <i>ForTheL for Type Theory</i>;
+    <a href="https://aitp-conference.org/2020/"><i>AITP 2020</i></a>,
+    Aussois, France.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Presentation Abstract: <a href="https://aitp-conference.org/2020/abstract/paper_16.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{DelKoeLor2020:ForForTypThe,
+  title={{ForTheL} for Type Theory},
+  author={De Lon, Adrian and Koepke, Peter and Lorenzen, Anton Felix},
+  year={2020}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>A Brief Tutorial on Mathematical Formalizations in Naproche-SAD</i></a>;
+    <a href="https://hcm-application.uni-bonn.de/en/events/eventpages/2020/mathematical-language-practical-type-theory-2020/"><i>HCM Workshop: Mathematical Language and Practical Type Theory</i></a>,
+    Bonn, Germany.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://github.com/naproche/Talks/2020/koepke_a-brief-tutorial-on-mathematical-formalizations-in-naproche-sad.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          We give a brief tutorial introduction into the potential and problems
+          of the natural language proof assistant Naproche-SAD. Naproche-SAD is
+          a prototypical system for natural language formal mathematics, which
+          allows some very naturalistic formalizations. On the other hand, using
+          natural language in a strictly formal context we shall come across
+          particular, partially unexpected problems that should even be subject
+          of further research and development. The tutorial examples are taken
+          from a short ForTheL text which introduces the standard number systems
+          <math display="inline">
+            <mrow>
+              <mi>ℕ</mi>
+              <mo>⊆</mo>
+              <mi>ℤ</mi>
+              <mo>⊆</mo>
+              <mi>ℚ</mi>
+              <mo>⊆</mo>
+              <mi>ℝ</mi>
+            </mrow>
+          </math>
+          and some of their basic properties.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Article{Koe2020:ABriTutOnMatForInNapSad,
+  title={A Brief Tutorial on Mathematical Formalizations in {Naproche-SAD}},
+  author={Koepke, Peter},
+  year={2020}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Adrian De Lon, Peter Koepke, Anton Lorenzen;
+    <a href="https://link.springer.com/chapter/10.1007/978-3-030-53518-6_19"><i>Interpreting Mathematical Texts in Naproche-SAD</i></a>;
+    in: Christoph Benzmüller, Bruce Miller (eds.);
+    <a href="https://link.springer.com/book/10.1007/978-3-030-53518-6"><i> Intelligent Computer Mathematics. 13th International Conference</i></a>;
+    <a href="https://cicm-conference.org/2020/cicm.php"><i>CICM 2020</i></a>,
+    Bertinoro, Italy.
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          Naproche-SAD is a natural proof assistant based on the controlled
+          natural input language ForTheL. Integrating ForTheL intoallows to
+          leverage type setting commands for the disambiguation and structuring
+          of mathematical texts, with high-quality mathematical typesetting
+          coming for free. A new generic parsing mechanism allows the
+          translation of texts into other formal languages besides the original
+          first-order internal format of Naproche-SAD. We can generate correct
+          Lean code from ForTheL statements which may be useful for writing
+          readable fabstracts.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{DelKoeLor-2020-IMTINS,
+  author={De Lon, Adrian and Koepke, Peter and Lorenzen, Anton},
+  editor={Benzmüller, Christoph and Miller, Bruce},
+  title={Interpreting Mathematical Texts in {Naproche-SAD}},
+  booktitle={Intelligent Computer Mathematics},
+  year={2020},
+  publisher={Springer International Publishing},
+  address={Cham},
+  pages={284--289}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>ForTheL as a Controlled Natural Language for Lean</i>;
+    <a href="https://www.andrew.cmu.edu/user/avigad/meetings/fomm2020/index.html"><i>Formal Methods in Mathematics / Lean Together 2020</i></a>,
+    Pittsburgh, USA.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://www.andrew.cmu.edu/user/avigad/meetings/fomm2020/slides/fomm_koepke.pdf">PDF</a><br>
+      Recording: <a href="https://www.youtube.com/watch?v=rsxzHFxa424">YouTube</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2020:ForAsAConNatLanForLea,
+  author={Koepke, Peter},
+  title={{ForTheL} as a Controlled Natural Language for {Lean}},
+  year={2020},
+  howpublished={Slides: \url{https://www.andrew.cmu.edu/user/avigad/meetings/fomm2020/slides/fomm_koepke.pdf}},
+  note={Talk at \emph{Formal Methods in Mathematics / Lean Together 2020}, {Pittsburgh}, {USA}}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2019</h2>
+
+<ul>
+  <li>
+    Peter Koepke;
+    <i>Textbook Mathematics in the Naproche-SAD System</i>;
+    <a href="https://cicm-conference.org/2019/cicm.php?event=fmm"><i>FFM</i></a>,
+    <a href="https://cicm-conference.org/2019/cicm.php"><i>CICM 2019</i></a>,
+    Prague, Czech Republic.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://ceur-ws.org/Vol-2634/FMM4.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          We report on the Naproche-SAD project (Natural Proof Checking &ndash;
+          System for Automated Deduction) as part of a wider programme of
+          Natural Formal Mathematics. After recalling the classical SAD system
+          with its natural proof language ForTheL (Formula Theory Language), we
+          describe its further development into Naproche-SAD, and present
+          snippets from recent formalizations of textbook material.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Article{Koe2019:TexMatInTheNapSadSys,
+  title={Textbook Mathematics in the {Naproche-SAD} System},
+  author={Koepke, Peter},
+  year={2019}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>Modeling Human Proof Checking in the Naproche-SAD System</i>;
+    <a href="https://www.icms.org.uk/workshops/2019/big-proof"><i>Big Proof 2019</i></a>,
+    <a href="https://www.icms.org.uk/"><i>ICMS</i></a>,
+    Edinburgh, UK.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://www.icms.org.uk/downloads/bigproof/Koepke.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          Checking an ordinary mathematical proof text is a highly interlinked
+          process involving natural language and formula parsing and logical
+          analyses and checks. Processing a single statement is broken down into
+          smaller proof obligations like proving well-definedness of terms
+          ("type checking") and proofs of sub-statements. The Evidence Algorithm
+          project started by V. Glushkov aimed at developing mathematical
+          software imitating this process. It lead to the SAD system of Andrei
+          Paskevich, that checks mathematical miniatures in a pseudo-natural
+          mathematical language. Our Naproche project has adopted SAD and
+          increased its efficiency, covering and usability. My talk describes
+          how various stages of text checking are implemented in Naproche-SAD
+          and presents our natural formalization of the 30-page appendix of
+          John Kelley's textbook "General Topology" on Kelley-Morse set theory.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2019:ModHumProCheInTheNapSadSys,
+  author={Koepke, Peter},
+  title={Modeling Human Proof Checking in the {Naproche-SAD} System},
+  year={2019},
+  howpublished={Slides: \url{https://www.icms.org.uk/downloads/bigproof/Koepke.pdf}},
+  note={Talk at the \emph{Big Proof} workshop at \emph{ICMS}, {Edinburgh}, {UK}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Steffen Frerix, Peter Koepke;
+    <i>Making Set Theory Great Again: The Naproche-SAD Project</i>;
+    <a href="https://aitp-conference.org/2019/"><i>AITP 2019</i></a>,
+    Obergurgl, Austria.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Presentation Abstract: <a href="https://aitp-conference.org/2019/abstract/paper%2026.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{FreKoe2019:MakSetTheGreAgaTheNapSadPro,
+  title={Making Set Theory Great Again: The {Naproche-SAD} Project},
+  author={Frerix, Steffen and Koepke, Peter},
+  year={2019}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>An Introduction to Haskell and Naproche-SAD</i>;
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://github.com/naproche/Talks/2019/koepke_an-introduction-to-haskell-and-naproche-sad.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Article{Koe2019:AnIntToHasAndNapSad,
+  author={Koepke, Peter},
+  title={An Introduction to {Haskell} and {Naproche-SAD}},
+  year={2019}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Makarius Wenzel;
+    <a href="https://link.springer.com/chapter/10.1007/978-3-030-23250-4_1"><i>Interaction with Formal Mathematical Documents in Isabelle/PIDE</i></a>;
+    in: Cezary Kaliszyk, Edwin Brady, Andrea Kohlhase, Claudio Sacerdoti Coen (eds.);
+    <a href="https://link.springer.com/book/10.1007/978-3-030-23250-4"><i> Intelligent Computer Mathematics. 12th International Conference</i></a>;
+    <a href="https://cicm-conference.org/2019/cicm.php"><i>CICM 2019</i></a>,
+    Prague, Czech Republic.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Preprint: <a href="https://arxiv.org/pdf/1905.01735">PDF</a>, <a href="https://arxiv.org/src/1905.01735">T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X Sources</a><br>
+      Slides: <a href="https://sketis.net/wp-content/uploads/2019/06/isabelle-pide-cachan2019.pdf">PDF</a>
+    </details>
+    <details class="abstract"> 
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          Isabelle/PIDE has emerged over more than 10 years as the standard
+          Prover IDE for interactive theorem proving in Isabelle. The
+          well-established Archive of Formal Proofs (AFP) testifies the success
+          of such applications of formalized mathematics in Isabelle/HOL. More
+          recently, the scope of PIDE has widened towards languages that are not
+          connected to logic and proof in Isabelle, but taken from a broader
+          repertoire of mathematics on the computer. The present paper provides
+          a general overview of the PIDE project and its underlying document
+          model, with built-in parallel evaluation and asynchronous interaction.
+          There is also some discussion of original aims and approaches,
+          successes and failures, later changes to the plan, and ideas for the
+          future.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{Wen2019:IntWitForMatDocInIsaPid,
+  author={Wenzel, Makarius},
+  editor={Kaliszyk, Cezary and Brady, Edwin and Kohlhase, Andrea and Sacerdoti Coen, Claudio},
+  title={Interaction with Formal Mathematical Documents in {Isabelle}/{PIDE}},
+  booktitle={Intelligent Computer Mathematics},
+  year={2019},
+  publisher={Springer International Publishing},
+  address={Cham}",
+  pages={1--15}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Makarius Wenzel;
+    <i>Makarius plaudert über Isabelle/{Naproche,Haskell}</i>;
+    <a href="https://curry-club-augsburg.de/"><i>Curry Club Augsburg</i></a>,
+    Augsburg, Germany.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Recording: <a href="https://www.youtube.com/watch?v=U0KTMdqwmNU">YouTube</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Wen2019:MakPlaUebIsaNapHas,
+  author={Wenzel, Makarius},
+  title={{Makarius plaudert über {Isabelle}/\{{Naproche},{Haskell}\}}},
+  year={2019},
+  howpublished={Recording: \url{https://www.youtube.com/watch?v=U0KTMdqwmNU}},
+  note={Talk at \emph{Curry Club Augsburg}, {Augsburg}, {Germany}}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2018</h2>
+
+<ul>
+  <li>
+    Steffen Frerix, Peter Koepke;
+    <i>Automatic Proof-Checking of Ordinary Mathematical Texts</i>;
+    in: Osman Hasan et al. (eds.);
+    <a href="https://ceur-ws.org/Vol-2307/"><i>Workshop Papers at 11th Conference on Intelligent Computer Mathematics CICM 2018</i></a>;
+    <a href="https://cicm-conference.org/2018/cicm.php?event=fmm"><i>FMM</i></a>,
+    <a href="https://cicm-conference.org/2018/cicm.php"><i>CICM 2018</i></a>,
+    Hagenberg, Austria.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://cicm-conference.org/2018/infproc/paper13.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          The System for Automated Deduction (SAD) by Andrei Paskevich et. al.
+          is an automatic proof-checker that can process fairly natural
+          mathematical input statements and short texts. We have recently made
+          significant improvements to the system: speed-ups of the checking
+          algorithms allow handling of chapter-sized texts with an argumentative
+          granularity comparable to textbook mathematics; extensions of the input
+          language provide native support of basic notions like sets an
+          functions; SAD input can now be written in a
+          L<span style="font-size: 0.75em; vertical-align: 0.25em; margin-left: -0.36em; margin-right: -0.15em; line-height: 1ex;">A</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X
+          style which typesets like ordinary mathematical text. Based on
+          experiences and examples so far we expect to be able to write natural
+          textbook-style mathematics which can be automatically checked for
+          proof correctness. Actually this paper is a proof-checked SAD document
+          itself.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>TeX</b></summary>
+<pre>@Article{FreKoe2018:AutProCheOfOrdMatTex,
+  title={Automatic Proof-Checking of Ordinary Mathematical Texts},
+  author={Frerix, Steffen and Koepke, Peter},
+  year={2018}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Steffen Frerix, Peter Koepke;
+    <a href="http://www.t-news.cn/Floc2018/FLoC2018-pages/paper2694.html"><i>Text-Orientated Formal Mathematics</i></a>;
+    <a href="http://www.t-news.cn/Floc2018/FLoC2018-pages/UITP-program.html"><i>UITP</i></a>,
+    <a href="https://www.floc2018.org/"><i>FLoC 2018</i></a>,
+    Oxford, UK.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="http://www.t-news.cn/Floc2018/FLoC2018-pages/proceedings_paper_327.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          The System for Automated Deduction (SAD) by Andrei Paskevich
+          proof-checks texts written in nearly natural mathematical language,
+          without explicit system commands or prover commands. Natural language
+          features like soft typing by noun phrases guide efficient text
+          processing and proof checking. We have implemented practical
+          improvements of the checking algorithm and extensions of the input
+          language, so that we are now able to process considerably longer and
+          more complicated texts. These are immediately readable by
+          mathematicians, as demonstrated by subsequent examples. This suggests
+          an approach to formal mathematics through collections or libraries of
+          texts in (a controlled) natural language.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Article{FreKoe2018:TexOriForMat,
+  title={Text-Orientated Formal Mathematics},
+  author={Frerix, Steffen and Koepke, Peter},
+  year={2018}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Steffen Frerix, Peter Koepke;
+    <i>Revisiting SAD</i>;
+    <a href="https://aitp-conference.org/2018/"><i>AITP 2018</i></a>,
+    Aussois, France.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://github.com/naproche/Talks/2018/frerix-koepke_revisiting-sad_1.pdf">PDF</a> (part 1), <a href="https://github.com/naproche/Talks/2018/frerix-koepke_revisiting-sad_2.pdf">PDF</a> (part 2)
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{FreKoe2018:RevSad,
+  title={Revisiting {SAD}},
+  author={Frerix, Steffen and Koepke, Peter},
+  year={2018},
+  note={Talk at \emph{AITP 2018}, {Aussois}, {France}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Steffen Frerix, Peter Koepke;
+    <i>Making Set Theory Great Again: The Naproche-SAD Project</i>.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://github.com/naproche/Talks/2018/frerix-koepke_making-set-theory-great-again--the-naproche-sad-project.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>TeX</b></summary>
+<pre>@Misc{FreKoe2018:MakSetTheGreAgaTheNapSadPro,
+  title={Making Set Theory Great Again: The {Naproche-SAD} Project},
+  author={Frerix, Steffen and Koepke, Peter},
+  year={2018}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>Legible Formal Mathematics Based on SAD</i>.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://github.com/naproche/Talks/2018/koepke_legible-formal-mathematics-based-on-sad.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>TeX</b></summary>
+<pre>@Misc{Koe2018:LegForMatBasOnSad,
+  title={Legible Formal Mathematics Based on {SAD}},
+  author={Koepke, Peter},
+  year={2018}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Steffen Frerix;
+    <i>Text-orientated Formalization Methods</i>;
+    Master's thesis.
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          In this thesis we analyze the proof assistant SAD and its input
+          language ForTheL. In the first section, we establish the logical tools
+          for the local manipulation of formulas. We go on to discuss some
+          important aspects of ForTheL and propose an extension to the language
+          to enable more convenient arguments using sets and functions. Finally,
+          we discuss the concepts of ontological and logical correctness of a
+          ForTheL text. In section 3, we describe a type reduction method for
+          first-order logic and prove it to be sound and complete. In the last
+          section we describe a version of SAD in which we have implemented the
+          presented ideas.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@mastersthesis{Fre2018:TexOriForMet,
+  author={Frerix, Steffen},
+  title={Text-orientated Formalization Methods},
+  school={Rheinische Friedrich-Wilhelms-Universität Bonn},
+  year={2018}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2016</h2>
+
+<ul>
+  <li>
+    Ioanna M. Dimitriou H., Peter Koepke;
+    <i>Revisiting Paulson's Theory of the Constructible Universe with Isar and Sledgehammer</i>;
+    <a href="https://aitp-conference.org/2016/"><i>AITP 2016</i></a>,
+    Obergurgl, Austria.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://aitp-conference.org/2016/slides/Koepke_slides.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{DimKoe2016:RevPauTheOfTheConUniWitIsaAndSle,
+  title={Revisiting Paulson's Theory of the Constructible Universe with Isar and Sledgehammer},
+  author={Dimitriou H., Ioanna M. and Koepke, Peter},
+  year={2016},
+  note={Talk at \emph{AITP 2016}, {Obergurgl}, {Austria}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>Set Theory and Formal Mathematics</i>;
+    <a href="https://math.huji.ac.il/~mm70/"><i>Menachem Magidor 70th Birthday Conference</i></a>,
+    Jerusalem, Israel.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://github.com/naproche/Talks/2016/koepke_set-theory-and-formal-mathematics.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2016:SetTheAndForMat,
+  title={Set Theory and Formal Mathematics},
+  author={Koepke, Peter},
+  year={2016},
+  note={Talk at \emph{Menachem Magidor 70th Birthday Conference}, {Jerusalem}, {Israel}}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2015</h2>
+
+<ul>
+  <li>
+    Peter Koepke;
+    <i>Formalism and Computations</i>;
+    <a href="https://www.filosofinenyhdistys.fi/clmps2015/"><i>CLMPS 2015</i></a>,
+    Helsinki, Finland.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://github.com/naproche/Talks/2015/koepke_formalism-and-computations.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2015:ForAndCom,
+  title={Formalism and Computations},
+  author={Koepke, Peter},
+  year={2015},
+  note={Talk at \emph{CLMPS 2015}, {Finland}, {Helsinki}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>Foundations for Formal Mathematics</i>;
+    <i>5<sup>th</sup> Colloquium of HCM Research Area KL</i>,
+    Bonn, Germany.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://github.com/naproche/Talks/2015/koepke_foundations-for-formal-mathematics.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2015:FouForForMat,
+  title={Foundations for Formal Mathematics},
+  author={Koepke, Peter},
+  year={2015},
+  note={Talk at the \emph{5th Colloquium of HCM Research Area KL}, {Bonn}, {Germany}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>Natural Formalism</i>;
+    <i>Philosophy of Mathematics Seminar</i>,
+    Oxford, UK.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://github.com/naproche/Talks/2015/koepke_natural-formalism.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2015:NatFor,
+  title={Natural Formalism},
+  author={Koepke, Peter},
+  year={2015},
+  note={Talk at the \emph{Philosophy of Mathematics Seminar}, {Oxford}, {UK}}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2014</h2>
+
+<ul>
+  <li>
+    Marcos Cramer;
+    <i>The Naproche System: Proof-Checking Mathematical Texts in Controlled Natural Language</i>;
+    in: Hermann Cölfen; Ulrich Schmitz; Bernhard Schröder (eds.);
+    <i>Sprache und Datenverarbeitung</i> 38-1.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Prepring: <a href="https://naproche-net.github.io/downloads/2014-SDV.pdf">PDF</a>
+    </details>
+    <details> 
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          The Naproche system is a system for linguistically analysing and
+          proof-checking mathematical texts written in a controlled natural
+          language, i.e. a subset of the usual natural language of mathematical
+          texts defined through a formal grammar. This paper gives an overview
+          over the linguistic and logical techniques developed for the Naproche
+          system. Special attention is given to the dynamic nature of
+          quantification in natural language, to the phenomenon of implicit
+          function introduction in mathematical texts, and to the usage of
+          definitions for dynamically extending the language of a mathematical
+          text.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InCollection{Cra2014:TheNapSysProCheMatTexInConNatLan,
+  author={Cramer, Marcos},
+  title={The {Naproche} System: Proof-Checking Mathematical Texts in Controlled Natural Language},
+  booktitle={Sprache und Datenverarbeitung},
+  publisher={Universitätsverlag Rhein-Ruhr}
+  year={2014}
+  editor={Cölfen, Hermann and Schmitz, Ulrich and Schröder, Bernhard},
+  volume={38},
+  number={1},
+  address={Duisburg},
+  pages={9--33}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2013</h2>
+
+<ul>
+  <li>
+    Marcos Cramer;
+    <i>Proof-Checking Mathematical Texts in Controlled Natural Language</i>;
+    PhD thesis.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Thesis: <a href="https://naproche-net.github.io/downloads/2013-doktor.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          The research conducted for this thesis has been guided by the vision
+          of a computer program that could check the correctness of mathematical
+          proofs written in the language found in mathematical textbooks. Given
+          that reliable processing of unrestricted natural language input is out
+          of the reach of current technology, we focused on the attainable goal
+          of using a controlled natural language (a subset of a natural language
+          defined through a formal grammar) as input language to such a program.
+          We have developed a prototype of such a computer program, the Naproche
+          system. This thesis is centered around the novel logical and
+          linguistic theory needed for defining and motivating the controlled
+          natural language and the proof checking algorithm of the Naproche
+          system. This theory provides means for bridging the wide gap between
+          natural and formal mathematical proofs.
+        </p>
+        <p>
+          We explain how our system makes use of and extends existing linguistic
+          formalisms in order to analyse the peculiarities of the language of
+          mathematics. In this regard, we describe a phenomenon of this language
+          previously not described by other logicians or linguists, the implicit
+          dynamic function introduction, exemplified by constructs of the form
+          "for every
+          <math display="inline">
+            <mrow>
+              <mi>x</mi>
+            </mrow>
+          </math>
+          there is an
+          <math display="inline">
+            <mrow>
+              <mi>f</mi>
+              <mo>(</mo>
+              <mi>x</mi>
+              <mo>)</mo>
+            </mrow>
+          </math>
+          such that ...". We show how this function introduction can lead to a
+          paradox analogous to Russell's paradox. To tackle this problem, we
+          developed a novel foundational theory of functions called
+          Ackermann-like Function Theory, which is equiconsistent to ZFC
+          (Zermelo-Fraenkel set theory with the Axiom of Choice) and can be used
+          for imposing limitations to implicit dynamic function introduction in
+          order to avoid this paradox. 
+        </p>
+        <p>
+          We give a formal account of implicit dynamic function introduction by
+          extending Dynamic Predicate Logic, a formalism developed by linguists
+          to account for the dynamic nature of natural language quantification,
+          to a novel formalism called Higher-Order Dynamic Predicate Logic,
+          whose semantics is based on Ackermann-like Function Theory.
+          Higher-Order Dynamic Predicate Logic also includes a formal account of
+          the linguistic theory of presuppositions, which we use for clarifying
+          and formally modelling the usage of potentially undefined terms (e.g.
+          <math display="inline">
+            <mrow>
+              <mn>1</mn>
+              <mo>/</mo>
+              <mi>x</mi>
+            </mrow>
+          </math>,
+          which is undefined for
+          <math display="inline">
+            <mrow>
+              <mi>x</mi>
+              <mo>=</mo>
+              <mn>0</mn>
+            </mrow>
+          </math>,)
+          and of definite descriptions (e.g. "the even prime number") in the
+          language of mathematics. The semantics of the controlled natural
+          language is defined through a translation from the controlled natural
+          language into an extension of Higher-Order Dynamic Predicate Logic
+          called Proof Text Logic. Proof Text Logic extends Higher-Order Dynamic
+          Predicate Logic in two respects, which make it suitable for
+          representing the content of mathematical texts: It contains features
+          for representing complete texts rather than single assertions, and
+          instead of being based on Ackermann-like Function Theory, it is based
+          on a richer foundational theory called Class-Map-Tuple-Number Theory,
+          which does not only have maps/functions, but also classes/sets,
+          tuples, numbers and Booleans as primitives. 
+        </p>
+        <p>
+          The proof checking algorithm checks the deductive correctness of proof
+          texts written in the controlled natural language of the Naproche
+          system. Since the semantics of the controlled natural language is
+          defined through a translation into the Proof Text Logic formalism, the
+          proof checking algorithm is defined on Proof Text Logic input. The
+          algorithm makes use of automated theorem provers for checking the
+          correctness of single proof steps. In this way, the proof steps in the
+          input text do not need to be as fine-grained as in formal proof
+          calculi, but may contain several reasoning steps at once, just as is
+          usual in natural mathematical texts. The proof checking algorithm has
+          to recognize implicit dynamic function introductions in the input text
+          and has to take care of presuppositions of mathematical statements
+          according to the principles of the formal account of presuppositions
+          mentioned above. We prove two soundness and two completeness theorems
+          for the proof checking algorithm: In each case one theorem compares
+          the algorithm to the semantics of Proof Text Logic and one theorem
+          compares it to the semantics of standard first-order predicate logic.
+        </p>
+        <p>
+          As a case study for the theory developed in the thesis, we illustrate
+          the working of the Naproche system on a controlled natural language
+          adaptation of the beginning of Edmund Landau's Grundlagen der
+          Analysis.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@phdthesis{Cra2013:ProCheMatTexInConNatLan,
+  author={Cramer, Marcos},
+  title={Proof-Checking Mathematical Texts in Controlled Natural Language},
+  school={Rheinische Friedrich-Wilhelms-Universität Bonn},
+  year={2013}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2012</h2>
+
+<ul>
+  <li>
+    Marcos Cramer;
+    <i>Implicit Dynamic Function Introduction and Its Connections to the Foundations of Mathematics</i>;
+    in: Oleg Prosorov (ed.);
+    <a href="https://www.collegepublications.co.uk/logic/?00037"><i>Proceedings of the International Conference Philosophy, Mathematics, Linguistics: Aspects of Interaction, 2012 (PhML-2012)</i></a>;
+    <a href="https://www.pdmi.ras.ru/EIMI/2012/PhML/index.htm"><i>PhML 2012</i></a>,
+    St. Petersburg, Russia.
+    <details class="resources"> 
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://naproche-net.github.io/downloads/2012-PhML.pdf">PDF</a>
+    </details>
+    <details> 
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          We discuss a feature of the natural language of mathematics &ndash;
+          the implicit dynamic introduction of functions &ndash; that has, to
+          our knowledge, not been captured in any formal system so far. If this
+          feature is used without limitations, it yields a paradox analogous to
+          Russell's paradox. Hence any formalism capturing it has to impose some
+          limitations on it. We sketch two formalisms, both extensions of
+          Dynamic Predicate Logic, that innovatively do capture this feature,
+          and that differ only in the limitations they impose onto it. One of
+          these systems is based on a novel theory of functions that interprets
+          ZFC, and thus exhibits interesting connections to the foundations of
+          mathematics.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{Cra2012:ImpDynFunIntAndItsConToTheFouOfMat,
+  author={Cramer, Marcos},
+  editor={Prosorov, Oleg},
+  title={Implicit Dynamic Function Introduction and Its Connections to the Foundations of Mathematics},
+  booktitle={Proceedings of the International Conference Philosophy, Mathematics, Linguistics: Aspects of Interaction, 2012 (PhML-2012)},
+  year={2012},
+  publisher={College Publications},
+  pages={23--34}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2011</h2>
+
+<ul>
+  <li>
+    Marcos Cramer;
+    <i>Higher-Order Dynamic Predicate Logic</i>;
+    <a href="https://naturalreasoning.wordpress.com/"><i>COCONAT 2011</i></a>,
+    Tilburg, Netherlands.
+    <details class="resources"> 
+      <summary><b>Resources</b></summary>
+      Extended abstract: <a href="https://naproche-net.github.io/downloads/2011-COCONAT.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Cra2011:HigOrdDynPreLog,
+  author={Cramer, Marcos},
+  title={Higher-Order Dynamic Predicate Logic},
+  year={2011}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Sebastian Zittermann;
+    <i>Entwicklung des Naproche-Proof-State-Datentyps</i>;
+    Master's thesis.
+    <details class="resources"> 
+      <summary><b>Resources</b></summary>
+      Thesis: <a href="https://naproche-net.github.io/downloads/2011-MA-Thesis_Zittermann.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@mastersthesis{Zit2011:EntDesNapProStaDat,
+  author={Zittermann, Sebastian},
+  title={Entwicklung des Naproche-Proof-State-Datentyps},
+  school={Fachhochschule Köln},
+  year={2011}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Marcos Cramer, Peter Koepke, Bernhard Schröder;
+    <a href="https://link.springer.com/chapter/10.1007/978-3-642-22673-1_13"><i>Parsing and Disambiguation of Symbolic Mathematics in the Naproche System</i></a>;
+    in: James H. Davenport, William M. Farmer, Florian Rabe, Josef Urban (eds.);
+    <a href="https://link.springer.com/book/10.1007/978-3-642-22673-1"><i>Intelligent Computer Mathematics. 18th Symposium, Calculemus 2011, and 10th International Conference, MKM 2011</i></a>;
+    <a href="http://cicm11.cs.unibo.it/cicm11/"><i>CICM 2011</i></a>,
+    Bertinoro, Italy.
+    <details class="resources"> 
+      <summary><b>Resources</b></summary>
+      Prepring: <a href="https://naproche-net.github.io/downloads/2011-MKM.pdf">PDF</a>
+    </details>
+    <details class="abstract"> 
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          The Naproche system is a system for linguistically analysing and
+          proof-checking mathematical texts written in a controlled natural
+          language. The aim is to have an input language that is as close as
+          possible to the language that mathematicians actually use when writing
+          textbooks or papers.
+        </p>
+        <p>
+          Mathematical texts consist of a combination of natural language and
+          symbolic mathematics, with symbolic mathematics obeying its own
+          syntactic rules. We discuss the difficulties that a program for
+          parsing and disambiguating symbolic mathematics must face and present
+          how these difficulties have been tackled in the Naproche system. One
+          of these difficulties is the fact that information provided in the
+          preceding context &ndash; including information provided in natural
+          language &ndash; can influence the way a symbolic expression has to be
+          disambiguated.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{CraKoeSch2011:ParAndDisOfSymMatInTheNapSys,
+  author={Cramer, Marcos and Koepke, Peter and Schröder, Bernhard},
+  editor={Davenport, James H. and Farmer, William M. and Urban, Josef and Rabe, Florian},
+  title={Parsing and Disambiguation of Symbolic Mathematics in the Naproche System},
+  booktitle={Intelligent Computer Mathematics},
+  year={2011},
+  publisher={Springer Berlin Heidelberg},
+  address={Berlin, Heidelberg},
+  pages={180--195}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>Formal Mathematics and Mathematical Practice</i>;
+    <i>14th Congress of Logic, Methodology, and Philosophy of Science</i>, Nancy, France.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://www.math.uni-bonn.de/people/koepke/Talks/Formal_mathematics_and_mathematical_practice.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2011:ForMatAndMatPra,
+  author={Koepke, Peter},
+  title={Formal Mathematics and Mathematical Practice},
+  year={2011},
+  howpublished={Slides: \url{https://www.math.uni-bonn.de/people/koepke/Talks/Formal_mathematics_and_mathematical_practice.pdf}},
+  note={Talk at the \emph{14th Congress of Logic, Methodology, and Philosophy of Science}, {Nancy}, {France}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>Formal Mathematics and Controlled Natural Language</i>;
+    <i>Oberseminar Diskrete Optimierung</i>, Bonn, Germany.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://www.math.uni-bonn.de/people/koepke/Talks/Formal_mathematics_and_controlled_natural_language.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2011:ForMatAndConNatLan,
+  author={Koepke, Peter},
+  title={Formal Mathematics and Controlled Natural Language},
+  year={2011},
+  howpublished={Slides: \url{https://www.math.uni-bonn.de/people/koepke/Talks/Formal_mathematics_and_controlled_natural_language.pdf}},
+  note={Talk at \emph{Oberseminar Diskrete Optimierung}, {Bonn}, {Germany}}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2010</h2>
+
+<ul>
+  <li>
+    Merlin Carl, Peter Koepke;
+    <i>Interpreting Naproche &ndash; An Algorithmic Approach to the Derivation-Indicator View</i>;
+    in: Alison Pease, Markus Guhe, and Alan Smaill (eds.);
+    <i>Mathematical practice and cognition. Proceedings of the International Symposium on Mathematical Practice and Cognition</i>;
+    <a href="https://web.archive.org/web/20170124084123/http://www.aisb.org.uk/convention/aisb10/AISB2010.html"><i>AISB 2010</i></a>,
+    Leicester, UK.
+    <details class="resources"> 
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://www.math.uni-bonn.de/people/koepke/Preprints/Interpreting_Naproche-an_algorithmic_approach_to_the_derivation-indicator_view.pdf">PDF</a>
+    </details>
+    <details class="abstract"> 
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          In [<a href="#ref_270328">1</a>], Jody Azzouni proposes a derivation
+          indicator view of mathematical practice and in particular of proofs.
+        </p>
+        <p>
+          The Naproche Project [<a href="#ref_092358">5</a>] takes proofs as
+          linguistic entities whose semantics is given by corresponding formal
+          derivations. This view is computationally implemented in the Naproche
+          System where simple natural proof texts are automatically transformed
+          into derivations, using techniques from computational linguistics,
+          formal logic and automatic theorem proving. The development of the
+          system has identified many ways in which parts of proof texts indicate
+          elements of formal derivations. The Naproche Project can thus be seen
+          as a support of the derivation indicator view, and we comment on some
+          of the critique against derivation indication from this standpoint and
+          our experience. Doing so, we extend earlier work by the second author
+          on the relation between natural and formal proofs; since then, further
+          development has shown the relation of DI to Naproche to be an
+          interesting field that can (and should) be elaborated in detail.
+        </p>
+        <hr>
+        <p>
+          <ul>
+            <li>
+                <span id="ref_270328">[1]</span> Azzouni, Jody (2006):
+                Tracking Reason
+                (Oxford University Press)
+            </li>
+            <li>
+                <span id="ref_092358">[5]</span>  The Naproche homepage:
+                <a href="www.naproche.net">www.naproche.net</a>
+            </li>
+          </ul>
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{CarKoe2011:IntNapAnAlgAppToTheDerIndVie,
+  author={Car, Merlin and Koepke, Peter},
+  editor={Pease, Alison and Guhe, Markus and Smaill, Alan},
+  title={Interpreting {Naproche} -- An Algorithmic Approach to the Derivation-Indicator View},
+  booktitle={Proceedings of AISB 2010 Symposium on Mathematical Practice and Cognition},
+  pages={7--10},
+  year={2010}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Marcos Cramer, Peter Koepke, Daniel Kühlwein, Bernhard Schröder;
+    <a href="https://link.springer.com/chapter/10.1007/978-3-642-14203-1_37"><i>Premise Selection in the Naproche System</i></a>;
+    in: Jürgen Giesl, Reiner Hähnle (eds.);
+    <a href="https://link.springer.com/book/10.1007/978-3-642-14203-1"><i>Automated Reasoning. 5th International Joint Conference</i></a>;
+    <i>IJCAR 2010</i>,
+    Edinburgh, UK.
+    <details class="resources"> 
+      <summary><b>Resources</b></summary>
+      Preprint: <a href="https://naproche-net.github.io/downloads/2010-IJCAR.pdf">PDF</a>
+    </details>
+    <details class="abstract"> 
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          Automated theorem provers (ATPs) struggle to solve problems with large
+          sets of possibly superfluous axiom. Several algorithms have been
+          developed to reduce the number of axioms, optimally only selecting the
+          necessary axioms. However, most of these algorithms consider only
+          single problems. In this paper, we describe an axiom selection method
+          for series of related problems that is based on logical and textual
+          proximity and tries to mimic a human way of understanding mathematical
+          texts. We present first results that indicate that this approach is
+          indeed useful.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{CraKoeKueSch2010:PreSelInTheNapSys,
+  author={Cramer, Marcos and Koepke, Peter and Kühlwein, Daniel and Schröder, Bernhard}",
+  editor={Giesl, Jürgen and Hähnle, Reiner},
+  title={Premise Selection in the {Naproche} System},
+  booktitle={Automated Reasoning},
+  year={2010},
+  publisher={Springer Berlin Heidelberg},
+  address={Berlin, Heidelberg},
+  pages={434--440}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Marcos Cramer, Daniel Kühlwein, Bernhard Schröder;
+    <i>Presupposition Projection and Accommodation in Mathematical Texts</i>;
+    in: Manfred Pinkal, Ines Rehbein, Sabine Schulte im Walde, Angelika Storrer (eds.);
+    <a href="https://dblp.org/db/conf/konvens/konvens2010.html"><i>Semantic Approaches in Natural Language Processing</i></a>;
+    <i>KONVENS 2010</i>,
+    Saarbrücken, Germany.
+    <details class="resources"> 
+      <summary><b>Resources</b></summary>
+      Preprint: <a href="https://naproche-net.github.io/downloads/2010-konvens10.pdf">PDF</a><br>
+      Proceedings: <a href="https://www.ims.uni-stuttgart.de/documents/team/schulte/publications/proceedings/konvens-10.pdf">PDF</a>
+    </details>
+    <details class="abstract"> 
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          This paper discusses presuppositions in mathematical texts and
+          describes how presupposition handling was implemented in the Naproche
+          system for checking natural language mathematical proofs. Mathematical
+          texts have special properties from a pragmatic point of view, since in
+          a mathematical proof every new assertion is expected to logically
+          follow from previously known material, whereas in most other texts one
+          expects new assertions to add logically new information to the
+          context. This pragmatic difference has its influence on how
+          presuppositions can be projected and accommodated in mathematical
+          texts. Nevertheless, the account of presupposition handling developed
+          for the Naproche system turned out to have equivalent projection
+          predictions to an existing account of presupposition projection.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{DBLP:conf/konvens/2010,
+  author={Cramer, Marcos and Kühlwein, Daniel and Schröder, Bernhard},
+  editor={Pinkal, Manfred and Rehbein, Ines and Schulte im Walde, Sabine and Storrer, Angelika},
+  title={Presupposition Projection and Accommodation in Mathematical Texts},
+  booktitle={Semantic Approaches in Natural Language Processing: Proceedings of the 10th Conference on Natural Language Processing, {KONVENS} 2010, September 6-8, 2010, Saarland University, Saarbrücken, Germany},
+  publisher={universaar, Universitätsverlag des Saarlandes / Saarland University Press / Presses universitaires de la Sarre},
+  pages={29--36},
+  year={2010}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Marcos Cramer, Bernhard Schröder;
+    <a href="https://link.springer.com/chapter/10.1007/978-3-642-31175-8_3"><i>Interpreting Plurals in the Naproche CNL</i></a>;
+    in:  Michael Rosner, Norbert E. Fuchs (eds.);
+    <a href="https://link.springer.com/book/10.1007/978-3-642-31175-8"><i> Controlled Natural Language. Second International Workshop</i></a>;
+    <a href="https://staff.um.edu.mt/mros1/cnl2010/"><i>CNL 2010</i></a>,
+    Marettimo Island, Italy.
+    <details class="resources"> 
+      <summary><b>Resources</b></summary>
+      Preprint: <a href="https://naproche-net.github.io/downloads/2010-CNL.pdf">PDF</a>
+    </details>
+    <details class="abstract"> 
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          The Naproche CNL is a controlled natural language for mathematical
+          texts. A recent addition to the Naproche CNL are plural statements. We
+          discuss the collective-distributive ambiguity in the context of
+          mathematical language, as well as pairwise interpretations of
+          collective plurals. Additionally, we present a special scope ambiguity
+          conjunctions give rise to. Finally, we describe an innovative plural
+          interpretation algorithm implemented in Naproche for disambiguating
+          plurals in DRT and giving them the interpretation that would normally
+          be preferred in a mathematical context.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{CraSch2010:IntPluInTheNapCnl,
+  author={Cramer, Marcos and Schröder, Bernhard},
+  editor={Rosner, Michael and Fuchs, Norbert E.},
+  title={Interpreting Plurals in the {Naproche} CNL},
+  booktitle={Controlled Natural Language},
+  year={2012},
+  publisher={Springer Berlin Heidelberg},
+  address={Berlin, Heidelberg},
+  pages={43--52}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>Combining Linguistics and Proof Checking of Mathematical Texts</i>;
+    <i>Philosophy of Mathematical Practice</i>, Brussels, Belgium.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://www.math.uni-bonn.de/people/koepke/Talks/Combining_linguistics_and_proof_checking_of_mathematical_texts.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2010:ComLinAndProCheOfMatTex,
+  author={Koepke, Peter},
+  title={Combining Linguistics and Proof Checking of Mathematical Texts},
+  year={2010},
+  howpublished={Slides: \url{https://www.math.uni-bonn.de/people/koepke/Talks/Combining_linguistics_and_proof_checking_of_mathematical_texts.pdf}},
+  note={Talk at \emph{Philosophy of Mathematical Practice}, {Brussels}, {Belgium}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>Checking Natural Language Proofs</i>;
+    <i>Meeting in Honor of Jouko Väänänen's Sixtieth Birthday</i>, Helsinki, Finland.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://www.math.uni-bonn.de/people/koepke/Talks/Checking_natural_language_proofs.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2010:CheNatLanPro,
+  author={Koepke, Peter},
+  title={Checking Natural Language Proofs},
+  year={2010},
+  howpublished={Slides: \url{https://www.math.uni-bonn.de/people/koepke/Talks/Checking_natural_language_proofs.pdf}},
+  note={Talk at the \emph{Meeting in Honor of Jouko Väänänen's Sixtieth Birthday}, {Helsinki}, {Finland}}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2009</h2>
+
+<ul>
+  <li>
+    Marcos Cramer, Bernhard Fisseni, Peter Koepke, Daniel Kühlwein, Bernhard Schröder, Jip Veldman;
+    <a href="https://link.springer.com/chapter/10.1007/978-3-642-14418-9_11"><i>The Naproche Project Controlled Natural Language Proof Checking of Mathematical Texts</i></a>
+    in: Norbert E. Fuchs (ed.);
+    <a href="https://link.springer.com/book/10.1007/978-3-642-14418-9"><i>Controlled Natural Language. Workshop on Controlled Natural Language</i></a>;
+    <a href="http://attempto.ifi.uzh.ch/site/cnl2009/"><i>CNL 2009</i></a>,
+    Marettimo Island, Italy.
+    <details class="resources"> 
+      <summary><b>Resources</b></summary>
+      Preprint: <a href="https://icr.uni.lu/mcramer/downloads/CNL-paper.pdf">PDF</a>
+    </details>
+    <details class="abstract"> 
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          This paper discusses the semi-formal language of mathematics and
+          presents the Naproche CNL, a controlled natural language for
+          mathematical authoring. Proof Representation Structures, an adaptation
+          of Discourse Representation Structures, are used to represent the
+          semantics of texts written in the Naproche CNL. We discuss how the
+          Naproche CNL can be used in formal mathematics, and present our
+          prototypical Naproche system, a computer program for parsing texts in
+          the Naproche CNL and checking the proofs in them for logical
+          correctness.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{CraFisKoeKueSchVel2009:TheNapProConNatLanProCheOfMatTex,
+  author={Cramer, Marcos and Fisseni, Bernhard and Koepke, Peter and Kühlwein, Daniel and Schröder, Bernhard and Veldman, Jip},
+  editor={Fuchs, Norbert E.},
+  title={The Naproche Project Controlled Natural Language Proof Checking of Mathematical Texts},
+  booktitle={Controlled Natural Language},
+  year={2009},
+  publisher={Springer Berlin Heidelberg},
+  address={Berlin, Heidelberg},
+  pages={170--186},
+}</pre>
+    </details>
+  </li>
+  <li>
+    Doerthe Arndt;
+    <i>Semantik und Korrektheit von Prolog-Programmen im Naproche-Projekt</i>;
+    Diploma thesis.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Thesis: <a href="https://naproche-net.github.io/downloads/2009-arndtDiplom.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@mastersthesis{Arn2009:SemUndKorVonProProImNapPro,
+  title={Semantik und Korrektheit von {Prolog}-Programmen im {Naproche}-Projekt},
+  author={Arndt, Doerthe},
+  school={Rheinische Friedrich-Wilhelms-Universität Bonn},
+  year={2009},
+  type={Diploma thesis}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Merlin Carl, Marcos Cramer, Daniel Kühlwein;
+    <i>Chapter 1 of Landau in Naproche</i>.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://naproche-net.github.io/downloads/2009-landauChapter1.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Article{CarCraKue2009:ChaOneOfLanInNap,
+  title={Chapter 1 of {Landau} in {Naproche}},
+  author={Carl, Merlin and Cramer, Marcos and Kühlwein, Daniel},
+  year={2009}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Marcos Cramer, Peter Koepke, Daniel Kühlwein, Bernhard Schröder;
+    <i>The Naproche System</i>;
+    <a href="https://orcca.on.ca/conferences/cicm2009/calculemus09/important.html"><i>Calculemus</i></a>,
+    <a href="https://orcca.on.ca/conferences/cicm2009/cicm09/index.html"><i>CICM 2009</i></a>,
+    Ontario, Canada.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://naproche-net.github.io/downloads/2009-emergingsystems.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          The Naproche project (Natural language Proof Checking) was initiated
+          by Bernhard Schröder and Peter Koepke at the University of Bonn to
+          focus on an interdisciplinary study of the semi-formal language of
+          mathematics. A central goal of Naproche is to develop a controlled
+          natural language (CNL) for mathematical texts and adapted proof
+          checking software which checks texts written in the CNL for
+          syntactical and mathematical correctness. The project is still at a
+          prototypical stage, further information is available at
+          <i>www.naproche.net</i>.
+        </p>
+        <p>
+          This paper describes the Naproche system, an implementation of the
+          ideas developed by the Naproche project. The Naproche system accepts
+          L<span style="font-size: 0.75em; vertical-align: 0.25em; margin-left: -0.36em; margin-right: -0.15em; line-height: 1ex;">A</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X-style
+          texts, consisting of mathematical formulas imbedded in a
+          controlled natural language. Texts written in the controlled natural
+          language are parsed using techniques from computational linguistics
+          and transformed into first-order formulas. The formulas are given to
+          an automatic theorem prover which checks whether each formula of an
+          argument is a logical consequence of the preceding formulas or axioms.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex" >
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Article{CraKoeKueSch2009:TheNapSys,
+  title={The Naproche System},
+  author={Cramer, Marcos and Koepke, Peter and Kühlwein, Daniel and Schröder, Bernhard},
+  year={2009}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Marcos Cramer;
+    <i>Mathematisch-logische Aspekte von Beweisrepräsentationsstrukturen</i>;
+    Master's thesis.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Thesis: <a href="https://naproche-net.github.io/downloads/2009-cramermaster.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@mastersthesis{Cra2009:MatLogAspVonBew,
+  title={Mathematisch-logische Aspekte von Beweisrepräsentationsstrukturen},
+  author={Cramer, Marcos},
+  school={Rheinische Friedrich-Wilhelms-Universität Bonn},
+  year={2009}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Daniel Kühlwein;
+    <i>A calculus for Proof Representation Structures</i>;
+    Diploma thesis.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Thesis: <a href="https://naproche-net.github.io/downloads/2009-kuehlwein-diplom.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          Was ist ein mathematischer Beweis? Ein mathematischer Beweis ist ein
+          Text, der den Leser von der Richtigkeit einer Aussage überzeugen soll.
+          Diese oder eine vergleichbare Aussage werden viele Personen,
+          fachfremde und Mathematiker, als Antwort geben. Aber wie genau sieht
+          solch ein "Beweistext" aus? Nach welchen Regeln ist er aufgebaut?
+          Betrachtet man mathematische Beweise als eine Mischung von natürlicher
+          Sprache und mathematischen Zeichen, wie man sie in mathematischen
+          Lehrbüchern und Zeitschriften findet, so sind diese Fragen schwer zu
+          beantworten. Abgesehen von solchen "normalen" Beweisen gibt es jedoch
+          noch eine weitere Art von Beweisen: formale Beweise. Für diese ist es
+          leicht eine Antwort zu finden: Das zugehörige Kalkül definiert, was
+          erlaubt ist und was nicht. Alfred Whitehead und Bertrand Russell haben
+          mit ihrem Werk Principia Mathematica gezeigt, dass es theoretisch
+          möglich ist, Mathematik rein formal zu betreiben. In den Principia
+          Mathematica werden zwar nur die Grundlagen der Mathematik
+          formalisiert, jedoch kann man daraus ableiten, dass es auch für den
+          Rest möglich ist. Hierauf aufbauend kann man nun die zuvor genannten
+          "normalen" Beweise als Abkürzungen für formale Beweise betrachten.
+          Unter dieser Annahme wäre die einzige Regel für einen "normalen"
+          Beweis, dass er eindeutig in einen formalen Beweis übersetzbar ist.
+        </p>
+        <p>
+          Inwieweit ist es möglich, "normale" Beweise (automatisch) in formale
+          Beweise zu übersetzen? In welchem Ausmaß sind solche übersetzungen
+          eindeutig? Was ist die Sprache der Mathematik? Unter der Leitung von
+          Peter Koepke (Mathematik, Universität Bonn) und Bernhard Schröder
+          (Linguistik, Universität Duisburg-Essen) untersucht das
+          Naproche-Projekt (NAtural language PROof CHEcking) diese und ähnliche
+          Fragestellungen.
+        </p>
+        <p>
+          Als praktische Umsetzung dieser überlegungen wird das Naproche-System,
+          ein Computerprogramm, das "normale" Beweise auf logische Korrektheit
+          überprüfen soll, entwickelt. In der aktuellen Version unterteilt sich
+          das Naproche-System in drei Hauptmodule: Die Eingabeverarbeitung, die
+          linguistische Verarbeitung und die logische überprüfung. Ziel dieses
+          Diplomprojektes war die Entwicklung und Implementierung des dritten
+          Moduls, der logischen überprüfung.
+        </p>
+        <p>
+          Nach der linguistischen Verarbeitung ist ein Eingabetext in eine so
+          genannte Beweisrepräsentationsstruktur (Proof Representation
+          Structure, PRS) transformiert worden. Die logische überprüfung muss
+          entscheiden, ob die dem Eingabetext entsprechende
+          Beweisrepräsentationsstruktur logisch korrekt ist oder nicht. Man
+          benötigt also ein Kalkül für Beweisrepräsentationsstrukturen. Diese
+          Diplomarbeit beschreibt solch ein Kalkül. Sie unterteilt sich in fünf
+          Kapitel:
+        </p>
+        <p>
+          Kapitel 1 gibt eine Einführung in diese Arbeit. Das Naproche Projekt
+          wird beschrieben und für Naproche wichtige Arbeiten werden
+          vorgestellt.
+        </p>
+        <p>
+          Kapitel 2 behandelt die Grundlagen der Logik erster Stufe. Zuerst
+          werden eine Sprache erster Ordnung, sowie die dazugehörigen Terme und
+          Formeln definiert. Danach wird die Semantik erklärt, und ein korrektes
+          und vollständiges Sequenzenkalkül eingeführt.
+        </p>
+        <p>
+          In Kapitel 3 wird das Naproche-System ausführlicher behandelt. Das
+          Kapitel beginnt mit der Beschreibung der groben Struktur des
+          Naproche-Systems. Danach wird die momentan zulässige Eingabesprache
+          definiert. Eine Einführung in Diskursrepräsentationstheorie (Discourse
+          Representation Theory, DRT), auf der die Linguistik des
+          Naproche-Systems basiert, und Diskursrepräsentationsstrukturen
+          (Discourse Representation Structures, DRS) wird gegeben. Daraufhin
+          werden Beweisrepräsentationsstrukturen definiert. Automatische
+          Beweiser (Automated Theorem Prover, ATP) und das TPTP-Projekt, welche
+          für die logische überprüfung der Beweisrepräsentationsstrukturen
+          benutzt werden, werden vorgestellt und ihr Einsatz im Naproche-System
+          erklärt. Das Kapitel schließt mit dem BuraliForti-Paradoxon als einem
+          Beispiel für ein nicht-triviales Theorem, das von dem aktuellen
+          Naproche-System vollständig überprüft werden kann, ab.
+        </p>
+        <p>
+          Kapitel 4 definiert das Naproche-Kalkül für
+          Beweisrepräsentationsstrukturen und zeigt dessen Vollständigkeit und
+          Korrektheit: Nach einigen Lemmas wird zunächst das Formelbild (Formula
+          Image) einer Beweisrepräsentationsstruktur definiert. Dies ist eine
+          Abbildung, welche jeder Beweisrepräsentationsstruktur eine Sequenz von
+          Formeln erster Stufe zuordnet. Danach wird das eigentliche Kalkül in
+          Abhängigkeit von einem vorgegebenen Kalkül P definiert. Es folgt eine
+          Betrachtung des Zusammenhangs zwischen der Eingabesprache des
+          Naproche-Systems und Beweisrepräsentationsstrukturen, bevor das neu
+          definierte Kalkül mit dem Quellcode des Naproche-Systems verglichen
+          wird. Es wird gezeigt, dass die Ableitbarkeit einer
+          Beweisrepräsentationsstruktur in dem Kalkül äquivalent dazu ist, dass
+          das idealisierte Naproche-System die Beweisrepräsentationsstruktur
+          akzeptiert. Zuletzt wird die Korrektheit und Vollständigkeit des
+          Naproche-Kalküls gezeigt. Insbesondere werden folgende Theoreme
+          bewiesen:
+        </p>
+        <p>
+          <b>Theorem.</b> Vollständigkeit des Naproche-Kalküls<br>
+          <i>
+            Ist
+            <math display="inline">
+              <mrow>
+                <mi>P</mi>
+              </mrow>
+            </math>
+            ein vollständiges Kalkül,
+            dann ist das Naproche-Kalkül vollständig. D.h. falls
+            <math display="inline">
+              <mrow>
+                <mi>Γ</mi>
+                <mo>⊨</mo>
+                <mi>φ</mi>
+              </mrow>
+            </math>,
+            dann ist die Beweisrepräsentationsstruktur, die nur die
+            Annahmen-Bedingung mit der Annahme
+            <math display="inline">
+              <mrow>
+                <mo>⋀</mo>
+                <mi>Γ</mi>
+              </mrow>
+            </math>
+            und der Folgerung
+            <math display="inline">
+              <mrow>
+                <mi>φ</mi>
+              </mrow>
+            </math>
+            enthält, Naproche-akzeptiert.
+          </i>
+        </p>
+        <p>
+          <b>Theorem.</b> Korrektheit des Naproche-Kalküls<br>
+          <i>
+            Ist
+            <math display="inline">
+              <mrow>
+                <mi>P</mi>
+              </mrow>
+            </math>
+            ein korrektes Kalkül, dann ist das Naproche-Kalkül korrekt. D.h. falls
+            <math display="inline">
+              <mrow>
+                <mi>A</mi>
+              </mrow>
+            </math>
+            eine Naproche-akzeptierte Beweisrepräsentationsstruktur ohne
+            Definitions-Bedingungen ist, dann ist das Formelbild
+            <math display="inline">
+              <mrow>
+                <mo>FI</mo>
+                <mo>(</mo>
+                <mi>A</mi>
+                <mo>)</mo>
+                </mfenced>
+              </mrow>
+            </math>
+            in dem Sequenzenkalkül ableitbar.
+          </i>
+        </p>
+        <p>
+          Der Beweis erfolgt durch eine doppelte Induktion über die Tiefe der
+          Beweisrepräsentationsstruktur und die Anzahl ihrer Bedingungen. Im
+          Induktionsschritt werden die vorherigen Definitionen, das Kalkül für
+          Beweisrepräsentationsstrukturen und deren Formelbild, zusammen mit dem
+          Sequenzenkalkül aus Kapitel 2 benutzt
+        </p>
+        <p>
+          Im letzten Kapitel werden zunächst einige Probleme des
+          Naproche-Systems aufgezeigt. Der Einfluss des automatischen Beweisers
+          und der Eingabesprache wird näher betrachtet. Danach werden mögliche
+          Verbesserungen an dem aktuellen Programm besprochen. Insbesondere
+          werden Ideen zur Verbesserung der Benutzerfreundlichkeit und der
+          Beweisfähigkeit genannt. Zuletzt wird kurz die geplante zukünftige
+          Zusammenarbeit mit dem VeriMathDoc Projekt in Saarbrücken und Bremen
+          beschrieben.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@mastersthesis{Kue2009:ACalForProRepStr,
+  title={A Calculus for Proof Representation Structures},
+  author={Kühlwein, Daniel},
+  school={Rheinische Friedrich-Wilhelms-Universität Bonn},
+  year={2009},
+  type={Diploma thesis}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Jip Veldman, Bernhard Fisseni, Bernhard Schröder, Peter Koepke;
+    <a href="https://ids-pub.bsz-bw.de/frontdoor/index/index/docId/8257"><i>From Proof Texts to Logic</i></a>;
+    in: Christian Chiarcos, Richard Eckart de Castilho und Manfred Stede (eds.);
+    <i>Von der Form zur Bedeutung: Texte automatisch verarbeiten &ndash; From Form to Meaning: Processing Texts Automatically. Proceedings of the Biennial GSCL Conference 2009</i>.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://ids-pub.bsz-bw.de/frontdoor/deliver/index/docId/8257/file/Veldman_Fisseni_Schroeder_Koepke_From_Proof_Texts_to_Logic_2009.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          We present an extension to Discourse Representation Theory that can be
+          used to analyze mathematical texts written in the commonly used
+          semi-formal language of mathematics (or at least a subset of it).
+          Moreover, we describe an algorithm that can be used to check the
+          resulting Proof Representation Structures for their logical validity
+          and adequacy as a proof.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InCollection{VelFisSchKoe2009:FroProoTexToLog,
+  author={Veldman, Jip and Fisseni, Bernhard and Schröder, Bernhard and Koepke, Peter},
+  title={From Proof Texts to Logic. Discourse Representation Structures for Proof Texts in Mathematics},
+  series={Von der Form zur Bedeutung: Texte automatisch verarbeiten. From Form to Meaning: Processing Texts Automatically. Proceedings of the Biennial {GSCL} Conference 2009},
+  editor={Chiarcos, Christian and de Castilho, Richard Eckart and Stede, Manfred},
+  publisher={Narr},
+  address={Tübingen},
+  pages={137--145},
+  year= {2009}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>Mathematical Proofs as Derivation-Indicators: Theory and Implementation</i>;
+    <i>Philosophy of Mathematical Practice</i>, Brussels, Belgium.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://www.math.uni-bonn.de/people/koepke/Talks/Mathematical_proofs_as_derivation-indicators.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2009:MatProAsDerIndTheAndImp,
+  author={Koepke, Peter},
+  title={Mathematical Proofs as Derivation-Indicators: Theory and Implementation},
+  year={2009},
+  howpublished={Slides: \url{https://www.math.uni-bonn.de/people/koepke/Talks/Mathematical_proofs_as_derivation-indicators.pdf}},
+  note={Talk at the \emph{Seminar on the Philosophy of Mathematics}, {Utrecht}, {Netherlands}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>Understanding Natural Language Mathematical Proofs</i>;
+    <i>CUNY Graduate Center</i>, New York City, USA and <i>Oberseminar Mathematische Logik</i>, München, Germany.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://www.math.uni-bonn.de/people/koepke/Talks/Understanding_natural_language_mathematical_proofs.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2009:UndNatLanMatPro,
+  author={Koepke, Peter},
+  title={Understanding Natural Language Mathematical Proofs},
+  year={2009},
+  howpublished={Slides: \url{https://www.math.uni-bonn.de/people/koepke/Talks/Understanding_natural_language_mathematical_proofs.pdf}},
+  note={Talks at \emph{CUNY Graduate Center}, {New York City}, {USA} and \emph{Oberseminar Mathematische Logik}, {München}, {Germany}}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2008</h2>
+
+<ul>
+  <li>
+    Konstantin Verchinine, Alexander Lyaletski, Andrei Paskevich, Anatoly Anisimov;
+    <a href="https://link.springer.com/chapter/10.1007/978-3-540-85110-3_47"><i>On Correctness of Mathematical Texts From a Logical and Practical Point of View</i></a>;
+    in: Serge Autexier, John Campbell, Julio Rubio, Volker Sorge, Masakazu Suzuki, Freek Wiedijk (eds.);
+    <a href="Intelligent Computer Mathematics "><i> Intelligent Computer Mathematics. 9th International Conference</i></a>;
+    <a href="https://web.archive.org/web/20090316043842/http://events.cs.bham.ac.uk/cicm08/mkm08/"><i>MKM</i></a>
+    <a href="https://web.archive.org/web/20090316043823/https://events.cs.bham.ac.uk/cicm08/"><i>CICM 2008</i></a>;
+    Birmingham, UK.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="http://tertium.org/papers/mkm-08.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          Formalizing mathematical argument is a fascinating activity in itself
+          and (we hope!) also bears important practical applications. While
+          traditional proof theory investigates deducibility of an individual
+          statement from a collection of premises, a mathematical proof, with
+          its structure and continuity, can hardly be presented as a single
+          sequent or a set of logical formulas. What is called "mathematical
+          text", as used in mathematical practice through the ages, seems to be
+          more appropriate. However, no commonly adopted formal notion of
+          mathematical text has emerged so far.
+        </p>
+        <p>
+          In this paper, we propose a formalism which aims to reflect natural
+          (human) style and structure of mathematical argument, yet to be
+          appropriate for automated processing: principally, verification of its
+          correctness (we consciously use the word rather than "soundness" or
+          "validity").
+        </p>
+        <p>
+          We consider mathematical texts that are formalized in the ForTheL
+          language (brief description of which is also given) and we formulate a
+          point of view on what a correct mathematical text might be. Logical
+          notion of correctness is formalized with the help of a calculus.
+          Practically, these ideas, methods and algorithms are implemented in a
+          proof assistant called SAD. We give a short description of SAD and a
+          series of examples showing what can be done with it. 
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{VerLyaPasAni2008:OnCorOfMatTexFroALogAndPraPoiOfVie,
+  author={Verchinine, Konstantin and Lyaletski, Alexander and Paskevich, Andrei and Anisimov, Anatoly},
+  title={On Correctness of Mathematical Texts From a Logical and Practical Point of View},
+  booktitle={Intelligent Computer Mathematics, AISC/Calculemus/MKM 2008},
+  editor={Autexier, Serge and Campbell, John and Rubio, Julio and Sorge, Volker and Suzuki, Masakazu and Wiedijk, Freek},
+  series={Lecture Notes in Computer Science},
+  publisher={Springer},
+  address={Birmingham, United Kingdom},
+  year={2008},
+  pages={583--598}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Daniel Kühlwein;
+    <i>A Short Introduction To Naproche v0.1</i>;
+    Technical report.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://naproche-net.github.io/downloads/2008-kuehlwein-01.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@techreport{Kue2008:AShoIntToNap,
+  title={A Short Introduction To {Naproche} v0.1},
+  author={Kühlwein, Daniel},
+  year={2008}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Nickolay Kolev;
+    <i>Generating Proof Representation Structures in the Project NAPROCHE</i>;
+    Magister thesis.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Thesis: <a href="https://naproche-net.github.io/downloads/2008-kolev-01.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@mastersthesis{Kol2008:GenProRepStrInTheProNap,
+  title={Generating Proof Representation Structures in the Project {NAPROCHE}},
+  author={Kolev, Nickolay},
+  school={Rheinische Friedrich-Wilhelms-Universität Bonn},
+  year={2008},
+  type={Magister thesis}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2007</h2>
+
+<ul>
+  <li>
+    Andrei Paskevich;
+    <i>Méthodes de formalisation des connaissances et des raisonnements mathématiques: aspects appliqués et théoriques</i>;
+    PhD thesis.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Thesis: <a href="http://tertium.org/papers/thesis-07.fr.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          We study the means of presentation of mathematical knowledge and reasoning
+          schemes. Our research aims at an automated system for verification of
+          formalized mathematical texts.
+          
+          In this system, a text to verify is written in a formal language which is
+          close to the natural language and style of mathematical publications. Our
+          intention is to exploit the hint which are given to us by the «human» form
+          of the problem: definitions, proof schemes, nouns denoting classes of
+          objects, etc. We describe such a language, called ForTheL.
+          
+          Verification consists in showing that the text is «sensible» and «grounded»,
+          that functions and relations are applied within the domain, according to the
+          definitions, and assertions follow from their respective premises. A formal
+          definition of a correct text relies on a sound sequent calculus and on the
+          notion of local validity (local with respect to some occurrence inside a
+          formula).
+          
+          Proof search is carried out on two levels. The lower level is an automated
+          theorem prover based on a combinatorial procedure. We introduce a variant of
+          connection tableaux which is sound and complete in the first-order logic
+          with equality.
+          
+          The higher level is a «reasoner» which employs natural proving techniques in
+          order to filter, simplify, decompose a proof task before passing it to the
+          prover. The algorithms of the reasoner are based on transformations that
+          preserve the locally valid propositions.
+          
+          The proposed methods are implemented in the proof assistant SAD.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@phdthesis{Pas2007:MetDeForDesconnEtDesRaiMat,
+  author={Paskevych, Andriy},
+  title={Méthodes de formalisation des connaissances et des raisonnements mathématiques: aspects appliqués et théoriques},
+  school={Université Paris 12},
+  year={2007},
+}</pre>
+    </details>
+  </li>
+  <li>
+    Andrei Paskevich;
+    <i>The Syntax and Semantics of the ForTheL Language</i>.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="http://www.nevidal.org/download/forthel.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Article{Pas2007:TheSynAndSemOfTheForLan,
+  title={The Syntax and Semantics of the {ForTheL} Language},
+  author={Paskevich, Andrei},
+  year={2007}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Konstantin Verchinine, Alexander Lyaletski, Andrei Paskevich;
+    <a href="https://link.springer.com/chapter/10.1007/978-3-540-73595-3_29"><i>System for Automated Deduction (SAD): A Tool for Proof Verification</i></a>;
+    in: Frank Pfenning (ed.);
+    <a href="https://link.springer.com/book/10.1007/978-3-540-73595-3"><i>Automated Deduction &ndash; CADE-21</i></a>;
+    <i>CADE 2007</i>,
+    Bremen, Germany.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://typeset.io/pdf/system-for-automated-deduction-sad-a-tool-for-proof-39e0mghkyz.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          In this paper a proof assistant called SAD is presented. SAD deals with
+          mathematical texts that are formalized in the ForTheL language (a brief
+          description of which is also given) and checks their correctness. We
+          give a short description of SAD and a series of examples that show what
+          can be done with it. Note that abstract notion of correctness on which
+          the implementation is based, can be formalized with the help of a
+          calculus (not presented here).
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{VerLyaPas2007:SysForAutDed,
+  author={Verchinine, Konstantin and Lyaletski, Alexander and Paskevich, Andrei},
+  editor={Pfenning, Frank},
+  title={System for Automated Deduction ({SAD}): A Tool for Proof Verification},
+  booktitle={Automated Deduction -- {CADE}-21},
+  year={2007},
+  publisher={Springer Berlin Heidelberg},
+  address={Berlin, Heidelberg},
+  pages={398--403}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Andrei Paskevich, Konstantin Verchinine, Alexander Lyaletski, Anatoly Anisimov;
+    <i>Reasoning Inside a Formula and Ontological Correctness of a Formal Mathematical Text</i>;
+    in: Manuel Kauers, Manfred Kerber, Robert Miner, Wolfgang Windsteiger (eds.);
+    <i>Calculemus/MKM 2007 &ndash; Work in Progress</i>;
+    <a href="https://www3.risc.jku.at/conferences/Calculemus2007/?content=regi"><i>Calculemus</i></a><i>/MKM 2007</i>;
+    Linz, Austria.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="http://tertium.org/papers/mkm-07.pdf">PDF</a><br>
+      Proceedings: <a href="https://www3.risc.jku.at/publications/download/risc_3117/wip.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          Dealing with a formal mathematical text (which we regard as a
+          structured collection of hypotheses and conclusions), we often want to
+          perform various analysis and transformation tasks on the initial
+          formulas, without preliminary normalization. One particular example is
+          checking for "ontological correctness", namely, that every occurrence
+          of a non-logical symbol stems from some definition of that symbol in
+          the foregoing text. Generally, we wish to test whether some known fact
+          (axiom, definition, lemma) is “applicable” at a given position inside
+          a statement, and to actually apply it (when needed) in a logically
+          sound way.
+        </p>
+        <p>
+          In this paper, we introduce the notion of a locally valid statement, a
+          statement that can be considered true at a given position inside a
+          first-order formula. We justify the reasoning about "innards" of a
+          formula; in particular, we show that a locally valid equivalence is a
+          sufficient condition for an equivalent transformation of a subformula.
+          Using the notion of local validity, we give a formal definition of
+          ontological correctness for a text written in a special formal
+          language called ForTheL. 
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{PasVerLyaAni2007:ReaInsAForAndOntCorOfAForMatTex,
+  author={Paskevich, Andrei and Verchinine, Konstantin and Lyaletski, Alexander and Anisimov, Anatoly},
+  title={Reasoning Inside a Formula and Ontological Correctness of a Formal Mathematical Text},
+  booktitle={Calculemus/MKM 2007 -- Work in Progress},
+  editor={Kauers, Manuel and Kerber, Manfred and Miner, Robert and Windsteiger, Wolfgang},
+  series={RISC-Linz Report Series, University of Linz, Austria},
+  address={Hagenberg, Austria},
+  year={2007},
+  pages={77--91}
+}
+</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>The NAPROCHE project</i>;
+    <i>Workshop Deduction in Semantics</i>, Stuttgart, Germany.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="https://www.math.uni-bonn.de/people/koepke/Talks/The_NAPROCHE_project.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2007:TheNapPro,
+  author={Koepke, Peter},
+  title={The {NAPROCHE} project},
+  year={2007},
+  howpublished={Slides: \url{https://www.math.uni-bonn.de/people/koepke/Talks/The_NAPROCHE_project.pdf}},
+  note={Talk at \emph{Workshop Deduction in Semantics}, {Stuttgart}, {Germany}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>The Language of Proofs</i>;
+    <i>Trimestre on Methods of Proof Theory in Mathematics</i>, Bonn, Germany.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://www.math.uni-bonn.de/people/koepke/Talks/The_language_of_proofs.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2007:TheLanOfPro,
+  author={Koepke, Peter},
+  title={The Language of Proofs},
+  year={2007},
+  howpublished={Slides: \url{https://www.math.uni-bonn.de/people/koepke/Talks/The_language_of_proofs.pdf}},
+  note={Talk at \emph{Trimestre on Methods of Proof Theory in Mathematics}, {Bonn}, {Germany}}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2006</h2>
+
+<ul>
+  <li>
+    Peter Koepke;
+    <i>Linguistics and Logic of Common Mathematical Language</i>;
+    <i>Brouwer Seminar</i>, Nijmegen, Netherlands.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://www.math.uni-bonn.de/people/koepke/Talks/Linguistics_and_logic_of_common_mathematical_language.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2006:LinAndLogOfComMatLan,
+  author={Koepke, Peter},
+  title={Linguistics and Logic of Common Mathematical Language},
+  year={2006},
+  howpublished={Slides: \url{https://www.math.uni-bonn.de/people/koepke/Talks/Linguistics_and_logic_of_common_mathematical_language.pdf}},
+  note={Talk at \emph{Brouwer Seminar}, {Nijmegen}, {Netherlands}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Peter Koepke;
+    <i>Proof Checking with a Natural Language Interface</i>;
+    <i>Logical Methods in the Humanities Workshop</i>, Stanford, USA.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Slides: <a href="https://www.math.uni-bonn.de/people/koepke/Talks/Proof_checking_with_a_natural_language_interface.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Koe2006:ProCheWitANatLanInt,
+  author={Koepke, Peter},
+  title={Proof Checking with a Natural Language Interface},
+  year={2006},
+  howpublished={Slides: \url{https://www.math.uni-bonn.de/people/koepke/Talks/Proof_checking_with_a_natural_language_interface.pdf}},
+  note={Talk at \emph{Logical Methods in the Humanities Workshop}, {Stanford}, {USA}}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Alexander Lyaletski, Andrey Paskevich, Konstantin Verchinine;
+    <a href="https://www.sciencedirect.com/science/article/pii/S1570868305000741?ref=pdf_download&fr=RR-2&rr=8e7920abdd54d389"><i>SAD As a Mathematical Aassistant &ndash; How Should We Go From Here to There?</i></a>;
+    in: Christoph Benzmüller (ed.);
+    <a href="https://www.sciencedirect.com/journal/journal-of-applied-logic/vol/4/issue/4"><i>Towards Computer Aided Mathematics 4.4</i></a>.
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          The System for Automated Deduction (SAD) is developed in the framework
+          of the Evidence Algorithm research project and is intended for
+          automated processing of mathematical texts. The SAD system works on
+          three levels of reasoning: (a) the level of text presentation where
+          proofs are written in a formal natural-like language for subsequent
+          verification; (b) the level of foreground reasoning where a particular
+          theorem proving problem is simplified and decomposed; (c) the level of
+          background deduction where exhaustive combinatorial inference search
+          in classical first-order logic is applied to prove end subgoals.
+        </p>
+        <p>
+          We present an overview of SAD describing the ideas behind the project,
+          the system's design, and the process of problem formalization in the
+          fashion of SAD. We show that the choice of classical first-order logic
+          as the background logic of SAD is not too restrictive. For example, we
+          can handle binders like <math display="inline"><mo>Σ</mo></math> or
+          <math display="inline"><mo>lim</mo></math> without resort to second
+          order or to a full-powered set theory. We illustrate our approach with
+          a series of examples, in particular, with the classical problem
+          <math display="inline"><msqrt><mn>2</mn></msqrt><mo>∉</mo><mi>ℚ</mi></math>.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{LyaPasVer2006SasAsAMatAssHowShoWeGoFroHerToThe,
+  author={Lyaletski, Alexander and Paskevich, Andrey and Verchinine, Konstantin},
+  editor={Benzmüller, Christoph},
+  title={{SAD} As a Mathematical Assistant -- How Should We Go From Here to There?},
+  journal={Journal of Applied Logic},
+  volume={4},
+  number={4},
+  pages={560--591},
+  year={2006}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2004</h2>
+
+<ul>
+  <li>
+    Alexander Lyaletski, Andrey Paskevich, Konstantin Verchinine;
+    <a href="https://link.springer.com/chapter/10.1007/978-3-540-27818-4_17"><i>Theorem Proving and Proof Verification in the System SAD</i></a>;
+    in: Andrea Asperti, Grzegorz Bancerek, Andrzej Trybulec (eds.);
+    <a href="https://link.springer.com/book/10.1007/b100478"><i>Mathematical Knowledge Management</i></a>.
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          In this paper, the current state of the System for Automated Deduction, SAD,
+          is described briefly. The system may be considered as the modern vision of
+          the Evidence Algorithm programme advanced by Academician V. Glushkov in
+          early 1970s. V. Glushkov proposed to make investigation simultaneously into
+          formalized languages for presenting mathematical texts in the form most
+          appropriate for a user, formalization and evolutionary development of
+          computer-made proof step, information environment having an influence on the
+          evidence of a proof step, and man-assisted search for a proof. In this
+          connection, SAD supports a number of formal languages for representing and
+          processing mathematical knowledge along with the formal language ForTheL as
+          their top representative, uses a sequent formalism developed for
+          constructing an efficient technique of proof search within the signature of
+          an initial theory, and gives a new way to organize the information
+          environment for sharing mathematical knowledge among various computer
+          services. The system SAD can be used to solve large variety of theorem
+          proving problems including: establishing of the deducibility of sequents in
+          first-order classical logic, theorem proving in ForTheL-environment,
+          verifying correctness of self-contained ForTheL-texts, solving problems
+          taken from the online library TPTP. A number of examples is given for
+          illustrating the mathematical knowledge processing implemented in SAD.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{LyaPasVer2004:TheProAndProVerInTheSysSad,
+  author={Lyaletski, Alexander and Paskevich, Andrey and Verchinine, Konstantin},
+  editor={Asperti, Andrea and Bancerek, Grzegorz and Trybulec, Andrzej},
+  title={Theorem Proving and Proof Verification in the System {SAD}},
+  booktitle={Mathematical Knowledge Management},
+  year={2004},
+  publisher={Springer Berlin Heidelberg},
+  address={Berlin, Heidelberg},
+  pages={236--250}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Alexander V. Lyaletski, Anatoly E. Doroshenko, Andrey Paskevich, Konstantin Verchinine;
+    <a href="https://cs.emis.de/LNI/Proceedings/Proceedings48/article2340.html"><i>Evidential Paradigm and Intelligent Mathematical Text Processing</i></a>;
+    in: Anatoly E. Doroshenko, Terry A. Halpin, Stephen W. Liddle, Heinrich C. Mayr;
+    <a href="https://cs.emis.de/LNI/Proceedings/Proceedings48.html"><i>Information Systems Technology and its Applications, 3rd International Conference</i></a>;
+    <i>ISTA 2004</i>;
+    Salt Lake City, USA.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="http://tertium.org/papers/ista-04.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          This paper presents the evidential paradigm of computer-supported
+          mathematical assistance in "doing" mathematics and in reasoning
+          activity. At present, the evidential paradigm is implemented in the
+          form of System for Automated Deduction (SAD). The system is based on
+          the methods of automated theorem proving and is intended for
+          intelligent mathematical text processing. It proves mathematical
+          theorems, verifies validity of self-contained mathematical texts and
+          can be used for inference search in first-order sequent-based logic as
+          well. For human-like representation of mathematical knowledge, SAD
+          exploits an original formal language close to natural languages of
+          scientific publications. Since the problem of automated text
+          verification is of great importance for industrial applications
+          (checking specifications, proving safety properties of network
+          protocols, etc), the paper illustrates some principles and
+          peculiarities of the evidential paradigm by means of exemplifying the
+          verification of a part of a non-trivial mathematical text. 
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{LayDorPasVer2004:EviParAndIntMatTexPro,
+  author={Lyaletski, Alexander V. and Doroshenko, Anatoly E. and Paskevich, Andrey and Verchinine, Konstantin},
+  title={Evidential Paradigm and Intelligent Mathematical Text Processing},
+  booktitle={Information Systems Technology and its Applications, 3rd International Conference, ISTA 2004},
+  editor={Doroshenko, Anatoly E. and Halpin, Terry A. and Liddle, Stephen W. and Mayr, Heinrich C.},
+  series={Lecture Notes in Informatics},
+  publisher={GI},
+  address={Salt Lake City UT, USA},
+  year={2004},
+  volume={48},
+  pages={205--211}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2003</h2>
+
+<ul>
+  <li>
+    Alexander Lyaletski, Konstantin Verchinine, Andrey Paskevich;
+    <i>On Verification Tools Implemented in the System for Automated Deduction</i>;
+    <a href="https://cliplab.org/Conferences/Colognet/ITCLS-2003/"><i>CoLogNet</i></a>,
+    <i>FM 2003</i>
+    Pisa, Italy.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="http://tertium.org/papers/itcls-03.ps.gz">PS</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          Among the tasks of the Evidence Algorithm programme, the verification
+          of formalized mathematical texts is of great significance. Our
+          investigations in this domain were brought to practice in the last
+          version of the System for Automated Deduction (SAD). The system
+          exploits a formal language to represent mathematical knowledge in a
+          "natural" form and a sequential first-order formalism to prove
+          statements in the frame of a self-contained mathematical text. In the
+          paper, we give an overview of the architecture of SAD and its
+          verification tools. In order to demonstrate the work of SAD, a sample
+          verification session is examined.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Article{LyaVerPas2003:OnVerTooImpInTheSysForAutDed,
+  author={Lyaletski, Alexander and Verchinine, Konstantin and Paskevich, Andrey},
+  title={On Verification Tools Implemented in the {System} for {Automated} {Deduction}},
+  year={2003}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2002</h2>
+
+<ul></ul>
+  <li>
+    Zainutdin Aselderov, Konstantin Verchinine, Anatoli Degtyarev, Alexander Lyaletski, Andrey Paskevich, Alexandre Pavlov;
+    <i>Linguistic Tools and Deductive Technique of the System for Automated Deduction</i>.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="http://tertium.org/papers/iis-02.ps.gz">PS</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          This paper is devoted to a brief description of some
+          peculiarities and of the first software implementation
+          of the System for Automated Deduction, SAD. Architecture
+          of SAD corresponds well to a modern vision of the Evidence
+          Algorithm that was conceived by V. Glushkov as a programme
+          for constructing open systems for automated theorem proving
+          that are intended for computer-aided "doing" mathematics:
+          i.e. for extracting and accumulating mathematical computer
+          knowledge and for using it in a regular and efficient manner
+          to prove a given statement that is always considered as a part
+          of a self-contained mathematical text. In addition, the main
+          principles of SAD reflect the current understanding of
+          the problem of man-assisted processing of mathematical
+          computer knowledge.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Article{AseVerDegLyaPasPav2002:LinTooAndDedTecOfTheSysForAutDed,
+  author={Aselderov, Zainutdin and Verchinine Konstantin and Degtyarev Anatoli and Lyaletski Alexander and Paskevich Andrey and Pavlov Alexandre},
+  title={Linguistic Tools and Deductive Technique of the {System} for {Automated} {Deduction}},
+  year={2002}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Alexander Lyaletski, Konstantin Verchinine, Anatoli Degtyarev, Andrey Paskevich;
+    <i>System for Automated Deduction (SAD): Linguistic and Deductive Peculiarities</i>;
+    in:  Mieczysław A. Kłopotek, Sławomir T. Wierzchoń, Maciej Michalewicz (eds.);
+    <a href="https://link.springer.com/book/10.1007/978-3-7908-1777-5"><i>Intelligent Information Systems 2002 </i></a>;
+    <i>IIS 2002</i>,
+    Sopot, Poland.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="http://tertium.org/papers/iis-02.ps.gz">PS</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          In this paper a state-of-the-art of a system for automated
+          deduction called SAD is described. An architecture of SAD
+          corresponds well to a modern vision of the Evidence Algorithm
+          programme initiated by Academician V. Glushkov. The system
+          is intended for accumulating mathematical knowledge and using
+          it in a regular and efficient manner for processing
+          a self-contained mathematical text in order to prove
+          a given statement that always is considered as a part
+          of the text. Two peculiarities are inherent in SAD:
+          (a) mathematical texts under consideration are formalized
+          with the help of a specific formal language, which is close
+          to a natural language used in mathematical publications;
+          (b) proof search is based on a specific sequent-type calculus,
+          which gives a possibility to formalize "natural reasoning style".
+          The language may be used as a tool to write and verify mathematical
+          papers, theorems, and formal specifications, to perform model
+          checking, and so on. The calculus is oriented to constructing
+          some natural proof search methods such as definition and
+          auxiliary proposition applications.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{LyaVerPas2002:SysForAutDedSadLinAndDedPec,
+  author={Lyaletski, Alexander and Verchinine, Konstantin and Degtyarev, Anatoli and Paskevich, Andrey},
+  title={{System} for {Automated} {Deduction} ({SAD}): Linguistic and Deductive Peculiarities},
+  booktitle={Intelligent Information Systems, 11th International Symposium, IIS 2002},
+  editor={Kłopotek, Mieczysław A. and Wierzchoń, Sławomir T. and Michalewicz, Maciej},
+  series={Advances in Soft Computing},
+  publisher={Physica-Verlag},
+  address={Sopot, Poland},
+  year={2002},
+  pages={413--422}
+}</pre>
+    </details>
+  </li>
+</ul>
+
+<h2>2000</h2>
+
+<ul>
+  <li>
+    Konstantin Vershinin, Andrei Paskevich;
+    <i>ForTheL &ndash; the Language of Formal Theories</i>;
+    in: <a href="http://www.foibg.com/ijita/vol01-09/ijita-fv07.htm"><i>International Journal Information Theories and Applications (vol. 7)</i></a>.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Article: <a href="http://tertium.org/papers/ita-00.ps.gz">PS</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Article{VerPas2000:ForTheLanOfForThe,
+  title={{{ForTheL} -- the Language of Formal Theories}},
+  author={Vershinin, Konstantin and Paskevich, Andrey},
+  journal={International Journal of Information Theories and Applications},
+  volume={7},
+  number={3},
+  pages={120--126},
+  year={2000}
+}</pre>
+    </details>
+  </li>
+</ul>
+
     </main>
     <footer>
         <ol>

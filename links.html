@@ -100,6 +100,38 @@
             border-top: 1px solid black;
             font-size: 16px;
         }
+
+        ul li:not(:last-of-type) {
+            margin-bottom: 1em;
+        }
+
+        .resources {
+            margin-top: 0.3em;
+        }
+
+        .bibtex {
+            margin-top: 0.3em;
+        }
+
+        .bibtex pre {
+            background-color: lightgray;
+            font-size: 80%;
+            padding: 10px;
+            overflow-x: scroll;
+            border: solid;
+            border-width: 1px;
+        }
+
+        .abstract {
+            margin-top: 0.3em;
+        }
+
+        .abstract div {
+            font-size: 80%;
+            padding: 10px;
+            border: solid;
+            border-width: 1px;
+        }
     </style>
 </head>
 
@@ -114,8 +146,8 @@
                 <li><a href="documentation.html">Documentation</a></li>
                 <li><a href="formalizations.html">Formalizations</a></li>
                 <li><a href="history.html">History</a></li>
-                <li><a href="publications.html">Publications</a></li>
-                <!--li><a class="youarehere" href="links.html">Links</a></li-->
+                <li><a href="publications.html">Publications &amp; Talks</a></li>
+                <li><a class="youarehere" href="links.html">Links</a></li>
                 <li><a href="people.html">People</a></li>
             </ol>
         </nav>
@@ -123,7 +155,49 @@
     <main>
 <h1>Links</h1>
 
-(coming soon)
+<ul>
+  <li>
+    The source code of Naproche:<br>
+    <a href="https://github.com/naproche/naproche">https://github.com/naproche/naproche</a>
+  </li>
+  <li>
+    The Isabelle Proof Assistant as part of which Naproche is distributed:<br>
+    <a href="https://isabelle.in.tum.de">https://isabelle.in.tum.de/Isabelle</a>
+  </li>
+  <li>
+    The E Theorem Prover used by Naproche:<br>
+    <a href="https://wwwlehre.dhbw-stuttgart.de/~sschulz/E/E.html">https://wwwlehre.dhbw-stuttgart.de/~sschulz/E/E.html</a>
+  </li>
+  <li>
+    The Vampire Theorem Prover used by Naproche:<br>
+    <a href="https://vprover.github.io/">https://vprover.github.io/</a>
+  </li>
+  <li>
+    Naproche-ZF, an experimental natural theorem prover based on higher-order
+    set theory:<br>
+    <a href="https://adelon.net/naproche-zf">https://adelon.net/naproche-zf</a>
+  </li>
+  <li>
+    FTLex, a ForTheL tokenizer used by Naproche:<br>
+    <a href="https://github.com/McEarl/ftlex">https://github.com/McEarl/ftlex</a>
+  </li>
+  <li>
+    Naproche-SAD, the predecessor of Naproche:<br>
+    <a href="https://github.com/Naproche-SAD/Naproche-SAD">https://github.com/Naproche-SAD/Naproche-SAD</a>
+  </li>
+  <li>
+    Naproche 0, a predecessor of Naproche-SAD:<br>
+    <a href="https://naproche-net.github.io/">https://naproche-net.github.io/</a>
+  </li>
+  <li>
+    SAD, a predecessor of Naproche-SAD:<br>
+    <a href="http://nevidal.org/sad.en.html">http://nevidal.org/sad.en.html</a>
+  </li>
+  <li>
+    An implementation of ForTheL in <a href="https://www.grammaticalframework.org/">GF</a>:<br>
+    <a href="https://github.com/aarneranta/gf-math/tree/main/grammars/forthel">https://github.com/aarneranta/gf-math/tree/main/grammars/forthel</a>
+  </li>
+</ul>
     </main>
     <footer>
         <ol>
