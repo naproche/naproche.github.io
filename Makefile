@@ -2,6 +2,7 @@ build: $(patsubst content/%,build/%,$(shell find content -type f))
 
 clean:
 	rm -fr build
+	git worktree remove deploy
 
 build/%.html: content/%.html resources/header.html resources/footer.html Makefile
 	@mkdir -p $(dir $@)
