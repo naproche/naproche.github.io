@@ -11,12 +11,6 @@
     <a href="https://link.springer.com/book/10.1007/978-3-032-07021-0"><i>Intelligent Computer Mathematics 18th International Conference</i></a>;
     <a href="https://cicm-conference.org/2025/cicm.php"><i>CICM 2025</i></a>,
     Brasília, Brazil.
-    <details class="resources">
-      <summary><b>Resources</b></summary>
-      TBD<!--
-      Article: <a href="...">PDF</a>
-      -->
-    </details>
     <details class="abstract">
       <summary><b>Abstract</b></summary>
       <div>
@@ -36,7 +30,7 @@
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
 <pre>@InProceedings{KoeSch2025:ForTheSolModInNap,
   author={Koepke, Peter and Schäfer, Patrick},
-  editor={de Paiva, Valeria and koepke, Peter},
+  editor={de Paiva, Valeria and Koepke, Peter},
   title={Formalizing the {Solow} Model in {Naproche}},
   booktitle={Intelligent Computer Mathematics},
   year={2025},
@@ -54,29 +48,71 @@
     Brasília, Brazil.
     <details class="resources">
       <summary><b>Resources</b></summary>
-      TBD<!--
-      Article: <a href="...">PDF</a>
-      -->
+      Slides: <a href="https://github.com/naproche/Talks/blob/master/2025/koepke_formalizing-and-autoformalizing-euclids-lemma-in-naproche.pdf">PDF</a>
     </details>
     <details class="abstract">
       <summary><b>Abstract</b></summary>
-      TBD<!--
       <div>
-        ...
+        <p>
+          Euclid's lemma is a simple, yet fundamental result and tool in
+          elementary number theory. In the English Wikipedia it is stated as: If
+          a prime
+          <math>
+            <mi>p</mi>
+          </math>
+          divides the product
+          <math>
+            <mrow>
+              <mi>a</mi>
+              <mi>b</mi>
+            </mrow>
+          </math>
+          of two integers
+          <math>
+            <mi>a</mi>
+          </math>
+          and
+          <math>
+            <mi>b</mi>
+          </math>,
+          then
+          <math>
+            <mi>p</mi>
+          </math>
+          must divide at least one of those integers
+          <math>
+            <mi>a</mi>
+          </math>
+          or
+          <math>
+            <mi>b</mi>
+          </math>.
+        </p>
+        <p>
+          For our formalization of perfectoid rings in the natural language
+          proof checker Naproche we needed a proof of the lemma which only
+          employs non-negative integers. In the Wikipedia article we found such
+          a proof, which we translated by hand, staying close to the original
+          language and proof structure.
+        </p>
+        <p>
+          In our talk we will present the proof and use it to demonstrate some
+          Naproche principles. We shall then report how ChatGPT was able to
+          produce a similar proof automatically from the Wikipedia text after
+          being tought sufficiently many Naproche principles in an interactive
+          &quot;conversation&quot;. 
+        </p>
       </div>
-      -->
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-      TBD<!--
 <pre>@Misc{Koe2025:ForAndAutEucLemInNap,
   author={Peter Koepke},
-  title={Formalizing and Autoformalizing Euclid's Lemma in Naproche},
+  title={Formalizing and Autoformalizing {Euclid}'s Lemma in {Naproche}},
   year={2025},
-  howpublished={Slides: \url{...}},
+  howpublished={Slides: \url{https://github.com/naproche/Talks/blob/master/2025/koepke_formalizing-and-autoformalizing-euclids-lemma-in-naproche.pdf}},
   note={Talk at the \emph{NatFoM} workshop at \emph{CICM 2025}, {Brasília}, {Brazil}}
 }</pre>
-    -->
     </details>
   </li>
   <li>
@@ -87,29 +123,59 @@
     Brasília, Brazil.
     <details class="resources">
       <summary><b>Resources</b></summary>
-      TBD<!--
-      Article: <a href="...">PDF</a>
-      -->
+      Slides: <a href="https://github.com/naproche/Talks/blob/master/2025/schaefer_formalization-of-an-ideology.pdf">PDF</a>
     </details>
     <details class="abstract">
       <summary><b>Abstract</b></summary>
-      TBD<!--
       <div>
-        ...
+        <p>
+          This work presents a formalization of the ideology Social Darwinism
+          using Naproche, a controlled natural language proof-checking system.
+          The ideology is translated into a precise mathematical model, with
+          assumptions made explicit and conclusions derived unambiguously. The
+          study demonstrates how formalization, a practice common in economic
+          theory and mathematics, can enhance transparency, verifiability, and
+          reproducibility in the analysis of conceptual systems.
+        </p>
+        <p>
+          Naproche combines natural mathematical language with automated
+          reason-ing. Definitions, theorems, and proofs are interpreted in
+          first-order logic and checked by automated provers. This preserves the
+          readability of conventional mathematical exposition while enabling
+          formal verification, without requiring extensive prior experience with
+          proof assistants. As a result, it opens formalization to a wider
+          audience beyond mathematicians, including economists and related
+          researchers.
+        </p>
+        <p>
+          The rationale for formalizing ideologies is that coherent worldviews
+          can, in principle, be expressed in formal terms. Once formalized, they
+          can be analyzed systematically, with assumptions exposed to structured
+          critique and conclusions verified independently of rhetoric or
+          intuition. In this work, such a critique of Social Darwinism is
+          carried out, showing how formalization not only clarifies the logical
+          structure of an ideology but also provides a rigorous framework for
+          its critical evaluation.
+        </p>
+        <p>
+          Future research may extend this framework to additional ideologies,
+          enabling systematic comparison and advancing a formalized approach to
+          complex sociopolitical thought. The results indicate that formal
+          methods are not confined to mathematics but can be applied more
+          broadly, yielding objective, verifiable models and facilitating
+          critical engagement.
+        </p>
       </div>
-      -->
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-      TBD<!--
 <pre>@Misc{Sch2025:ForOfAnIde,
   author={Patrick Schäfer},
   title={Formalization of an Ideology},
   year={2025},
-  howpublished={Slides: \url{...}},
+  howpublished={Slides: \url{https://github.com/naproche/Talks/blob/master/2025/schaefer_formalization-of-an-ideology.pdf}},
   note={Talk at the \emph{NatFoM} workshop at \emph{CICM 2025}, {Brasília}, {Brazil}}
 }</pre>
-    -->
     </details>
   </li>
   <li>
@@ -120,29 +186,77 @@
     Brasília, Brazil.
     <details class="resources">
       <summary><b>Resources</b></summary>
-      TBD<!--
-      Article: <a href="...">PDF</a>
-      -->
+      Slides: <a href="https://github.com/naproche/Talks/blob/master/2025/schuetz_managing-naproche-formalizations-with-stex-and-flams.pdf">PDF</a>
     </details>
     <details class="abstract">
       <summary><b>Abstract</b></summary>
-      TBD<!--
       <div>
-        ...
+        <p>
+          Naproche is a proof assistant that accepts formalizations written in
+          L<span style="font-size: 0.75em; vertical-align: 0.25em; margin-left: -0.36em; margin-right: -0.15em; line-height: 1ex;">A</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X.
+          This allows the source files of those formalizations on the one hand
+          to be passed to Naproche to be checked for logical correctness (the
+          &quot;logical level&quot;) and on the other hand to be passed to a
+          T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X
+          engine to be rendered as, e.g., PDF or HTML (the &quot;presentational
+          level&quot;). However, this poses the challenge that several language
+          a Naproche formalization can make use of must be specified both on the
+          logical <emph>and</emph> the presentational level. Examples of such language
+          features are:
+          <ul>
+            <li>
+               referencing formal statements across formalizations;
+            </li>
+            <li>
+               reusing symbolic notations across formalizations;
+            </li>
+            <li>
+               including formalizations into each other.
+            </li>
+          </ul>
+          Whereas the features listed above are already supported on the logical
+          level of Naproche, they are currently all lacking proper support on
+          the presentational level.
+        </p>
+        <p>
+          In this talk, we will present how
+          <span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">S</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X
+          [<a href="#ref_579823">2</a>] (a
+          L<span style="font-size: 0.75em; vertical-align: 0.25em; margin-left: -0.36em; margin-right: -0.15em; line-height: 1ex;">A</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X
+          package to create semantically annotated documents) can be integrated
+          into the Naproche ecosystem to provide presentational support for all
+          three language features from the above list.
+        </p>
+        <p>
+          Moreover, we will demonstrate how FLAMS [<a href="#ref_223834">1</a>]
+          (a framework for managing semantically annotated documents) can be
+          integrated in the Naproche workflow to manage and facilitate the build
+          process of both PDF and HTML presentations of formalizations &ndash;
+          which is also currently lacking proper support in the Naproche
+          ecosystem.
+        </p>
+        <hr>
+        <p>
+          <ul>
+            <li>
+                <span id="ref_223834">[1]</span> <a href="https://github.com/FlexiFormal/FLAMS">https://github.com/FlexiFormal/FLAMS</a>
+            </li>
+            <li>
+                <span id="ref_579823">[2]</span> <a href="https://github.com/slatex/stex">https://github.com/slatex/stex</a>
+            </li>
+          </ul>
+        </p>
       </div>
-      -->
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-      TBD<!--
 <pre>@Misc{Sch2025:ManNapForWitSteAndFla,
   author={Marcel Schütz},
-  title={Managing Naproche Formalizations with sTeX and FLAMS},
+  title={Managing {Naproche} Formalizations with {sTeX} and {FLAMS}},
   year={2025},
-  howpublished={Slides: \url{...}},
+  howpublished={Slides: \url{https://github.com/naproche/Talks/blob/master/2025/schuetz_managing-naproche-formalizations-with-stex-and-flams.pdf}},
   note={Talk at the \emph{NatFoM} workshop at \emph{CICM 2025}, {Brasília}, {Brazil}}
 }</pre>
-    -->
     </details>
   </li>
   <li>
@@ -151,31 +265,116 @@
     <a href="https://cicm-conference.org/2025/cicm.php?event=natfom"><i>NatFoM</i></a>,
     <a href="https://cicm-conference.org/2025/cicm.php"><i>CICM 2025</i></a>,
     Brasília, Brazil.
-    <details class="resources">
-      <summary><b>Resources</b></summary>
-      TBD<!--
-      Article: <a href="...">PDF</a>
-      -->
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{Hah2025:AutWitNapZf,
+  author={Hahn, Atle},
+  title={Autoformalization with {Naproche}-{ZF}},
+  year={2025},
+  note={Talk at the \emph{NatFoM} workshop at \emph{CICM 2025}, {Brasília}, {Brazil}}
+}</pre>
     </details>
+  </li>
+  <li>
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    <i>Towards Autoformalization of Textbook Mathematics with Natural Proof Checking</i>;
+    <a href="https://malinca.gitlabpages.inria.fr/malinca.gitlab.io/events-kickoff/"><i>Malinca Kick-Off Meeting 2025</i></a>,
+    Paris, France.
     <details class="abstract">
       <summary><b>Abstract</b></summary>
-      TBD<!--
       <div>
-        ...
+        <p>
+          Textbook mathematics relies on context and implicit reasoning,
+          presenting its arguments in a form optimized for human comprehension
+          rather than formal verification. Formal systems, in contrast, demand
+          explicit, step-by-step arguments in a rigid syntax, which contributes
+          to the difficulty of formalization. To bridge this gap, we propose
+          using a controlled natural language as an intermediate representation,
+          augmented by automated theorem provers to verify human-sized proof
+          steps. The design of this language draws both from practical
+          experiences with proof vernaculars of interactive theorem provers and
+          from techniques of formal linguistics. This approach aligns naturally
+          with LLM-based autoformalization, exploiting the vast corpus of
+          quasiformalist mathematical texts. By isolating essential mathematical
+          content from incidental surface details, it opens a path towards
+          systematic modelling and verification of textbook mathematics.
+        </p>
       </div>
-      -->
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-      TBD<!--
-<pre>@Misc{Hah2025:AutWitNapZf,
-  author={Hahn, Atle},
-  title={Autoformalization with Naproche-ZF},
+<pre>@Misc{Del2025:TowAutOfTexMatWitNatProChe,
+  author={De Lon, Adrian},
+  title={Towards Autoformalization of Textbook Mathematics with Natural Proof Checking},
   year={2025},
-  howpublished={Slides: \url{...}},
-  note={Talk at the \emph{NatFoM} workshop at \emph{CICM 2025}, {Brasília}, {Brazil}}
+  note={Talk at the \emph{{Malinca} Kick-Off Meeting}, {Paris}, {France}}
 }</pre>
-    -->
+    </details>
+  </li>
+  <li>
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    <i>A Natural Language Formalization of Perfectoid Rings in Naproche</i>;
+    in: Yannick Forster,  Chantal Keller (eds.);
+    <a href="https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ITP.2025">16th International Conference on Interactive Theorem Proving</a>;
+    <a href="https://icetcs.github.io/frocos-itp-tableaux25/"><i>ITP 2025</i></a>,
+    Reykjavik, Iceland.
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Proceedings: <a href="https://drops.dagstuhl.de/storage/00lipics/lipics-vol352-itp2025/LIPIcs.ITP.2025/LIPIcs.ITP.2025.pdf">PDF</a>
+    </details>
+    <details class="abstract">
+      <summary><b>Abstract</b></summary>
+      <div>
+        <p>
+          This paper describes an experiment to formalize sophisticated
+          mathematics in the Naproche proof assistant which uses natural
+          language input and a first-order internal logic. We view this as a
+          contribution to the ongoing discussion whether formal systems for
+          research mathematics require complex, computer-orientated type systems
+          or whether approaches closer to traditional mathematical practices are
+          possible. The formalization also explores the limits of the current
+          Naproche system and avenues for further development.
+        </p>
+      </div>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@InProceedings{Koe2025:ANatLanForOfPerRinInNap,
+  author={Koepke, Peter},
+  editor={Forster, Yannick and Keller, Chantal},
+  title={A Natural Language Formalization of Perfectoid Rings in {Naproche}},
+  booktitle={16th International Conference on Interactive Theorem Proving ({ITP} 2025)},
+  series={Leibniz International Proceedings in Informatics ({LIPIcs})},
+  year={2025},
+  volume={352},
+  publisher={Schloss {Dagstuhl} -- {Leibniz}-Zentrum für Informatik},
+  address={Dagstuhl, Germany},
+  pages={6:1--6:15}
+}</pre>
+    </details>
+  </li>
+  <li>
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Josef Urban <a href="https://orcid.org/0000-0002-1384-1613"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Atle Hahn,
+    Mario Carneiro <a href="https://orcid.org/0000-0002-0470-5249"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    <i>Le Miz s&rsquo;approche: Informalization and Autoformalization with Mizar and Naproche</i>;
+    <a href="https://aitp-conference.org/2025/"><i>AITP 2025</i></a>,
+    Aussoi, France. 
+    <details class="resources">
+      <summary><b>Resources</b></summary>
+      Presentation Abstract: <a href="https://aitp-conference.org/2025/abstract/AITP_2025_paper_13.pdf">PDF</a>,
+      Slides: <a href="https://aitp-conference.org/2025/slides/ADL.pdf">PDF</a>
+    </details>
+    <details class="bibtex">
+      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+<pre>@Misc{DelUrbKoeCar2025:LeMizSapInfAndAutWitMizAndNap,
+  author={De Lon, Adrian and Urban, Josef and Koepke, Peter and Carneiro, Mario},
+  title={Le Miz s'approche: Informalization and Autoformalization with Mizar and Naproche},
+  year={2025},
+  note={Talk at \emph{{AITP} 2025}, {Aussoi}, {France}}
+}</pre>
     </details>
   </li>
   <li>
