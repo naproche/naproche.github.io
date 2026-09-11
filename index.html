@@ -2,263 +2,288 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Naproche</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" property="og:description" content="Naproche proof assistant home page" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <!-- <meta property="og:image" content="ABSOLUTE_URL_GOES_HERE"/> -->
-    <style>
-        :root {
-            --highlight: #df061f;
-        }
+  <meta charset="UTF-8">
+  <title>Naproche</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" property="og:description" content="Naproche proof assistant home page" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <!-- <meta property="og:image" content="ABSOLUTE_URL_GOES_HERE"/> -->
+  <style>
+    :root {
+      --highlight: #df061f;
+    }
 
-        body {
-            font-size: 20px;
-            margin: auto;
-        }
+    body {
+      font-size: 20px;
+      margin: auto;
+    }
 
-        body {
-            max-width: 51rem;
-        }
+    body {
+      max-width: 51rem;
+    }
 
-        h1 {
-            font-size: 1.5rem;
-        }
+    h1 {
+      font-size: 1.5rem;
+    }
 
-        h2 {
-            font-size: 1.25rem;
-            border-top: 1px solid black;
-            padding-top: 0.5rem;
-        }
+    h2 {
+      font-size: 1.25rem;
+      border-top: 1px solid black;
+      padding-top: 0.5rem;
+    }
 
-        a {
-            text-decoration: none;
-            color: var(--highlight);
-        }
+    a {
+      text-decoration: none;
+      color: var(--highlight);
+    }
 
-        a:hover {
-            text-decoration: underline;
-        }
+    a:hover {
+      text-decoration: underline;
+    }
 
-        blockquote {
-            background-color: #eee;
-            padding: 1rem;
-            margin: 0;
-        }
+    blockquote {
+      background-color: #eee;
+      padding: 1rem;
+      margin: 0;
+    }
 
-        blockquote p:first-child {
-            margin-top: 0;
-        }
+    blockquote p:first-child {
+      margin-top: 0;
+    }
 
-        blockquote p:last-child {
-            margin-bottom: 0;
-        }
+    blockquote p:last-child {
+      margin-bottom: 0;
+    }
 
-        address {
-            font-style: normal;
-        }
+    address {
+      font-style: normal;
+    }
 
-        header {
-            display: flex;
-            border-bottom: 1px solid black;
-            padding: 0.5rem 0;
-        }
+    header {
+      display: flex;
+      border-bottom: 1px solid black;
+      padding: 0.5rem 0;
+    }
 
-        #header_index {
-            font-size: 2.25rem;
-            padding-right: 2.25rem;
-            color: currentcolor;
-        }
+    #header_index {
+      font-size: 2.25rem;
+      padding-right: 2.25rem;
+      color: currentcolor;
+    }
 
-        footer ol, nav ol {
-            display: flex;
-            flex-wrap: wrap;
-            list-style-type: none;
-            margin-inline-start: 0;
-            margin: 0;
-            padding-inline-start: 0;
-            column-gap: 0.75rem;
-            padding: 0;
-        }
+    footer ol,
+    nav ol {
+      display: flex;
+      flex-wrap: wrap;
+      list-style-type: none;
+      margin-inline-start: 0;
+      margin: 0;
+      padding-inline-start: 0;
+      column-gap: 0.75rem;
+      padding: 0;
+    }
 
-        nav ol li, footer ol li {
-            display: block;
-            padding: 0 1rem 0.25rem 0;
-        }
+    nav ol li,
+    footer ol li {
+      display: block;
+      padding: 0 1rem 0.25rem 0;
+    }
 
-        nav ol li a, footer ol li a {
-            text-decoration: none;
-            color: black;
-        }
+    nav ol li a,
+    footer ol li a {
+      text-decoration: none;
+      color: black;
+    }
 
-        .youarehere {
-            color: var(--highlight) !important;
-        }
+    .youarehere {
+      color: var(--highlight) !important;
+    }
 
-        footer {
-            border-top: 1px solid black;
-            font-size: 16px;
-        }
+    footer {
+      border-top: 1px solid black;
+      font-size: 16px;
+    }
 
-        ul li:not(:last-of-type) {
-            margin-bottom: 1em;
-        }
+    ul li:not(:last-of-type) {
+      margin-bottom: 1em;
+    }
 
-        .abstract ul li {
-            margin-bottom: 16px;
-        }
+    .abstract ul li {
+      margin-bottom: 16px;
+    }
 
-        .resources {
-            margin-top: 0.3em;
-        }
+    .resources {
+      margin-top: 0.3em;
+    }
 
-        .bibtex {
-            margin-top: 0.3em;
-        }
+    .bibtex {
+      margin-top: 0.3em;
+    }
 
-        .bibtex pre {
-            background-color: lightgray;
-            font-size: 80%;
-            padding: 10px;
-            overflow-x: scroll;
-            border: solid;
-            border-width: 1px;
-        }
+    .bibtex pre {
+      background-color: lightgray;
+      font-size: 80%;
+      padding: 10px;
+      overflow-x: scroll;
+      border: solid;
+      border-width: 1px;
+    }
 
-        .abstract {
-            margin-top: 0.3em;
-            text-align: justify;
-        }
+    .abstract {
+      margin-top: 0.3em;
+      text-align: justify;
+    }
 
-        .abstract div {
-            font-size: 80%;
-            padding: 10px;
-            border: solid;
-            border-width: 1px;
-        }
+    .abstract div {
+      font-size: 80%;
+      padding: 10px;
+      border: solid;
+      border-width: 1px;
+    }
 
-        .orcid-icon {
-            height: 1em;
-        }
+    .orcid-icon {
+      height: 1em;
+    }
 
-        .latest_release {
-            width: max-content;
-            border: solid black 1px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 10px;
-        }
+    #latest_release {
+      width: max-content;
+      max-width: 80%;
+      border: solid black 1px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 10px;
+      text-align: center;
+    }
 
-        .latest_release span {
-            font-weight: bold;
-        }
+    #latest_release_heading {
+      font-weight: bold;
+    }
 
-        .latest_release p {
-            margin: 10px 0 0;
-        }
-    </style>
+    #latest_release_link {
+      margin: 1em auto 0;
+      width: max-content;
+    }
+  </style>
 </head>
 
 <body>
-    <header>
-        <a id="header_index" title="Index page" class="youarehere" href="index.html">Naproche</a>
-        <nav>
-            <ol>
-                <li><a href="download.html">Download</a></li>
-                <!-- <li><a href="tutorial.html">Tutorial</a></li> -->
-                <li><a href="try.html">Playground</a></li>
-                <li><a href="documentation.html">Documentation</a></li>
-                <li><a href="formalizations.html">Formalizations</a></li>
-                <li><a href="history.html">History</a></li>
-                <li><a href="publications.html">Publications &amp; Talks</a></li>
-                <li><a href="links.html">Links</a></li>
-                <li><a href="people.html">People</a></li>
-            </ol>
-        </nav>
-    </header>
-    <main>
-
-<h1>Naproche</h1>
+  <header>
+    <a id="header_index" title="Index page" class="youarehere" href="index.html">Naproche</a>
+    <nav>
+      <ol>
+        <li><a href="download.html">Download</a></li>
+        <!-- <li><a href="tutorial.html">Tutorial</a></li> -->
+        <li><a href="try.html">Playground</a></li>
+        <li><a href="documentation.html">Documentation</a></li>
+        <li><a href="formalizations.html">Formalizations</a></li>
+        <li><a href="history.html">History</a></li>
+        <li><a href="publications.html">Publications &amp; Talks</a></li>
+        <li><a href="links.html">Links</a></li>
+        <li><a href="people.html">People</a></li>
+      </ol>
+    </nav>
+  </header>
+  <main><h1>Naproche</h1>
 <p><i>News:</i> The <a href="https://naproche.github.io/school/">EuroProofNet School on Natural Formal Mathematics</a> will take place from June 3rd to June 5th 2025 in Bonn. The school will feature talks on topics related to natural formal mathematics and hands-on tutorials. More details can be found on <a href="https://naproche.github.io/school/">the school's website</a>.</p>
 <p>
-    Naproche is a <em>natural</em> <a href="https://en.wikipedia.org/wiki/Proof_assistant">proof assistant</a> that models the usual reading and checking of mathematical proofs by mathematicians.
-    The  naturality of Naproche is twofold:
-    it uses a <a href="https://en.wikipedia.org/wiki/Controlled_natural_language">controlled natural language</a> as its input language,
-    but it also aims for proofs free from clutter and tedious details, i.e., proofs that read <em>naturally</em> to mathematicians.
-    The input language of Naproche is embedded into <a href="https://www.latex-project.org">LaTeX</a>,
-    allowing users to combine
-    natural argumentative language with symbolic material in a manner that is familiar to mathematicians.
+  Naproche is a <em>natural</em> <a href="https://en.wikipedia.org/wiki/Proof_assistant">proof assistant</a> that models the usual reading and checking of mathematical proofs by mathematicians.
+  The naturality of Naproche is twofold:
+  it uses a <a href="https://en.wikipedia.org/wiki/Controlled_natural_language">controlled natural language</a> as its input language,
+  but it also aims for proofs free from clutter and tedious details, i.e., proofs that read <em>naturally</em> to mathematicians.
+  The input language of Naproche is embedded into <a href="https://www.latex-project.org">LaTeX</a>,
+  allowing users to combine
+  natural argumentative language with symbolic material in a manner that is familiar to mathematicians.
 </p>
 <p>
-    Here’s an example of a theorem and proof in Naproche:
+  Here’s an example of a theorem and proof in Naproche:
 </p>
 <blockquote>
-<p>
+  <p>
     <i>Theorem</i> (Cantor).
-    Let <math><mi>M</mi></math> be a set.
-    No function on <math><mi>M</mi></math> surjects onto
-    the powerset of <math><mi>M</mi></math>.
-</p>
-<p>
+    Let <math>
+      <mi>M</mi>
+    </math> be a set.
+    No function on <math>
+      <mi>M</mi>
+    </math> surjects onto
+    the powerset of <math>
+      <mi>M</mi>
+    </math>.
+  </p>
+  <p>
     <i>Proof by contradiction.</i>
-    Consider a surjective function <math><mi>f</mi></math> from <math><mi>M</mi></math> to the powerset of <math><mi>M</mi></math>.
+    Consider a surjective function <math>
+      <mi>f</mi>
+    </math> from <math>
+      <mi>M</mi>
+    </math> to the powerset of <math>
+      <mi>M</mi>
+    </math>.
     <!-- The value of <math><mi>f</mi></math> at any element of <math><mi>M</mi></math> is a set. -->
     Define
     <math display="block">
-        <mrow>
-            <mi>N</mi>
-            <mo>=</mo>
-            <mo>{</mo>
-                <mi>x</mi>
-                <mo>∈</mo>
-                <mi>M</mi>
-            <mo>|</mo>
-                <mi>x</mi>
-                <mo>∉</mo>
-                <mi>f</mi>
-                <mo>(</mo>
-                <mi>x</mi>
-                <mo>)</mo>
-            <mo>}</mo>
-        </mrow><mtext>.</mtext>
+      <mrow>
+        <mi>N</mi>
+        <mo>=</mo>
+        <mo>{</mo>
+        <mi>x</mi>
+        <mo>∈</mo>
+        <mi>M</mi>
+        <mo>|</mo>
+        <mi>x</mi>
+        <mo>∉</mo>
+        <mi>f</mi>
+        <mo>(</mo>
+        <mi>x</mi>
+        <mo>)</mo>
+        <mo>}</mo>
+      </mrow>
+      <mtext>.</mtext>
     </math>
-    Thus <math><mi>N</mi></math> is a subset of <math><mi>M</mi></math>.
-    Consider an element <math><mi>z</mi></math> of <math><mi>M</mi></math> such that
+    Thus <math>
+      <mi>N</mi>
+    </math> is a subset of <math>
+      <mi>M</mi>
+    </math>.
+    Consider an element <math>
+      <mi>z</mi>
+    </math> of <math>
+      <mi>M</mi>
+    </math> such that
     <math>
-        <mrow>
-            <mi>f</mi>
-            <mo>(</mo>
-            <mi>z</mi>
-            <mo>)</mo>
-            <mo>=</mo>
-            <mi>N</mi>
-        </mrow>
+      <mrow>
+        <mi>f</mi>
+        <mo>(</mo>
+        <mi>z</mi>
+        <mo>)</mo>
+        <mo>=</mo>
+        <mi>N</mi>
+      </mrow>
     </math>.
     Then
     <math display="block">
-        <mrow>
-            <mi>z</mi>
-            <mo>∈</mo>
-            <mi>N</mi>
-            <mspace width="0.5em"/>
-            <mtext>iff</mtext>
-            <mspace width="0.5em"/>
-            <mspace/>
-            <mi>z</mi>
-            <mo>∉</mo>
-            <mi>f</mi>
-            <mo>(</mo>
-            <mi>z</mi>
-            <mo>)</mo>
-            <mo>=</mo>
-            <mi>N</mi>
-            <mtext>.</mtext>
-        </mrow>
+      <mrow>
+        <mi>z</mi>
+        <mo>∈</mo>
+        <mi>N</mi>
+        <mspace width="0.5em" />
+        <mtext>iff</mtext>
+        <mspace width="0.5em" />
+        <mspace />
+        <mi>z</mi>
+        <mo>∉</mo>
+        <mi>f</mi>
+        <mo>(</mo>
+        <mi>z</mi>
+        <mo>)</mo>
+        <mo>=</mo>
+        <mi>N</mi>
+        <mtext>.</mtext>
+      </mrow>
     </math>
     Contradiction.
     Qed.
-</p>
+  </p>
 </blockquote>
 <!--
 <blockquote>
@@ -373,27 +398,27 @@
 </blockquote>
 -->
 <p>
-    Naproche translates natural language to a <!--formal--> formula-based representation
-    and generates proof obligations associated with each step in a proof.
-    Each obligation consists of a conjecture together with hypotheses representing previous facts and local assumptions.
-    Thereafter Naproche uses <a href="https://en.wikipedia.org/wiki/Automated_theorem_proving">automated theorem provers</a> to check whether the conjecture of each obligation can be proved from its hypotheses.
+  Naproche translates natural language to a <!--formal--> formula-based representation
+  and generates proof obligations associated with each step in a proof.
+  Each obligation consists of a conjecture together with hypotheses representing previous facts and local assumptions.
+  Thereafter Naproche uses <a href="https://en.wikipedia.org/wiki/Automated_theorem_proving">automated theorem provers</a> to check whether the conjecture of each obligation can be proved from its hypotheses.
 </p>
 <!--p>
     The parsers of the Naproche (Natural Proof Checking) system define an accepted input language ForTheL
     (Formula Theory Language) which constitutes a controlled natural language (CNL) for mathematics.
 </p-->
 <p>
-    Students have successfully formalized a variety of undergraduate mathematics
-    in Naproche.
-    Naproche demonstrates that formal mathematics can be carried out in a language which is immediately readable by mathematicians.
-    Naproche texts may be structured in the familiar declarative proof style.
-</p>
-    </main>
-    <footer>
-        <ol>
-            <li><a href="impressum.html">Impressum</a></li>
-            <li><a href="privacy.html">Privacy</a></li>
-        </ol>
-    </footer>
+  Students have successfully formalized a variety of undergraduate mathematics
+  in Naproche.
+  Naproche demonstrates that formal mathematics can be carried out in a language which is immediately readable by mathematicians.
+  Naproche texts may be structured in the familiar declarative proof style.
+</p></main>
+<footer>
+  <ol>
+    <li><a href="impressum.html">Impressum</a></li>
+    <li><a href="privacy.html">Privacy</a></li>
+  </ol>
+</footer>
 </body>
+
 </html>

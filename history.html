@@ -2,204 +2,209 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Naproche</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" property="og:description" content="Naproche proof assistant home page" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <!-- <meta property="og:image" content="ABSOLUTE_URL_GOES_HERE"/> -->
-    <style>
-        :root {
-            --highlight: #df061f;
-        }
+  <meta charset="UTF-8">
+  <title>Naproche</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" property="og:description" content="Naproche proof assistant home page" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <!-- <meta property="og:image" content="ABSOLUTE_URL_GOES_HERE"/> -->
+  <style>
+    :root {
+      --highlight: #df061f;
+    }
 
-        body {
-            font-size: 20px;
-            margin: auto;
-        }
+    body {
+      font-size: 20px;
+      margin: auto;
+    }
 
-        body {
-            max-width: 51rem;
-        }
+    body {
+      max-width: 51rem;
+    }
 
-        h1 {
-            font-size: 1.5rem;
-        }
+    h1 {
+      font-size: 1.5rem;
+    }
 
-        h2 {
-            font-size: 1.25rem;
-            border-top: 1px solid black;
-            padding-top: 0.5rem;
-        }
+    h2 {
+      font-size: 1.25rem;
+      border-top: 1px solid black;
+      padding-top: 0.5rem;
+    }
 
-        a {
-            text-decoration: none;
-            color: var(--highlight);
-        }
+    a {
+      text-decoration: none;
+      color: var(--highlight);
+    }
 
-        a:hover {
-            text-decoration: underline;
-        }
+    a:hover {
+      text-decoration: underline;
+    }
 
-        blockquote {
-            background-color: #eee;
-            padding: 1rem;
-            margin: 0;
-        }
+    blockquote {
+      background-color: #eee;
+      padding: 1rem;
+      margin: 0;
+    }
 
-        blockquote p:first-child {
-            margin-top: 0;
-        }
+    blockquote p:first-child {
+      margin-top: 0;
+    }
 
-        blockquote p:last-child {
-            margin-bottom: 0;
-        }
+    blockquote p:last-child {
+      margin-bottom: 0;
+    }
 
-        address {
-            font-style: normal;
-        }
+    address {
+      font-style: normal;
+    }
 
-        header {
-            display: flex;
-            border-bottom: 1px solid black;
-            padding: 0.5rem 0;
-        }
+    header {
+      display: flex;
+      border-bottom: 1px solid black;
+      padding: 0.5rem 0;
+    }
 
-        #header_index {
-            font-size: 2.25rem;
-            padding-right: 2.25rem;
-            color: currentcolor;
-        }
+    #header_index {
+      font-size: 2.25rem;
+      padding-right: 2.25rem;
+      color: currentcolor;
+    }
 
-        footer ol, nav ol {
-            display: flex;
-            flex-wrap: wrap;
-            list-style-type: none;
-            margin-inline-start: 0;
-            margin: 0;
-            padding-inline-start: 0;
-            column-gap: 0.75rem;
-            padding: 0;
-        }
+    footer ol,
+    nav ol {
+      display: flex;
+      flex-wrap: wrap;
+      list-style-type: none;
+      margin-inline-start: 0;
+      margin: 0;
+      padding-inline-start: 0;
+      column-gap: 0.75rem;
+      padding: 0;
+    }
 
-        nav ol li, footer ol li {
-            display: block;
-            padding: 0 1rem 0.25rem 0;
-        }
+    nav ol li,
+    footer ol li {
+      display: block;
+      padding: 0 1rem 0.25rem 0;
+    }
 
-        nav ol li a, footer ol li a {
-            text-decoration: none;
-            color: black;
-        }
+    nav ol li a,
+    footer ol li a {
+      text-decoration: none;
+      color: black;
+    }
 
-        .youarehere {
-            color: var(--highlight) !important;
-        }
+    .youarehere {
+      color: var(--highlight) !important;
+    }
 
-        footer {
-            border-top: 1px solid black;
-            font-size: 16px;
-        }
+    footer {
+      border-top: 1px solid black;
+      font-size: 16px;
+    }
 
-        ul li:not(:last-of-type) {
-            margin-bottom: 1em;
-        }
+    ul li:not(:last-of-type) {
+      margin-bottom: 1em;
+    }
 
-        .abstract ul li {
-            margin-bottom: 16px;
-        }
+    .abstract ul li {
+      margin-bottom: 16px;
+    }
 
-        .resources {
-            margin-top: 0.3em;
-        }
+    .resources {
+      margin-top: 0.3em;
+    }
 
-        .bibtex {
-            margin-top: 0.3em;
-        }
+    .bibtex {
+      margin-top: 0.3em;
+    }
 
-        .bibtex pre {
-            background-color: lightgray;
-            font-size: 80%;
-            padding: 10px;
-            overflow-x: scroll;
-            border: solid;
-            border-width: 1px;
-        }
+    .bibtex pre {
+      background-color: lightgray;
+      font-size: 80%;
+      padding: 10px;
+      overflow-x: scroll;
+      border: solid;
+      border-width: 1px;
+    }
 
-        .abstract {
-            margin-top: 0.3em;
-            text-align: justify;
-        }
+    .abstract {
+      margin-top: 0.3em;
+      text-align: justify;
+    }
 
-        .abstract div {
-            font-size: 80%;
-            padding: 10px;
-            border: solid;
-            border-width: 1px;
-        }
+    .abstract div {
+      font-size: 80%;
+      padding: 10px;
+      border: solid;
+      border-width: 1px;
+    }
 
-        .orcid-icon {
-            height: 1em;
-        }
+    .orcid-icon {
+      height: 1em;
+    }
 
-        .latest_release {
-            width: max-content;
-            border: solid black 1px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 10px;
-        }
+    #latest_release {
+      width: max-content;
+      max-width: 80%;
+      border: solid black 1px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 10px;
+      text-align: center;
+    }
 
-        .latest_release span {
-            font-weight: bold;
-        }
+    #latest_release_heading {
+      font-weight: bold;
+    }
 
-        .latest_release p {
-            margin: 10px 0 0;
-        }
-    </style>
+    #latest_release_link {
+      margin: 1em auto 0;
+      width: max-content;
+    }
+  </style>
 </head>
 
 <body>
-    <header>
-        <a id="header_index" title="Index page" href="index.html">Naproche</a>
-        <nav>
-            <ol>
-                <li><a href="download.html">Download</a></li>
-                <!-- <li><a href="tutorial.html">Tutorial</a></li> -->
-                <li><a href="try.html">Playground</a></li>
-                <li><a href="documentation.html">Documentation</a></li>
-                <li><a href="formalizations.html">Formalizations</a></li>
-                <li><a class="youarehere" href="history.html">History</a></li>
-                <li><a href="publications.html">Publications &amp; Talks</a></li>
-                <li><a href="links.html">Links</a></li>
-                <li><a href="people.html">People</a></li>
-            </ol>
-        </nav>
-    </header>
-    <main>
-<h1>History</h1>
+  <header>
+    <a id="header_index" title="Index page" href="index.html">Naproche</a>
+    <nav>
+      <ol>
+        <li><a href="download.html">Download</a></li>
+        <!-- <li><a href="tutorial.html">Tutorial</a></li> -->
+        <li><a href="try.html">Playground</a></li>
+        <li><a href="documentation.html">Documentation</a></li>
+        <li><a href="formalizations.html">Formalizations</a></li>
+        <li><a class="youarehere" href="history.html">History</a></li>
+        <li><a href="publications.html">Publications &amp; Talks</a></li>
+        <li><a href="links.html">Links</a></li>
+        <li><a href="people.html">People</a></li>
+      </ol>
+    </nav>
+  </header>
+  <main><h1>History</h1>
 
 <p>
-    Naproche has been developed as a <em>natural proof assistant</em> since 2017,
-    based on two older
-    projects on proof checking with
-    natural language input: the Evidence Algorithm project which was
-    initiated by Victor Glushkov, leading eventually to the SAD system by
-    Andrei Paskevich, and the original Naproche initiative with a stronger
-    linguistic orientation.
+  Naproche has been developed as a <em>natural proof assistant</em> since 2017,
+  based on two older
+  projects on proof checking with
+  natural language input: the Evidence Algorithm project which was
+  initiated by Victor Glushkov, leading eventually to the SAD system by
+  Andrei Paskevich, and the original Naproche initiative with a stronger
+  linguistic orientation.
 </p>
 
 
 <h2>Naproche 0 (2003&ndash;2015)</h2>
 <p>
-    (coming soon)
+  (coming soon)
 </p>
 
 
 <h2>Evidence Algorithms and SAD (1960s&ndash;2008)</h2>
 <p>
-    (coming soon)
+  (coming soon)
 </p>
 <!-- The <a href="http://nevidal.org/sad.en.html">System for Automated Deduction</a> (SAD)-->
 
@@ -207,38 +212,38 @@
 
 <h2>Naproche-SAD and the current Naproche (since 2017)</h2>
 <p>
-    (coming soon)
+  (coming soon)
 </p>
 
 
 
 <h2>Ongoing work</h2>
 <p>
-    (coming soon)
+  (coming soon)
 </p>
 
 
 <h2>References</h2>
 <ol>
-    <li name="Naproche2007">
-        Daniel Kühlwein, Marcos Cramer, Peter Koepke, and Bernhard Schröder (2007);
-        <a href="https://www.math.uni-bonn.de/people/koepke/Preprints/The_Naproche_system.pdf"><i>The Naproche system</i></a>.
-    </li>
-    <li name="Sad2007">
-        Konstantin Verchinine, Alexander Lyaletski, and Andrei Paskevich (2007);
-        <a href="https://link.springer.com/chapter/10.1007/978-3-540-73595-3_29"><i>System for Automated Deduction (SAD): A tool for proof verification</i></a>; in <i>Automated Deduction &ndash; CADE&#8209;21</i>
-    </li>
-    <li name="Forthel2007">
-        Andrei Paskevich (2007);
-        <a href="http://nevidal.org/download/forthel.pdf"><i>The syntax and semantics of the ForTheL language</i></a>; (technical report, translated from Andrei Paskevich’s thesis)
-    </li>
-</ol>
-    </main>
-    <footer>
-        <ol>
-            <li><a href="impressum.html">Impressum</a></li>
-            <li><a href="privacy.html">Privacy</a></li>
-        </ol>
-    </footer>
+  <li name="Naproche2007">
+    Daniel Kühlwein, Marcos Cramer, Peter Koepke, and Bernhard Schröder (2007);
+    <a href="https://www.math.uni-bonn.de/people/koepke/Preprints/The_Naproche_system.pdf"><i>The Naproche system</i></a>.
+  </li>
+  <li name="Sad2007">
+    Konstantin Verchinine, Alexander Lyaletski, and Andrei Paskevich (2007);
+    <a href="https://link.springer.com/chapter/10.1007/978-3-540-73595-3_29"><i>System for Automated Deduction (SAD): A tool for proof verification</i></a>; in <i>Automated Deduction &ndash; CADE&#8209;21</i>
+  </li>
+  <li name="Forthel2007">
+    Andrei Paskevich (2007);
+    <a href="http://nevidal.org/download/forthel.pdf"><i>The syntax and semantics of the ForTheL language</i></a>; (technical report, translated from Andrei Paskevich’s thesis)
+  </li>
+</ol></main>
+<footer>
+  <ol>
+    <li><a href="impressum.html">Impressum</a></li>
+    <li><a href="privacy.html">Privacy</a></li>
+  </ol>
+</footer>
 </body>
+
 </html>

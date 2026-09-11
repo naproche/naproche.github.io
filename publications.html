@@ -2,190 +2,195 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Naproche</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" property="og:description" content="Naproche proof assistant home page" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <!-- <meta property="og:image" content="ABSOLUTE_URL_GOES_HERE"/> -->
-    <style>
-        :root {
-            --highlight: #df061f;
-        }
+  <meta charset="UTF-8">
+  <title>Naproche</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" property="og:description" content="Naproche proof assistant home page" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <!-- <meta property="og:image" content="ABSOLUTE_URL_GOES_HERE"/> -->
+  <style>
+    :root {
+      --highlight: #df061f;
+    }
 
-        body {
-            font-size: 20px;
-            margin: auto;
-        }
+    body {
+      font-size: 20px;
+      margin: auto;
+    }
 
-        body {
-            max-width: 51rem;
-        }
+    body {
+      max-width: 51rem;
+    }
 
-        h1 {
-            font-size: 1.5rem;
-        }
+    h1 {
+      font-size: 1.5rem;
+    }
 
-        h2 {
-            font-size: 1.25rem;
-            border-top: 1px solid black;
-            padding-top: 0.5rem;
-        }
+    h2 {
+      font-size: 1.25rem;
+      border-top: 1px solid black;
+      padding-top: 0.5rem;
+    }
 
-        a {
-            text-decoration: none;
-            color: var(--highlight);
-        }
+    a {
+      text-decoration: none;
+      color: var(--highlight);
+    }
 
-        a:hover {
-            text-decoration: underline;
-        }
+    a:hover {
+      text-decoration: underline;
+    }
 
-        blockquote {
-            background-color: #eee;
-            padding: 1rem;
-            margin: 0;
-        }
+    blockquote {
+      background-color: #eee;
+      padding: 1rem;
+      margin: 0;
+    }
 
-        blockquote p:first-child {
-            margin-top: 0;
-        }
+    blockquote p:first-child {
+      margin-top: 0;
+    }
 
-        blockquote p:last-child {
-            margin-bottom: 0;
-        }
+    blockquote p:last-child {
+      margin-bottom: 0;
+    }
 
-        address {
-            font-style: normal;
-        }
+    address {
+      font-style: normal;
+    }
 
-        header {
-            display: flex;
-            border-bottom: 1px solid black;
-            padding: 0.5rem 0;
-        }
+    header {
+      display: flex;
+      border-bottom: 1px solid black;
+      padding: 0.5rem 0;
+    }
 
-        #header_index {
-            font-size: 2.25rem;
-            padding-right: 2.25rem;
-            color: currentcolor;
-        }
+    #header_index {
+      font-size: 2.25rem;
+      padding-right: 2.25rem;
+      color: currentcolor;
+    }
 
-        footer ol, nav ol {
-            display: flex;
-            flex-wrap: wrap;
-            list-style-type: none;
-            margin-inline-start: 0;
-            margin: 0;
-            padding-inline-start: 0;
-            column-gap: 0.75rem;
-            padding: 0;
-        }
+    footer ol,
+    nav ol {
+      display: flex;
+      flex-wrap: wrap;
+      list-style-type: none;
+      margin-inline-start: 0;
+      margin: 0;
+      padding-inline-start: 0;
+      column-gap: 0.75rem;
+      padding: 0;
+    }
 
-        nav ol li, footer ol li {
-            display: block;
-            padding: 0 1rem 0.25rem 0;
-        }
+    nav ol li,
+    footer ol li {
+      display: block;
+      padding: 0 1rem 0.25rem 0;
+    }
 
-        nav ol li a, footer ol li a {
-            text-decoration: none;
-            color: black;
-        }
+    nav ol li a,
+    footer ol li a {
+      text-decoration: none;
+      color: black;
+    }
 
-        .youarehere {
-            color: var(--highlight) !important;
-        }
+    .youarehere {
+      color: var(--highlight) !important;
+    }
 
-        footer {
-            border-top: 1px solid black;
-            font-size: 16px;
-        }
+    footer {
+      border-top: 1px solid black;
+      font-size: 16px;
+    }
 
-        ul li:not(:last-of-type) {
-            margin-bottom: 1em;
-        }
+    ul li:not(:last-of-type) {
+      margin-bottom: 1em;
+    }
 
-        .abstract ul li {
-            margin-bottom: 16px;
-        }
+    .abstract ul li {
+      margin-bottom: 16px;
+    }
 
-        .resources {
-            margin-top: 0.3em;
-        }
+    .resources {
+      margin-top: 0.3em;
+    }
 
-        .bibtex {
-            margin-top: 0.3em;
-        }
+    .bibtex {
+      margin-top: 0.3em;
+    }
 
-        .bibtex pre {
-            background-color: lightgray;
-            font-size: 80%;
-            padding: 10px;
-            overflow-x: scroll;
-            border: solid;
-            border-width: 1px;
-        }
+    .bibtex pre {
+      background-color: lightgray;
+      font-size: 80%;
+      padding: 10px;
+      overflow-x: scroll;
+      border: solid;
+      border-width: 1px;
+    }
 
-        .abstract {
-            margin-top: 0.3em;
-            text-align: justify;
-        }
+    .abstract {
+      margin-top: 0.3em;
+      text-align: justify;
+    }
 
-        .abstract div {
-            font-size: 80%;
-            padding: 10px;
-            border: solid;
-            border-width: 1px;
-        }
+    .abstract div {
+      font-size: 80%;
+      padding: 10px;
+      border: solid;
+      border-width: 1px;
+    }
 
-        .orcid-icon {
-            height: 1em;
-        }
+    .orcid-icon {
+      height: 1em;
+    }
 
-        .latest_release {
-            width: max-content;
-            border: solid black 1px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 10px;
-        }
+    #latest_release {
+      width: max-content;
+      max-width: 80%;
+      border: solid black 1px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 10px;
+      text-align: center;
+    }
 
-        .latest_release span {
-            font-weight: bold;
-        }
+    #latest_release_heading {
+      font-weight: bold;
+    }
 
-        .latest_release p {
-            margin: 10px 0 0;
-        }
-    </style>
+    #latest_release_link {
+      margin: 1em auto 0;
+      width: max-content;
+    }
+  </style>
 </head>
 
 <body>
-    <header>
-        <a id="header_index" title="Index page" href="index.html">Naproche</a>
-        <nav>
-            <ol>
-                <li><a href="download.html">Download</a></li>
-                <!-- <li><a href="tutorial.html">Tutorial</a></li> -->
-                <li><a href="try.html">Playground</a></li>
-                <li><a href="documentation.html">Documentation</a></li>
-                <li><a href="formalizations.html">Formalizations</a></li>
-                <li><a href="history.html">History</a></li>
-                <li><a class="youarehere" href="publications.html">Publications &amp; Talks</a></li>
-                <li><a href="links.html">Links</a></li>
-                <li><a href="people.html">People</a></li>
-            </ol>
-        </nav>
-    </header>
-    <main>
-<h1>Publications &amp; Talks</h1>
+  <header>
+    <a id="header_index" title="Index page" href="index.html">Naproche</a>
+    <nav>
+      <ol>
+        <li><a href="download.html">Download</a></li>
+        <!-- <li><a href="tutorial.html">Tutorial</a></li> -->
+        <li><a href="try.html">Playground</a></li>
+        <li><a href="documentation.html">Documentation</a></li>
+        <li><a href="formalizations.html">Formalizations</a></li>
+        <li><a href="history.html">History</a></li>
+        <li><a class="youarehere" href="publications.html">Publications &amp; Talks</a></li>
+        <li><a href="links.html">Links</a></li>
+        <li><a href="people.html">People</a></li>
+      </ol>
+    </nav>
+  </header>
+  <main><h1>Publications &amp; Talks</h1>
 
-<h2>2025</h2> 
+<h2>2025</h2>
 
 <ul>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Patrick Schäfer <a href="https://orcid.org/0009-0002-4913-992X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Patrick Schäfer <a href="https://orcid.org/0009-0002-4913-992X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <a href="https://link.springer.com/chapter/10.1007/978-3-032-07021-0_20"><i>Formalizing the Solow Model in Naproche</i></a>;
     in: Valeria de Paiva, Peter Koepke (eds.);
     <a href="https://link.springer.com/book/10.1007/978-3-032-07021-0"><i>Intelligent Computer Mathematics 18th International Conference</i></a>;
@@ -208,7 +213,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{KoeSch2025:ForTheSolModInNap,
+      <pre>@InProceedings{KoeSch2025:ForTheSolModInNap,
   author={Koepke, Peter and Schäfer, Patrick},
   editor={de Paiva, Valeria and Koepke, Peter},
   title={Formalizing the {Solow} Model in {Naproche}},
@@ -221,7 +226,7 @@
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Formalizing and Autoformalizing Euclid's Lemma in Naproche</i>;
     <a href="https://cicm-conference.org/2025/cicm.php?event=natfom"><i>NatFoM</i></a>,
     <a href="https://cicm-conference.org/2025/cicm.php"><i>CICM 2025</i></a>,
@@ -280,13 +285,13 @@
           Naproche principles. We shall then report how ChatGPT was able to
           produce a similar proof automatically from the Wikipedia text after
           being tought sufficiently many Naproche principles in an interactive
-          &quot;conversation&quot;. 
+          &quot;conversation&quot;.
         </p>
       </div>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2025:ForAndAutEucLemInNap,
+      <pre>@Misc{Koe2025:ForAndAutEucLemInNap,
   author={Peter Koepke},
   title={Formalizing and Autoformalizing {Euclid}'s Lemma in {Naproche}},
   year={2025},
@@ -296,7 +301,7 @@
     </details>
   </li>
   <li>
-    Patrick Schäfer <a href="https://orcid.org/0009-0002-4913-992X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Patrick Schäfer <a href="https://orcid.org/0009-0002-4913-992X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Formalization of an Ideology</i>;
     <a href="https://cicm-conference.org/2025/cicm.php?event=natfom"><i>NatFoM</i></a>,
     <a href="https://cicm-conference.org/2025/cicm.php"><i>CICM 2025</i></a>,
@@ -349,7 +354,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Sch2025:ForOfAnIde,
+      <pre>@Misc{Sch2025:ForOfAnIde,
   author={Patrick Schäfer},
   title={Formalization of an Ideology},
   year={2025},
@@ -359,7 +364,7 @@
     </details>
   </li>
   <li>
-    Marcel Schütz <a href="https://orcid.org/0000-0002-5386-5134"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Marcel Schütz <a href="https://orcid.org/0000-0002-5386-5134"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Managing Naproche Formalizations with sTeX and FLAMS</i>;
     <a href="https://cicm-conference.org/2025/cicm.php?event=natfom"><i>NatFoM</i></a>,
     <a href="https://cicm-conference.org/2025/cicm.php"><i>CICM 2025</i></a>,
@@ -383,20 +388,20 @@
           a Naproche formalization can make use of must be specified both on the
           logical <emph>and</emph> the presentational level. Examples of such language
           features are:
-          <ul>
-            <li>
-               referencing formal statements across formalizations;
-            </li>
-            <li>
-               reusing symbolic notations across formalizations;
-            </li>
-            <li>
-               including formalizations into each other.
-            </li>
-          </ul>
-          Whereas the features listed above are already supported on the logical
-          level of Naproche, they are currently all lacking proper support on
-          the presentational level.
+        <ul>
+          <li>
+            referencing formal statements across formalizations;
+          </li>
+          <li>
+            reusing symbolic notations across formalizations;
+          </li>
+          <li>
+            including formalizations into each other.
+          </li>
+        </ul>
+        Whereas the features listed above are already supported on the logical
+        level of Naproche, they are currently all lacking proper support on
+        the presentational level.
         </p>
         <p>
           In this talk, we will present how
@@ -417,20 +422,20 @@
         </p>
         <hr>
         <p>
-          <ul>
-            <li>
-                <span id="ref_223834">[1]</span> <a href="https://github.com/FlexiFormal/FLAMS">https://github.com/FlexiFormal/FLAMS</a>
-            </li>
-            <li>
-                <span id="ref_579823">[2]</span> <a href="https://github.com/slatex/stex">https://github.com/slatex/stex</a>
-            </li>
-          </ul>
+        <ul>
+          <li>
+            <span id="ref_223834">[1]</span> <a href="https://github.com/FlexiFormal/FLAMS">https://github.com/FlexiFormal/FLAMS</a>
+          </li>
+          <li>
+            <span id="ref_579823">[2]</span> <a href="https://github.com/slatex/stex">https://github.com/slatex/stex</a>
+          </li>
+        </ul>
         </p>
       </div>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Sch2025:ManNapForWitSteAndFla,
+      <pre>@Misc{Sch2025:ManNapForWitSteAndFla,
   author={Marcel Schütz},
   title={Managing {Naproche} Formalizations with {sTeX} and {FLAMS}},
   year={2025},
@@ -452,7 +457,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Hah2025:AutWitNapZf,
+      <pre>@Misc{Hah2025:AutWitNapZf,
   author={Hahn, Atle},
   title={Autoformalization with {Naproche}-{ZF}},
   year={2025},
@@ -461,7 +466,7 @@
     </details>
   </li>
   <li>
-    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Towards Autoformalization of Textbook Mathematics with Natural Proof Checking</i>;
     <a href="https://malinca.gitlabpages.inria.fr/malinca.gitlab.io/events-kickoff/"><i>Malinca Kick-Off Meeting 2025</i></a>,
     Paris, France.
@@ -488,7 +493,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Del2025:TowAutOfTexMatWitNatProChe,
+      <pre>@Misc{Del2025:TowAutOfTexMatWitNatProChe,
   author={De Lon, Adrian},
   title={Towards Autoformalization of Textbook Mathematics with Natural Proof Checking},
   year={2025},
@@ -497,9 +502,9 @@
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>A Natural Language Formalization of Perfectoid Rings in Naproche</i>;
-    in: Yannick Forster,  Chantal Keller (eds.);
+    in: Yannick Forster, Chantal Keller (eds.);
     <a href="https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ITP.2025">16th International Conference on Interactive Theorem Proving</a>;
     <a href="https://icetcs.github.io/frocos-itp-tableaux25/"><i>ITP 2025</i></a>,
     Reykjavik, Iceland.
@@ -528,7 +533,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{Koe2025:ANatLanForOfPerRinInNap,
+      <pre>@InProceedings{Koe2025:ANatLanForOfPerRinInNap,
   author={Koepke, Peter},
   editor={Forster, Yannick and Keller, Chantal},
   title={A Natural Language Formalization of Perfectoid Rings in {Naproche}},
@@ -543,11 +548,11 @@
     </details>
   </li>
   <li>
-    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Josef Urban <a href="https://orcid.org/0000-0002-1384-1613"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Josef Urban <a href="https://orcid.org/0000-0002-1384-1613"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Atle Hahn,
-    Mario Carneiro <a href="https://orcid.org/0000-0002-0470-5249"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Mario Carneiro <a href="https://orcid.org/0000-0002-0470-5249"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Le Miz s&rsquo;approche: Informalization and Autoformalization with Mizar and Naproche</i>;
     <a href="https://aitp-conference.org/2025/"><i>AITP 2025</i></a>,
     Aussoi, France.
@@ -558,7 +563,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{DelUrbKoeCar2025:LeMizSapInfAndAutWitMizAndNap,
+      <pre>@Misc{DelUrbKoeCar2025:LeMizSapInfAndAutWitMizAndNap,
   author={De Lon, Adrian and Urban, Josef and Koepke, Peter and Carneiro, Mario},
   title={Le Miz s'approche: Informalization and Autoformalization with Mizar and {Naproche}},
   year={2025},
@@ -567,7 +572,7 @@
     </details>
   </li>
   <li>
-    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Natural Language Understanding In Natural Proof Checking</i>;
     <a href="https://europroofnet.github.io/MCLP/">MCLP 2025</a>,
     Orsay France.
@@ -577,7 +582,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Del2025:NatLanUndInNatProChe,
+      <pre>@Misc{Del2025:NatLanUndInNatProChe,
   author={De Lon, Adrian},
   title={Natural Language Understanding In Natural Proof Checking},
   year={2025},
@@ -586,7 +591,7 @@
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>A Naproche Teaser</i>;
     <a href="https://naproche.github.io/school/"><i>EuroProofNet School on Natural Formal Mathematics</i></a>,
     Bonn, Germany.
@@ -615,20 +620,20 @@
         </p>
         <hr>
         <p>
-          <ul>
-            <li>
-                <span id="ref_028953">[1]</span> Anonymous
-            </li>
-            <li>
-                <span id="ref_793455">[2]</span> The Isabelle homepage: <a href="https://isabelle.in.tum.de/">https://isabelle.in.tum.de/</a>
-            </li>
-          </ul>
+        <ul>
+          <li>
+            <span id="ref_028953">[1]</span> Anonymous
+          </li>
+          <li>
+            <span id="ref_793455">[2]</span> The Isabelle homepage: <a href="https://isabelle.in.tum.de/">https://isabelle.in.tum.de/</a>
+          </li>
+        </ul>
         </p>
       </div>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Article{Koe2025:ANapTea,
+      <pre>@Article{Koe2025:ANapTea,
   title={A {Naproche} Teaser},
   author={Koepke, Peter},
   year={2025}
@@ -636,7 +641,7 @@
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Naproche – Talking to ATPs</i>;
     <a href="https://naproche.github.io/school/"><i>EuroProofNet School on Natural Formal Mathematics</i></a>,
     Bonn, Germany.
@@ -661,7 +666,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2025:NapTalToAtp,
+      <pre>@Misc{Koe2025:NapTalToAtp,
   author={Koepke, Peter},
   title={{Naproche} -- Talking to ATPs},
   year={2025},
@@ -671,7 +676,7 @@
     </details>
   </li>
   <li>
-    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Naproche-ZF</i>;
     <a href="https://naproche.github.io/school/"><i>EuroProofNet School on Natural Formal Mathematics</i></a>,
     Bonn, Germany.
@@ -681,7 +686,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Del2025:NapZf,
+      <pre>@Misc{Del2025:NapZf,
   author={De Lon, Adrian},
   title={{Naproche-ZF}},
   year={2025},
@@ -692,11 +697,11 @@
   </li>
 </ul>
 
-<h2>2024</h2> 
+<h2>2024</h2>
 
 <ul>
   <li>
-    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <a href="https://link.springer.com/chapter/10.1007/978-3-031-63498-7_7"><i>The Naproche-ZF Theorem Prover</i></a>;
     in: Christoph Benzmüller, Marijn J.H. Heule, Renate A. Schmidt (eds.);
     <a href="https://link.springer.com/book/10.1007/978-3-031-63498-7"><i>Automated Reasoning. 12th International Joint Conference</i></a>;
@@ -719,13 +724,13 @@
           formalizations. In contrast to the Naproche system, the new system
           uses an extensible grammar-based approach, has more efficient proof
           automation, and enables larger interconnected formalizations based on
-          a standard library. 
+          a standard library.
         </p>
       </div>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{Del2024:TheNapZfThePro,
+      <pre>@InProceedings{Del2024:TheNapZfThePro,
   author={De Lon, Adrian},
   editor={Benzmüller, Christoph and Heule, Marijn J.H. and Schmidt, Renate A.},
   title={The {Naproche-ZF} Theorem Prover (Short Paper)},
@@ -738,7 +743,7 @@
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>First-Order Mathematics and Naproche</i>;
     <a href="https://www.mathematics.uni-bonn.de/him/programs/past/him-trimester-program-prospects-of-formal-mathematics"><i>Prospects of Formal Mathematics</i></a>,
     Bonn, Germany.
@@ -748,7 +753,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2024:FirOrdMatAndNap,
+      <pre>@Misc{Koe2024:FirOrdMatAndNap,
   author={Koepke, Peter},
   title={First-Order Mathematics and {Naproche}},
   year={2024},
@@ -758,8 +763,8 @@
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
-    <i>Naproche &ndash; System Introduction</i>;  
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
+    <i>Naproche &ndash; System Introduction</i>;
     <a href="https://www.mathematics.uni-bonn.de/him/programs/past/him-trimester-program-prospects-of-formal-mathematics"><i>Prospects of Formal Mathematics</i></a>,
     Bonn, Germany.
     <details class="resources">
@@ -768,7 +773,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2024:NapSysInt,
+      <pre>@Misc{Koe2024:NapSysInt,
   author={Koepke, Peter},
   title={{Naproche} -- System Introduction},
   year={2024},
@@ -778,8 +783,8 @@
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
-    <i>A Natural Language Formalization of Perfectoid Rings in Naproche</i>;  
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
+    <i>A Natural Language Formalization of Perfectoid Rings in Naproche</i>;
     <a href="https://www.mathematics.uni-bonn.de/him/programs/past/him-trimester-program-prospects-of-formal-mathematics"><i>Prospects of Formal Mathematics</i></a>,
     Bonn, Germany.
     <details class="resources">
@@ -788,7 +793,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2024:ANatLanForOfPerRinInNap,
+      <pre>@Misc{Koe2024:ANatLanForOfPerRinInNap,
   author={Koepke, Peter},
   title={A Natural Language Formalization of Perfectoid Rings in {Naproche}},
   year={2024},
@@ -798,8 +803,8 @@
     </details>
   </li>
   <li>
-    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
-    <i>Natural Theorem Proving With Naproche-ZF</i>;  
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
+    <i>Natural Theorem Proving With Naproche-ZF</i>;
     <a href="https://www.mathematics.uni-bonn.de/him/programs/past/him-trimester-program-prospects-of-formal-mathematics"><i>Prospects of Formal Mathematics</i></a>,
     Bonn, Germany.
     <details class="resources">
@@ -808,7 +813,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Del2024:NatTheProWitNapZf,
+      <pre>@Misc{Del2024:NatTheProWitNapZf,
   author={De Lon, Adrian},
   title={Natural Theorem Proving With {Naproche-ZF}},
   year={2024},
@@ -818,8 +823,8 @@
     </details>
   </li>
   <li>
-    Shashank Pathak <a href="https://orcid.org/0000-0003-4519-3689"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
-    <i>GFLean: Autoformalisation for Lean via GF</i>;  
+    Shashank Pathak <a href="https://orcid.org/0000-0003-4519-3689"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
+    <i>GFLean: Autoformalisation for Lean via GF</i>;
     <a href="https://www.mathematics.uni-bonn.de/him/programs/past/him-trimester-program-prospects-of-formal-mathematics"><i>Prospects of Formal Mathematics</i></a>,
     Bonn, Germany.
     <details class="resources">
@@ -828,7 +833,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Sha2024:GflAutForLeaViaGf,
+      <pre>@Misc{Sha2024:GflAutForLeaViaGf,
   author={Pathak, Shashank},
   title={{GFLean}: Autoformalisation for Lean via {GF}},
   year={2024},
@@ -838,8 +843,8 @@
     </details>
   </li>
   <li>
-    Shashank Pathak <a href="https://orcid.org/0000-0003-4519-3689"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
-    <i>GFLean: Autoformalisation for Lean via Grammatical Framework</i>;  
+    Shashank Pathak <a href="https://orcid.org/0000-0003-4519-3689"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
+    <i>GFLean: Autoformalisation for Lean via Grammatical Framework</i>;
     <a href="https://leanprover-community.github.io/lt2024/"><i>Lean Together 2024</i></a>,
     online.
     <details class="resources">
@@ -848,7 +853,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Sha2024:GflAutForLeaViaGraFra,
+      <pre>@Misc{Sha2024:GflAutForLeaViaGraFra,
   author={Pathak, Shashank},
   title={{GFLean}: Autoformalisation for Lean via {Grammatical Framework}},
   year={2024},
@@ -858,7 +863,7 @@
     </details>
   </li>
   <li>
-    Shashank Pathak <a href="https://orcid.org/0000-0003-4519-3689"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Shashank Pathak <a href="https://orcid.org/0000-0003-4519-3689"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <a href="https://arxiv.org/abs/2404.01234#"><i>GFLean: An Autoformalisation Framework for Lean via GF</i></a>.
     <details class="resources">
       <summary><b>Resources</b></summary>
@@ -875,13 +880,13 @@
           inner working and discuss its limitations. We also discuss how we can
           use neural network based translation programs and rule based
           translation programs together complimenting each other to build robust
-          autoformalisation frameworks. 
+          autoformalisation frameworks.
         </p>
       </div>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Sha2024:GflAnAutFraForLeaViaGf,
+      <pre>@Misc{Sha2024:GflAnAutFraForLeaViaGf,
   author={Pathak, Shashank},
   title={GFLean: An Autoformalisation Framework for Lean via GF},
   year={2024},
@@ -895,7 +900,7 @@
 
 <ul>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Experiences with Natural Language Proof Checking</i>;
     <a href="https://europroofnet.github.io/cambridge-2023/"><i>NatFoM</i></a>,
     <a href="https://cicm-conference.org/2023/cicm.php"><i>CICM 2023</i></a>,
@@ -908,87 +913,87 @@
       <summary><b>Abstract</b></summary>
       <div>
         <p>
-            The Naproche system (for Natural Proof Checking) [<a href="#ref_398647">1</a>, <a href="#ref_256439">2</a>] interactively
-            proof-checks natural language mathematical texts whilst they are being
-            editing. Input texts are written in the controlled natural language ForTheL
-            (for Formula Theory Language) [<a href="#ref_783657">3</a>] which is intended to approximate the
-            natural mathematical language. Since ForTheL uses a LaTeX format,
-            high-quality typesetting of formalizations is immediately available. Over
-            the last years a number of theorems from non-trivial university mathematics
-            have been formalized in Naproche. Naproche is distributed as part of the
-            Isabelle prover platform which also includes a selection of Naproche
-            formalizations. Some of these texts closely resemble material that could be
-            found in mathematics textbooks.
+          The Naproche system (for Natural Proof Checking) [<a href="#ref_398647">1</a>, <a href="#ref_256439">2</a>] interactively
+          proof-checks natural language mathematical texts whilst they are being
+          editing. Input texts are written in the controlled natural language ForTheL
+          (for Formula Theory Language) [<a href="#ref_783657">3</a>] which is intended to approximate the
+          natural mathematical language. Since ForTheL uses a LaTeX format,
+          high-quality typesetting of formalizations is immediately available. Over
+          the last years a number of theorems from non-trivial university mathematics
+          have been formalized in Naproche. Naproche is distributed as part of the
+          Isabelle prover platform which also includes a selection of Naproche
+          formalizations. Some of these texts closely resemble material that could be
+          found in mathematics textbooks.
         </p>
         <p>
-            Although Naproche allowed to achieve natural mathematical readability for
-            strictly proof-checked formalizations, the formalization process has been
-            slow and arduous. Users not only have to write a logically correct formal
-            document for the intended mathematical content, but at the same time they
-            have to struggle with the weaknesses of ATPs in dealing with implicit proof
-            tasks; they have to observe the rules of LaTeX and ForTheL; and ideally they
-            should aim for natural readability and mathematical elegance of the typeset
-            document. These simultanuous requirements are becoming even more problematic
-            as formalizations are getting longer, sometimes comprizing twenty or more
-            typeset pages, so that the automated background provers are having
-            difficulties to resolve proof tasks within seconds. But this is incompatible
-            with productive interactive work.
+          Although Naproche allowed to achieve natural mathematical readability for
+          strictly proof-checked formalizations, the formalization process has been
+          slow and arduous. Users not only have to write a logically correct formal
+          document for the intended mathematical content, but at the same time they
+          have to struggle with the weaknesses of ATPs in dealing with implicit proof
+          tasks; they have to observe the rules of LaTeX and ForTheL; and ideally they
+          should aim for natural readability and mathematical elegance of the typeset
+          document. These simultanuous requirements are becoming even more problematic
+          as formalizations are getting longer, sometimes comprizing twenty or more
+          typeset pages, so that the automated background provers are having
+          difficulties to resolve proof tasks within seconds. But this is incompatible
+          with productive interactive work.
         </p>
         <p>
-            In my talk I shall illustrate and analyse the present state of affairs and
-            suggest ways in which natural proof checking could be made usable for a
-            wider mathematical public and for more advanced mathematics. I shall discuss
-            several possible ways forward:
-            <ol type="A">
-            <li>
-                Invest massively in improving all components of the current Naproche
-                system: e.g., with an editor like TeXmacs [<a href="#ref_105821">4</a>] users could directly work on
-                typeset mathematics; comprehensive caching of proofs should accelerate
-                proving times by an order of magnitude; tune or train external provers for
-                the specific proof tasks generated by Naproche; use standard type-checking
-                routines for some Naproche type-checking, etc.
-            </li>
-            <li>
-                Program a new natural system that circumvents weaknesses and
-                complications of Naproche; at the moment, Adrian De Lon is working towards a
-                novel set-theory based natural proof assistant.
-            </li>
-            <li>
-                Combine the natural language approach of Naproche with established
-                systems. Such a project may have some similarities with the introduction of
-                the Mizar-type proof language Isar in Isabelle/HOL [<a href="#ref_906346">5</a>].
-            </li>
-            </ol>
+          In my talk I shall illustrate and analyse the present state of affairs and
+          suggest ways in which natural proof checking could be made usable for a
+          wider mathematical public and for more advanced mathematics. I shall discuss
+          several possible ways forward:
+        <ol type="A">
+          <li>
+            Invest massively in improving all components of the current Naproche
+            system: e.g., with an editor like TeXmacs [<a href="#ref_105821">4</a>] users could directly work on
+            typeset mathematics; comprehensive caching of proofs should accelerate
+            proving times by an order of magnitude; tune or train external provers for
+            the specific proof tasks generated by Naproche; use standard type-checking
+            routines for some Naproche type-checking, etc.
+          </li>
+          <li>
+            Program a new natural system that circumvents weaknesses and
+            complications of Naproche; at the moment, Adrian De Lon is working towards a
+            novel set-theory based natural proof assistant.
+          </li>
+          <li>
+            Combine the natural language approach of Naproche with established
+            systems. Such a project may have some similarities with the introduction of
+            the Mizar-type proof language Isar in Isabelle/HOL [<a href="#ref_906346">5</a>].
+          </li>
+        </ol>
         </p>
         <hr>
         <p>
-            <ul>
-            <li>
-                <span id="ref_398647">[1]</span> <a href="https://naproche.github.io/index.html">https://naproche.github.io/index.html</a>
-            </li>
-            <li>
-                <span id="ref_256439">[2]</span> Adrian De Lon, Peter Koepke, Anton Lorenzen, Adrian Marti, Marcel
-                Schütz, Makarius Wenzel: The Isabelle/Naproche Natural Language Proof
-                Assistant. In: Automated Deduction &ndash; CADE 28: 28th International
-                Conference on Automated Deduction (Proceedings), 2021, pp. 614&ndash;624.
-            </li>
-            <li>
-                <span id="ref_783657">[3]</span> Andrei Paskevich: The syntax and semantics of the ForTheL language.
-                2007. URL: <a href="http://nevidal.org/download/forthel.pdf">http://nevidal.org/download/forthel.pdf</a>
-            </li>
-            <li>
-                <span id="ref_105821">[4]</span> <a href="http://texmacs.org/tmweb/home/welcome.en.html">http://texmacs.org/tmweb/home/welcome.en.html</a>
-            </li>
-            <li>
-                <span id="ref_906346">[5]</span> <a href="https://isabelle.in.tum.de/">https://isabelle.in.tum.de/</a>
-            </li>
-            </ul>
+        <ul>
+          <li>
+            <span id="ref_398647">[1]</span> <a href="https://naproche.github.io/index.html">https://naproche.github.io/index.html</a>
+          </li>
+          <li>
+            <span id="ref_256439">[2]</span> Adrian De Lon, Peter Koepke, Anton Lorenzen, Adrian Marti, Marcel
+            Schütz, Makarius Wenzel: The Isabelle/Naproche Natural Language Proof
+            Assistant. In: Automated Deduction &ndash; CADE 28: 28th International
+            Conference on Automated Deduction (Proceedings), 2021, pp. 614&ndash;624.
+          </li>
+          <li>
+            <span id="ref_783657">[3]</span> Andrei Paskevich: The syntax and semantics of the ForTheL language.
+            2007. URL: <a href="http://nevidal.org/download/forthel.pdf">http://nevidal.org/download/forthel.pdf</a>
+          </li>
+          <li>
+            <span id="ref_105821">[4]</span> <a href="http://texmacs.org/tmweb/home/welcome.en.html">http://texmacs.org/tmweb/home/welcome.en.html</a>
+          </li>
+          <li>
+            <span id="ref_906346">[5]</span> <a href="https://isabelle.in.tum.de/">https://isabelle.in.tum.de/</a>
+          </li>
+        </ul>
         </p>
       </div>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2023:ExpWitNatLanProChe,
+      <pre>@Misc{Koe2023:ExpWitNatLanProChe,
   author={Koepke, Peter},
   title={Experiences with Natural Language Proof Checking},
   year={2023},
@@ -998,109 +1003,113 @@
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Mateusz Marcol,
-    Patrick Schäfer <a href="https://orcid.org/0009-0002-4913-992X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/>;
-    <i>Formalizing Sets, Numbers, and some "Wiedijk Theorems" in Naproche</i>;
-    <a href="https://europroofnet.github.io/cambridge-2023/"><i>NatFoM</i></a>,
-    <a href="https://cicm-conference.org/2023/cicm.php"><i>CICM 2023</i></a>,
-    Cambridge, UK.
-    <details class="abstract">
-      <summary><b>Abstract</b></summary>
-      <div>
-        <p>
-          Freek Wiedijk's webpage "Formalizing 100 Theorems" [<a href="#ref_570934">1</a>] is sometimes
-          considered a benchmark for formalizations in interactive proof systems. It
-          also provides immediate comparisons between proof styles in different
-          systems.
-        </p>
-        <p>
-          In our talk we present a formalization in the Naproche Natural Proof Checker
-          [<a href="#">2</a>, <a href="#">3</a>] of sets, numbers and about 10 theorems from Wiedijk's list. The
-          formalization is part of the Isabelle 2023 release together with a
-          pdf-printout. Naproche formalizations aim at natural mathematical
-          readability: texts are written in a LaTeX source format that compiles to pdf
-          documents which read like standard mathematics. Strong automatic theorem
-          provers are employed to achieve textbook-like proof granularities.
-        </p>
-        <p>
-          Naproche's input language ForTheL [<a href="#">4</a>] (for Formula Theory Language) is a
-          controlled natural language based on patterns of tokens. The Naproche system
-          parses an input text into an incomplete proof tree of first-order
-          statements, where leaves correspond to axiomatic assumptions, and other
-          nodes are supposed to follow logically from premises higher up in the tree.
-          The system reads through the proof tree and checks statements for type
-          correctness and provability from their premises. These checks are mainly
-          done by external ATPs like E or Vampire. In line with the standard
-          foundations of mathematics in first-order logic and set theory, linguistic
-          types like "natural number" or "function" are interpreted as type guards.
-          Sets (and classes) can be formed by abstraction terms, obeying set existence
-          axioms.
-        </p>
-        <p>
-          Naproche is a component of the Isabelle prover platform [<a href="#">5</a>]. After
-          downloading and installing Isabelle, Naproche is immediately available and
-          will automatically check .ftl.tex files opened in the Isabelle editor.
-          Isabelle/Naproche ships with a couple of example files ranging from small
-          demos to larger mathematical developments. The present formalization is
-          included as the example file sets_and_numbers.ftl.tex.
-        </p>
-        <p>
-          In the formalization, set theory is developed up to the well-known theorems
-          of Cantor and Cantor-Schröder-Bernstein which are #63 and #25 on Wiedijk's
-          list. The standard number systems are introduced "top-down": we postulate
-          field axioms for the real numbers and then introduce the subsystems of
-          rational, integer and natural numbers. Interestingly, the principle of
-          mathematical induction (#74) follows from the supremum principle for real
-          numbers. Using induction we prove the summation formulas for finite
-          geometric (#66) and arithmetic series (#68), and the number of subsets of
-          finite sets (#52). After the introduction of division and primes in the
-          natural numbers we prove the correctness of Euclid's algorithm (#69),
-          Bezout's theorem (#60), the irrationality of <math display="inline"><msqrt><mn>2</mn></msqrt></math> (#1) and the
-          infinitude of primes (#11). We conclude with the denumerability of the
-          rational numbers (#3) and the uncountability of the real continuum (#22).
-          Overall, the formalization could be used in a seminar which teaches natural
-          and formal proving with Naproche whilst recapitulating basic and interesting
-          facts about sets and numbers.
-        </p>
-        <hr>
-        <p>
+    Patrick Schäfer <a href="https://orcid.org/0009-0002-4913-992X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" />;
+      <i>Formalizing Sets, Numbers, and some "Wiedijk Theorems" in Naproche</i>;
+      <a href="https://europroofnet.github.io/cambridge-2023/"><i>NatFoM</i></a>,
+      <a href="https://cicm-conference.org/2023/cicm.php"><i>CICM 2023</i></a>,
+      Cambridge, UK.
+      <details class="abstract">
+        <summary><b>Abstract</b></summary>
+        <div>
+          <p>
+            Freek Wiedijk's webpage "Formalizing 100 Theorems" [<a href="#ref_570934">1</a>] is sometimes
+            considered a benchmark for formalizations in interactive proof systems. It
+            also provides immediate comparisons between proof styles in different
+            systems.
+          </p>
+          <p>
+            In our talk we present a formalization in the Naproche Natural Proof Checker
+            [<a href="#">2</a>, <a href="#">3</a>] of sets, numbers and about 10 theorems from Wiedijk's list. The
+            formalization is part of the Isabelle 2023 release together with a
+            pdf-printout. Naproche formalizations aim at natural mathematical
+            readability: texts are written in a LaTeX source format that compiles to pdf
+            documents which read like standard mathematics. Strong automatic theorem
+            provers are employed to achieve textbook-like proof granularities.
+          </p>
+          <p>
+            Naproche's input language ForTheL [<a href="#">4</a>] (for Formula Theory Language) is a
+            controlled natural language based on patterns of tokens. The Naproche system
+            parses an input text into an incomplete proof tree of first-order
+            statements, where leaves correspond to axiomatic assumptions, and other
+            nodes are supposed to follow logically from premises higher up in the tree.
+            The system reads through the proof tree and checks statements for type
+            correctness and provability from their premises. These checks are mainly
+            done by external ATPs like E or Vampire. In line with the standard
+            foundations of mathematics in first-order logic and set theory, linguistic
+            types like "natural number" or "function" are interpreted as type guards.
+            Sets (and classes) can be formed by abstraction terms, obeying set existence
+            axioms.
+          </p>
+          <p>
+            Naproche is a component of the Isabelle prover platform [<a href="#">5</a>]. After
+            downloading and installing Isabelle, Naproche is immediately available and
+            will automatically check .ftl.tex files opened in the Isabelle editor.
+            Isabelle/Naproche ships with a couple of example files ranging from small
+            demos to larger mathematical developments. The present formalization is
+            included as the example file sets_and_numbers.ftl.tex.
+          </p>
+          <p>
+            In the formalization, set theory is developed up to the well-known theorems
+            of Cantor and Cantor-Schröder-Bernstein which are #63 and #25 on Wiedijk's
+            list. The standard number systems are introduced "top-down": we postulate
+            field axioms for the real numbers and then introduce the subsystems of
+            rational, integer and natural numbers. Interestingly, the principle of
+            mathematical induction (#74) follows from the supremum principle for real
+            numbers. Using induction we prove the summation formulas for finite
+            geometric (#66) and arithmetic series (#68), and the number of subsets of
+            finite sets (#52). After the introduction of division and primes in the
+            natural numbers we prove the correctness of Euclid's algorithm (#69),
+            Bezout's theorem (#60), the irrationality of <math display="inline">
+              <msqrt>
+                <mn>2</mn>
+              </msqrt>
+            </math> (#1) and the
+            infinitude of primes (#11). We conclude with the denumerability of the
+            rational numbers (#3) and the uncountability of the real continuum (#22).
+            Overall, the formalization could be used in a seminar which teaches natural
+            and formal proving with Naproche whilst recapitulating basic and interesting
+            facts about sets and numbers.
+          </p>
+          <hr>
+          <p>
           <ul>
-          <li>
-            <span id="ref_570934">[1]</span> <a href="https://www.cs.ru.nl/~freek/100/">https://www.cs.ru.nl/~freek/100/</a>
-          </li>
-          <li>
-            <span id="ref_120439">[2]</span> <a href="https://naproche.github.io/index.html">https://naproche.github.io/index.html</a>
-          </li>
-          <li>
-            <span id="ref_852745">[3]</span> Adrian De Lon, Peter Koepke, Anton Lorenzen, Adrian Marti, Marcel
-            Schütz, Makarius Wenzel: The Isabelle/Naproche Natural Language Proof
-            Assistant. In: Automated Deduction &ndash; CADE 28: 28th International
-            Conference on Automated Deduction (Proceedings), 2021, pp. 614&ndash;624.
-          </li>
-          <li>
-            <span id="ref_058345">[4]</span> Andrei Paskevich: The syntax and semantics of the ForTheL language.
-            2007. URL: <a href="http://nevidal.org/download/forthel.pdf">http://nevidal.org/download/forthel.pdf</a>
-          </li>
-          <li>
-            <span id="ref_782545">[5]</span> <a href="https://isabelle.in.tum.de/">https://isabelle.in.tum.de/</a>
-          </li>
+            <li>
+              <span id="ref_570934">[1]</span> <a href="https://www.cs.ru.nl/~freek/100/">https://www.cs.ru.nl/~freek/100/</a>
+            </li>
+            <li>
+              <span id="ref_120439">[2]</span> <a href="https://naproche.github.io/index.html">https://naproche.github.io/index.html</a>
+            </li>
+            <li>
+              <span id="ref_852745">[3]</span> Adrian De Lon, Peter Koepke, Anton Lorenzen, Adrian Marti, Marcel
+              Schütz, Makarius Wenzel: The Isabelle/Naproche Natural Language Proof
+              Assistant. In: Automated Deduction &ndash; CADE 28: 28th International
+              Conference on Automated Deduction (Proceedings), 2021, pp. 614&ndash;624.
+            </li>
+            <li>
+              <span id="ref_058345">[4]</span> Andrei Paskevich: The syntax and semantics of the ForTheL language.
+              2007. URL: <a href="http://nevidal.org/download/forthel.pdf">http://nevidal.org/download/forthel.pdf</a>
+            </li>
+            <li>
+              <span id="ref_782545">[5]</span> <a href="https://isabelle.in.tum.de/">https://isabelle.in.tum.de/</a>
+            </li>
           </ul>
-        </p>
-      </div>
-    </details>
-    <details class="bibtex">
-      <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{KoeMarSch2023:ForSetNumAndSomWieTheInNap,
+          </p>
+        </div>
+      </details>
+      <details class="bibtex">
+        <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
+        <pre>@Misc{KoeMarSch2023:ForSetNumAndSomWieTheInNap,
   author={Koepke, Peter and Marcol, Mateusz and Schäfer, Patrick},
   title={Formalizing Sets, Numbers, and some ``{Wiedijk} Theorems'' in {Naproche}},
   year={2023},
   note={Talk at the \emph{NatFoM} workshop at \emph{CICM 2023}, {Cambridge}, {UK}}
 }</pre>
-    </details>
+      </details>
   </li>
   <li>
-    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Scaling a Natural Proof Assistant Step by Step</i>;
     <a href="https://europroofnet.github.io/cambridge-2023/"><i>NatFoM</i></a>,
     <a href="https://cicm-conference.org/2023/cicm.php"><i>CICM 2023</i></a>,
@@ -1128,41 +1137,41 @@
           chapters of a textbook. The following are some of the issues we are facing:
         </p>
         <p>
-          <ul>
-            <li>
-              <b>Check times.</b> Long formalizations take hours to check. Small
-              inefficiencies, increasingly difficult tasks for automated provers, and
-              lack of parallelism add up to a painful experience even on powerful PCs.
-            </li>
-            <li>
-              <b>Libraries.</b> These general performance issues combined with Naproche's
-              limited import mechanism (similar to an include directive) makes it
-              difficult to develop more interconnected formalizations or a standard
-              library that other formalizations can build on.
-            </li>
-            <li>
-              <b>Structures.</b> Naproche has no features dedicated to mathematical structures.
-              This means that users have to set up structures themselves. Moreover,
-              dealing with notation becomes cumbersome, such as having to explicitly
-              annotate which structure an operation belongs to.
-            </li>
-            <li>
-              <b>Surface area for user error.</b> It is still too easy for users of Naproche to
-              set themselves up for problems. Some parts of formalizations, such as some
-              top-level functions, have to be formalized using axioms, which can lead to
-              accidental contradictions. The grammar of the controlled language is in
-              parts overly permissive, leading to unintended results.
-            </li>
-            <li>
-              <b>Stability of formalizations.</b> Adding new theorems in the middle of a
-              formalization (or adding imports) adds additional premises to subsequent
-              tasks exported to automated provers. This makes it more difficult for
-              automated provers to find proofs, which then can break existing proofs in
-              Naproche. When flying too close to the resource limits given to automated
-              provers, formalizations become flaky or fail to be reproducible on other
-              computers.
-            </li>
-          </ul>
+        <ul>
+          <li>
+            <b>Check times.</b> Long formalizations take hours to check. Small
+            inefficiencies, increasingly difficult tasks for automated provers, and
+            lack of parallelism add up to a painful experience even on powerful PCs.
+          </li>
+          <li>
+            <b>Libraries.</b> These general performance issues combined with Naproche's
+            limited import mechanism (similar to an include directive) makes it
+            difficult to develop more interconnected formalizations or a standard
+            library that other formalizations can build on.
+          </li>
+          <li>
+            <b>Structures.</b> Naproche has no features dedicated to mathematical structures.
+            This means that users have to set up structures themselves. Moreover,
+            dealing with notation becomes cumbersome, such as having to explicitly
+            annotate which structure an operation belongs to.
+          </li>
+          <li>
+            <b>Surface area for user error.</b> It is still too easy for users of Naproche to
+            set themselves up for problems. Some parts of formalizations, such as some
+            top-level functions, have to be formalized using axioms, which can lead to
+            accidental contradictions. The grammar of the controlled language is in
+            parts overly permissive, leading to unintended results.
+          </li>
+          <li>
+            <b>Stability of formalizations.</b> Adding new theorems in the middle of a
+            formalization (or adding imports) adds additional premises to subsequent
+            tasks exported to automated provers. This makes it more difficult for
+            automated provers to find proofs, which then can break existing proofs in
+            Naproche. When flying too close to the resource limits given to automated
+            provers, formalizations become flaky or fail to be reproducible on other
+            computers.
+          </li>
+        </ul>
         </p>
         <p>
           To address the issues described above, I'm working on a new implementation
@@ -1177,28 +1186,28 @@
           the new proof assistant and its standard library. I will talk about how some
           of the issues described above are mitigated in the new implementation. I
           will also talk about the following:
-          <ul>
-            <li>
-              <b>Initial user impressions.</b> How does the formalization process compare to
-              the previous implementation? Are there any compromises?
-            </li>
-            <li>
-              <b>Library design.</b> Formalizing a standard library both with readability for
-              humans and granularity for automated proofs in mind.
-            </li>
-            <li>
-              <b>Premise selection.</b> Arguably the biggest contributor to long checking times
-              are increasingly difficult tasks for automated provers. Using premise
-              selection lets automated provers remain effective in large background
-              theories.
-            </li>
-          </ul>
+        <ul>
+          <li>
+            <b>Initial user impressions.</b> How does the formalization process compare to
+            the previous implementation? Are there any compromises?
+          </li>
+          <li>
+            <b>Library design.</b> Formalizing a standard library both with readability for
+            humans and granularity for automated proofs in mind.
+          </li>
+          <li>
+            <b>Premise selection.</b> Arguably the biggest contributor to long checking times
+            are increasingly difficult tasks for automated provers. Using premise
+            selection lets automated provers remain effective in large background
+            theories.
+          </li>
+        </ul>
         </p>
       </div>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Del2023:ScaANatProAssSteBySte,
+      <pre>@Misc{Del2023:ScaANatProAssSteBySte,
   author={De Lon, Adrian},
   title={Scaling a Natural Proof Assistant Step by Step},
   year={2023},
@@ -1208,7 +1217,7 @@
     </details>
   </li>
   <li>
-    Marcel Schütz <a href="https://orcid.org/0000-0002-5386-5134"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Marcel Schütz <a href="https://orcid.org/0000-0002-5386-5134"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Foundational Libraries in Naproche</i>;
     <a href="https://europroofnet.github.io/cambridge-2023/"><i>NatFoM</i></a>,
     <a href="https://cicm-conference.org/2023/cicm.php"><i>CICM 2023</i></a>,
@@ -1238,21 +1247,21 @@
           basis on its own to formalize sophisticated mathematics. To overcome this
           issue, Naproche also provides three foundational libraries about set and
           number theory on top of its built-in ontology [<a href="#ref_395402">5</a>]:
-          <ol>
-            <li>
-              One library that provides basic set-theoretical notions and operations as
-              well as the most commonly used Kelley&ndash;Morse axioms [<a href="#ref_057493">6</a>].
-            </li>
-            <li>
-              One that extends the first library with more advanced notions from set
-              theory like that of ordinal and cardinal numbers [<a href="#ref_850395">7</a>].
-            </li>
-            <li>
-              One that extends the first library with a new (soft) type of natural
-              numbers together with common arithmetical operations as well as some
-              basic notions of number theory [<a href="#ref_250038">8</a>].
-            </li>
-          </ol>
+        <ol>
+          <li>
+            One library that provides basic set-theoretical notions and operations as
+            well as the most commonly used Kelley&ndash;Morse axioms [<a href="#ref_057493">6</a>].
+          </li>
+          <li>
+            One that extends the first library with more advanced notions from set
+            theory like that of ordinal and cardinal numbers [<a href="#ref_850395">7</a>].
+          </li>
+          <li>
+            One that extends the first library with a new (soft) type of natural
+            numbers together with common arithmetical operations as well as some
+            basic notions of number theory [<a href="#ref_250038">8</a>].
+          </li>
+        </ol>
         </p>
         <p>
           Since these libraries are written in a LaTeX dialect of ForTheL they not
@@ -1264,31 +1273,31 @@
           Cantor-Schroeder-Bernstein theorem [<a href="#ref_675384">9</a>,<a href="#ref_839204">10</a>] and Furstenberg's proof of the
           infinitude of primes [<a href="#ref_304384">11</a>,<a href="#ref_075934">12</a>]. However, they also pose some serious problems
           yet that have to be addressed in future versions of Naproche:
-          <ol>
-            <li>
-              <b>Modularity:</b> Since Naproche lacks a mature module system for organizing
-              formalizations, their reusability is currently fairly limited.
-            </li>
-            <li>
-              <b>Scalability:</b> The proof checking abilities of Naproche do not scale well
-              with the size of the libraries.
-            </li>
-            <li>
-              <b>Time redundancy:</b> Currently Naproche has no mechanisms to provide
-              persistent certificates of the correctness of its libraries so they are
-              rechecked by the system every time they are imported to a ForTheL
-              document.
-            </li>
-            <li>
-              <b>Abstract mathematical structures:</b> Naproche's current abilities of
-              handling abstract mathematical structures (such as groups or topological
-              spaces) in contrast to "concrete" ones like "the" universe of sets or
-              "the" structure of natural numbers are very limited. This demands for an
-              extension of ForTheL that can handle such abstract structures using
-              language constructs that do not differ remarkably from the mathematical
-              vernacular.
-            </li>
-          </ol>
+        <ol>
+          <li>
+            <b>Modularity:</b> Since Naproche lacks a mature module system for organizing
+            formalizations, their reusability is currently fairly limited.
+          </li>
+          <li>
+            <b>Scalability:</b> The proof checking abilities of Naproche do not scale well
+            with the size of the libraries.
+          </li>
+          <li>
+            <b>Time redundancy:</b> Currently Naproche has no mechanisms to provide
+            persistent certificates of the correctness of its libraries so they are
+            rechecked by the system every time they are imported to a ForTheL
+            document.
+          </li>
+          <li>
+            <b>Abstract mathematical structures:</b> Naproche's current abilities of
+            handling abstract mathematical structures (such as groups or topological
+            spaces) in contrast to "concrete" ones like "the" universe of sets or
+            "the" structure of natural numbers are very limited. This demands for an
+            extension of ForTheL that can handle such abstract structures using
+            language constructs that do not differ remarkably from the mathematical
+            vernacular.
+          </li>
+        </ol>
         </p>
         <p>
           Hence, although Naproche appears as a promising basis for dealing with
@@ -1298,63 +1307,63 @@
         </p>
         <hr>
         <p>
-          <ul>
-            <li>
-              <span id="ref_934583">[1]</span> <a href="https://github.com/naproche/naproche">https://github.com/naproche/naproche</a>
-            </li>
-            <li>
-              <span id="ref_937584">[2]</span> <a href="https://isabelle.in.tum.de/website-Isabelle2022/">https://isabelle.in.tum.de/website-Isabelle2022/</a>
-            </li>
-            <li>
-              <span id="ref_025748">[3]</span> De Lon, A., Koepke, P., Lorenzen, A., Marti, A., Schütz, M., Wenzel,
-              M. (2021). The Isabelle/Naproche Natural Language Proof Assistant. In:
-              Platzer, A., Sutcliffe, G. (eds) Automated Deduction &ndash; CADE 28. CADE 2021.
-              Lecture Notes in Computer Science, vol 12699. Springer, Cham.
-              <a href="https://doi.org/10.1007/978-3-030-79876-5_36">https://doi.org/10.1007/978-3-030-79876-5_36</a>
-            </li>
-            <li>
-              <span id="ref_750481">[4]</span> De Lon, A., Koepke, P., Lorenzen, A., Marti, A., Schütz, M.,
-              Sturzenhecker, E. (2021). Beautiful Formalizations in Isabelle/Naproche.
-              In: Kamareddine, F., Sacerdoti Coen, C. (eds) Intelligent Computer
-              Mathematics. CICM 2021. Lecture Notes in Computer Science, vol 12833.
-              Springer, Cham. <a href="https://doi.org/10.1007/978-3-030-81097-9_2">https://doi.org/10.1007/978-3-030-81097-9_2</a>
-            </li>
-            <li>
-              <span id="ref_395402">[5]</span> Schütz, M., De Lon, A., Koepke, P. (2022). Setting up Set-Theoretical
-              Foundations in Naproche. In: Work-in-progress papers presented at the 15th
-              Conference on Intelligent Computer Mathematics, CICM 2022 (Informal
-              Proceedings). <a href="https://www3.risc.jku.at/publications/download/risc_6584/proceedings-CICM2022-informal.pdf">https://www3.risc.jku.at/publications/download/risc_6584/proceedings-CICM2022-informal.pdf</a>
-            </li>
-            <li>
-              <span id="ref_057493">[6]</span> <a href="https://github.com/naproche/naproche/tree/master/examples/foundations">https://github.com/naproche/naproche/tree/master/examples/foundations</a>
-            </li>
-            <li>
-              <span id="ref_850395">[7]</span> <a href="https://github.com/naproche/naproche/tree/master/examples/set-theory">https://github.com/naproche/naproche/tree/master/examples/set-theory</a>
-            </li>
-            <li>
-              <span id="ref_250038">[8]</span> <a href="https://github.com/naproche/naproche/tree/master/examples/arithmetic">https://github.com/naproche/naproche/tree/master/examples/arithmetic</a>
-            </li>
-            <li>
-              <span id="ref_675384">[9]</span> <a href="https://github.com/naproche/naproche/blob/master/examples/zermelo.ftl.tex">https://github.com/naproche/naproche/blob/master/examples/zermelo.ftl.tex</a>
-            </li>
-            <li>
-              <span id="ref_839204">[10]</span> Schröder, B.S.W. The fixed point property for ordered sets. In: Arab.
-              J. Math. 1, 529&ndash;547 (2012). <a href="https://doi.org/10.1007/s40065-012-0049-7">https://doi.org/10.1007/s40065-012-0049-7</a>
-            </li>
-            <li>
-              <span id="ref_304384">[11]</span> <a href="https://github.com/naproche/naproche/blob/master/examples/furstenberg.ftl.tex">https://github.com/naproche/naproche/blob/master/examples/furstenberg.ftl.tex</a>
-            </li>
-            <li>
-              <span id="ref_075934">[12]</span> Furstenberg, H. (1955). On the Infinitude of Primes. In: American
-              Mathematical Monthly 62 (1955): 353.
-            </li>
-          </ul>
+        <ul>
+          <li>
+            <span id="ref_934583">[1]</span> <a href="https://github.com/naproche/naproche">https://github.com/naproche/naproche</a>
+          </li>
+          <li>
+            <span id="ref_937584">[2]</span> <a href="https://isabelle.in.tum.de/website-Isabelle2022/">https://isabelle.in.tum.de/website-Isabelle2022/</a>
+          </li>
+          <li>
+            <span id="ref_025748">[3]</span> De Lon, A., Koepke, P., Lorenzen, A., Marti, A., Schütz, M., Wenzel,
+            M. (2021). The Isabelle/Naproche Natural Language Proof Assistant. In:
+            Platzer, A., Sutcliffe, G. (eds) Automated Deduction &ndash; CADE 28. CADE 2021.
+            Lecture Notes in Computer Science, vol 12699. Springer, Cham.
+            <a href="https://doi.org/10.1007/978-3-030-79876-5_36">https://doi.org/10.1007/978-3-030-79876-5_36</a>
+          </li>
+          <li>
+            <span id="ref_750481">[4]</span> De Lon, A., Koepke, P., Lorenzen, A., Marti, A., Schütz, M.,
+            Sturzenhecker, E. (2021). Beautiful Formalizations in Isabelle/Naproche.
+            In: Kamareddine, F., Sacerdoti Coen, C. (eds) Intelligent Computer
+            Mathematics. CICM 2021. Lecture Notes in Computer Science, vol 12833.
+            Springer, Cham. <a href="https://doi.org/10.1007/978-3-030-81097-9_2">https://doi.org/10.1007/978-3-030-81097-9_2</a>
+          </li>
+          <li>
+            <span id="ref_395402">[5]</span> Schütz, M., De Lon, A., Koepke, P. (2022). Setting up Set-Theoretical
+            Foundations in Naproche. In: Work-in-progress papers presented at the 15th
+            Conference on Intelligent Computer Mathematics, CICM 2022 (Informal
+            Proceedings). <a href="https://www3.risc.jku.at/publications/download/risc_6584/proceedings-CICM2022-informal.pdf">https://www3.risc.jku.at/publications/download/risc_6584/proceedings-CICM2022-informal.pdf</a>
+          </li>
+          <li>
+            <span id="ref_057493">[6]</span> <a href="https://github.com/naproche/naproche/tree/master/examples/foundations">https://github.com/naproche/naproche/tree/master/examples/foundations</a>
+          </li>
+          <li>
+            <span id="ref_850395">[7]</span> <a href="https://github.com/naproche/naproche/tree/master/examples/set-theory">https://github.com/naproche/naproche/tree/master/examples/set-theory</a>
+          </li>
+          <li>
+            <span id="ref_250038">[8]</span> <a href="https://github.com/naproche/naproche/tree/master/examples/arithmetic">https://github.com/naproche/naproche/tree/master/examples/arithmetic</a>
+          </li>
+          <li>
+            <span id="ref_675384">[9]</span> <a href="https://github.com/naproche/naproche/blob/master/examples/zermelo.ftl.tex">https://github.com/naproche/naproche/blob/master/examples/zermelo.ftl.tex</a>
+          </li>
+          <li>
+            <span id="ref_839204">[10]</span> Schröder, B.S.W. The fixed point property for ordered sets. In: Arab.
+            J. Math. 1, 529&ndash;547 (2012). <a href="https://doi.org/10.1007/s40065-012-0049-7">https://doi.org/10.1007/s40065-012-0049-7</a>
+          </li>
+          <li>
+            <span id="ref_304384">[11]</span> <a href="https://github.com/naproche/naproche/blob/master/examples/furstenberg.ftl.tex">https://github.com/naproche/naproche/blob/master/examples/furstenberg.ftl.tex</a>
+          </li>
+          <li>
+            <span id="ref_075934">[12]</span> Furstenberg, H. (1955). On the Infinitude of Primes. In: American
+            Mathematical Monthly 62 (1955): 353.
+          </li>
+        </ul>
         </p>
       </div>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Sch2023:FouLibInNap,
+      <pre>@Misc{Sch2023:FouLibInNap,
   author={Schütz, Marcel},
   title={Foundational Libraries in {Naproche}},
   howpublished={Slides: \url{https://github.com/naproche/Talks/blob/master/2023/schuetz_foundational-libraries-in-naproche.pdf}}
@@ -1369,8 +1378,8 @@
 
 <ul>
   <li>
-    Anton Lorenzen <a href="https://orcid.org/0000-0003-3538-9688"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Anton Lorenzen <a href="https://orcid.org/0000-0003-3538-9688"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Web-Naproche</i> (part of <a href="https://link.springer.com/chapter/10.1007/978-3-031-16681-5_24"><i>CICM'22 System Entries</i></a>);
     in: Kevin Buzzard, Temur Kutsia (eds.);
     <a href="https://link.springer.com/book/10.1007/978-3-031-16681-5"><i>Intelligent Computer Mathematics. 15th International Conference</i></a>;
@@ -1388,7 +1397,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{LorKoeShm2022:Cic22SysEnt,
+      <pre>@InProceedings{LorKoeShm2022:Cic22SysEnt,
   author={Koepke, Peter and Lorenzen, Anton and Shminke, Boris},
   editor={Buzzard, Kevin and Kutsia, Temur},
   title={{CICM}'22 System Entries},
@@ -1401,9 +1410,9 @@
     </details>
   </li>
   <li>
-    Marcel Schütz <a href="https://orcid.org/0000-0002-5386-5134"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Marcel Schütz <a href="https://orcid.org/0000-0002-5386-5134"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Setting up Set-Theoretical Foundations in Naproche</i>;
     in: Kevin Buzzard, Temur Kutsia (eds.);
     <i>Work-in-progress papers presented at the 15th Conference on Intelligent Computer Mathematics</i>;
@@ -1430,7 +1439,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{SchDelKoe2022:SetUpSetTheFouInNap,
+      <pre>@InProceedings{SchDelKoe2022:SetUpSetTheFouInNap,
   author={Schütz, Marcel and De Lon, Adrian and Koepke, Peter},
   editor={Buzzard, Kevin and Kutsia, Temur},
   title={Setting up Set-Theoretical Foundations in {Naproche}},
@@ -1441,7 +1450,7 @@
     </details>
   </li>
   <li>
-    Jan Frederik Schaefer <a href="https://orcid.org/0000-0003-2545-4626"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Jan Frederik Schaefer <a href="https://orcid.org/0000-0003-2545-4626"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Implementing ForTheL in GLIF: A Case Study</i>;
     Master's Project.
     <details class="resources">
@@ -1460,7 +1469,7 @@
           raising the entry barrier for potential users. To improve
           accessibility, the input languages can be designed to be a subset of
           natural language. We call such languages <i>controlled
-          mathematical languages</i>.
+            mathematical languages</i>.
         </p>
         <p>
           Implementing such languages requires creating a parser and a mechanism
@@ -1489,7 +1498,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Sch2020:ImpForInGliACasStu,
+      <pre>@Misc{Sch2020:ImpForInGliACasStu,
   author={Schaefer, Jan Frederik},
   title={Implementing {ForTheL} in {GLIF}: A Case Study},
   year={2020},
@@ -1504,12 +1513,12 @@
 
 <ul>
   <li>
-    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Anton Lorenzen <a href="https://orcid.org/0000-0003-3538-9688"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Adrian Marti <a href="https://orcid.org/0000-0001-8932-8843"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Marcel Schütz <a href="https://orcid.org/0000-0002-5386-5134"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Makarius Wenzel <a href="https://orcid.org/0000-0002-3753-8280"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Anton Lorenzen <a href="https://orcid.org/0000-0003-3538-9688"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Adrian Marti <a href="https://orcid.org/0000-0001-8932-8843"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Marcel Schütz <a href="https://orcid.org/0000-0002-5386-5134"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Makarius Wenzel <a href="https://orcid.org/0000-0002-3753-8280"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <a href="https://link.springer.com/chapter/10.1007/978-3-030-79876-5_36"><i>The Isabelle/Naproche Natural Language Proof Assistant</i></a>;
     in: André Platzer, Geoff Sutcliffe (eds.);
     <a href="https://link.springer.com/book/10.1007/978-3-030-79876-5"><i>Automated Deduction &ndash; CADE 28</i></a>;
@@ -1536,7 +1545,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{DelKoeLorMarSchWen2021:TheIsaNapNatLanProAss,
+      <pre>@InProceedings{DelKoeLorMarSchWen2021:TheIsaNapNatLanProAss,
   author={De Lon, Adrian and Koepke, Peter and Lorenzen, Anton and Marti, Adrian and Schütz, Marcel and Wenzel, Makarius},
   editor={Platzer, André and Sutcliffe, Geoff},
   title={The {Isabelle}/{Naproche} Natural Language Proof Assistant},
@@ -1549,9 +1558,9 @@
     </details>
   </li>
   <li>
-    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Anton Lorenzen <a href="https://orcid.org/0000-0003-3538-9688"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Anton Lorenzen <a href="https://orcid.org/0000-0003-3538-9688"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <a href="https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ITP.2021.16"><i>A Natural Formalization of the Mutilated Checkerboard Problem in Naproche</i></a>;
     in: Liron Cohen and Cezary Kaliszyk (eds.);
     <a href=""><i>12th International Conference on Interactive Theorem Proving</i></a>;
@@ -1580,7 +1589,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{DelKoeLor2021:ANatForOfTheMutCheProInNap,
+      <pre>@InProceedings{DelKoeLor2021:ANatForOfTheMutCheProInNap,
   author={De Lon, Adrian and Koepke, Peter and Lorenzen, Anton},
   title={A Natural Formalization of the Mutilated Checkerboard Problem in {Naproche}},
   booktitle={12th International Conference on Interactive Theorem Proving ({ITP} 2021)},
@@ -1595,9 +1604,9 @@
     </details>
   </li>
   <li>
-    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Anton Lorenzen <a href="https://orcid.org/0000-0003-3538-9688"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Anton Lorenzen <a href="https://orcid.org/0000-0003-3538-9688"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Dealing with Soft Types in Naproche's Logical Backend</i>;
     <a href="https://aitp-conference.org/2021/"><i>AITP 2021</i></a>,
     Aussoi, France.
@@ -1607,7 +1616,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{DelKoeLor2021:DeaWitSofTypInNapLogBac,
+      <pre>@Misc{DelKoeLor2021:DeaWitSofTypInNapLogBac,
   title={Dealing with Soft Types in {Naproche}'s Logical Backend},
   author={De Lon, Adrian and Koepke, Peter and Lorenzen, Anton},
   year={2021}
@@ -1615,11 +1624,11 @@
     </details>
   </li>
   <li>
-    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Anton Lorenzen <a href="https://orcid.org/0000-0003-3538-9688"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Adrian Marti <a href="https://orcid.org/0000-0001-8932-8843"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Marcel Schütz <a href="https://orcid.org/0000-0002-5386-5134"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Anton Lorenzen <a href="https://orcid.org/0000-0003-3538-9688"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Adrian Marti <a href="https://orcid.org/0000-0001-8932-8843"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Marcel Schütz <a href="https://orcid.org/0000-0002-5386-5134"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Erik Sturzenhecker;
     <a href="https://link.springer.com/chapter/10.1007/978-3-030-81097-9_2"><i>Beautiful Formalizations in Isabelle/Naproche</i></a>;
     in: Fairouz Kamareddine, Claudio Sacerdoti Coen (eds.);
@@ -1649,7 +1658,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{DelKoeLorMarSchStu2021:BeaForInIsaNap,
+      <pre>@InProceedings{DelKoeLorMarSchStu2021:BeaForInIsaNap,
   author={De Lon, Adrian and Koepke, Peter and Lorenzen, Anton and Marti, Adrian and Schütz, Marcel and Sturzenhecker, Erik},
   editor={Kamareddine, Fairouz and Sacerdoti Coen, Claudio},
   title={Beautiful Formalizations in {Isabelle}/{Naproche}},
@@ -1662,7 +1671,7 @@
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>An Introduction to Naproche, Along a Formalization of Euclid's Proof of the Infinitude of Primes</i>.
     <details class="resources">
       <summary><b>Resources</b></summary>
@@ -1670,7 +1679,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Article{Koe2021:AnIntToNapAloAForOfEucProOfTheInfOfPri,
+      <pre>@Article{Koe2021:AnIntToNapAloAForOfEucProOfTheInfOfPri,
   title={An Introduction to {Naproche}, Along a Formalization of {Euclid}'s Proof of the Infinitude of Primes},
   author={Koepke, Peter},
   year={2021}
@@ -1683,9 +1692,9 @@
 
 <ul>
   <li>
-    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Anton Felix Lorenzen <a href="https://orcid.org/0000-0003-3538-9688"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Anton Felix Lorenzen <a href="https://orcid.org/0000-0003-3538-9688"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>ForTheL for Type Theory</i>;
     <a href="https://aitp-conference.org/2020/"><i>AITP 2020</i></a>,
     Aussois, France.
@@ -1695,7 +1704,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{DelKoeLor2020:ForForTypThe,
+      <pre>@Misc{DelKoeLor2020:ForForTypThe,
   title={{ForTheL} for Type Theory},
   author={De Lon, Adrian and Koepke, Peter and Lorenzen, Anton Felix},
   year={2020}
@@ -1703,7 +1712,7 @@
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>A Brief Tutorial on Mathematical Formalizations in Naproche-SAD</i></a>;
     <a href="https://hcm-application.uni-bonn.de/en/events/eventpages/2020/mathematical-language-practical-type-theory-2020/"><i>HCM Workshop: Mathematical Language and Practical Type Theory</i></a>,
     Bonn, Germany.
@@ -1740,7 +1749,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Article{Koe2020:ABriTutOnMatForInNapSad,
+      <pre>@Article{Koe2020:ABriTutOnMatForInNapSad,
   title={A Brief Tutorial on Mathematical Formalizations in {Naproche-SAD}},
   author={Koepke, Peter},
   year={2020}
@@ -1748,9 +1757,9 @@
     </details>
   </li>
   <li>
-    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Anton Lorenzen <a href="https://orcid.org/0000-0003-3538-9688"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Adrian De Lon <a href="https://orcid.org/0000-0002-2697-7253"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Anton Lorenzen <a href="https://orcid.org/0000-0003-3538-9688"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <a href="https://link.springer.com/chapter/10.1007/978-3-030-53518-6_19"><i>Interpreting Mathematical Texts in Naproche-SAD</i></a>;
     in: Christoph Benzmüller, Bruce Miller (eds.);
     <a href="https://link.springer.com/book/10.1007/978-3-030-53518-6"><i> Intelligent Computer Mathematics. 13th International Conference</i></a>;
@@ -1774,7 +1783,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{DelKoeLor-2020-IMTINS,
+      <pre>@InProceedings{DelKoeLor-2020-IMTINS,
   author={De Lon, Adrian and Koepke, Peter and Lorenzen, Anton},
   editor={Benzmüller, Christoph and Miller, Bruce},
   title={Interpreting Mathematical Texts in {Naproche-SAD}},
@@ -1787,7 +1796,7 @@
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>ForTheL as a Controlled Natural Language for Lean</i>;
     <a href="https://www.andrew.cmu.edu/user/avigad/meetings/fomm2020/index.html"><i>Formal Methods in Mathematics / Lean Together 2020</i></a>,
     Pittsburgh, USA.
@@ -1798,7 +1807,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2020:ForAsAConNatLanForLea,
+      <pre>@Misc{Koe2020:ForAsAConNatLanForLea,
   author={Koepke, Peter},
   title={{ForTheL} as a Controlled Natural Language for {Lean}},
   year={2020},
@@ -1808,9 +1817,9 @@
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Jan Penquitt,
-    Marcel Schütz <a href="https://orcid.org/0000-0002-5386-5134"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Marcel Schütz <a href="https://orcid.org/0000-0002-5386-5134"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Erik Sturzenhecker;
     <i>Formalizing Foundational Notions in Naproche-SAD</i>;
     <a href="https://cicm-conference.org/2020/cicm.php?event=NFM"><i>NFM</i></a>,
@@ -1842,7 +1851,7 @@
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Article{KoePenSchStu2021:ForFouNatInNapSad,
+      <pre>@Article{KoePenSchStu2021:ForFouNatInNapSad,
 author={Koepke, Peter and Penquitt, Jan and Schütz, Marcel and Sturzenhecker, Erik},
 title={Formalizing Foundational Notions in {Naproche}-{SAD}},
 year={2020},
@@ -1855,7 +1864,7 @@ year={2020},
 
 <ul>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Textbook Mathematics in the Naproche-SAD System</i>;
     <a href="https://cicm-conference.org/2019/cicm.php?event=fmm"><i>FFM</i></a>,
     <a href="https://cicm-conference.org/2019/cicm.php"><i>CICM 2019</i></a>,
@@ -1879,7 +1888,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Article{Koe2019:TexMatInTheNapSadSys,
+      <pre>@Article{Koe2019:TexMatInTheNapSadSys,
   title={Textbook Mathematics in the {Naproche-SAD} System},
   author={Koepke, Peter},
   year={2019}
@@ -1887,7 +1896,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Modeling Human Proof Checking in the Naproche-SAD System</i>;
     <a href="https://www.icms.org.uk/workshops/2019/big-proof"><i>Big Proof 2019</i></a>,
     <a href="https://www.icms.org.uk/"><i>ICMS</i></a>,
@@ -1918,7 +1927,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2019:ModHumProCheInTheNapSadSys,
+      <pre>@Misc{Koe2019:ModHumProCheInTheNapSadSys,
   author={Koepke, Peter},
   title={Modeling Human Proof Checking in the {Naproche-SAD} System},
   year={2019},
@@ -1929,7 +1938,7 @@ year={2020},
   </li>
   <li>
     Steffen Frerix,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Making Set Theory Great Again: The Naproche-SAD Project</i>;
     <a href="https://aitp-conference.org/2019/"><i>AITP 2019</i></a>,
     Obergurgl, Austria.
@@ -1939,7 +1948,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{FreKoe2019:MakSetTheGreAgaTheNapSadPro,
+      <pre>@Misc{FreKoe2019:MakSetTheGreAgaTheNapSadPro,
   title={Making Set Theory Great Again: The {Naproche-SAD} Project},
   author={Frerix, Steffen and Koepke, Peter},
   year={2019}
@@ -1947,7 +1956,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>An Introduction to Haskell and Naproche-SAD</i>;
     <details class="resources">
       <summary><b>Resources</b></summary>
@@ -1955,7 +1964,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Article{Koe2019:AnIntToHasAndNapSad,
+      <pre>@Article{Koe2019:AnIntToHasAndNapSad,
   author={Koepke, Peter},
   title={An Introduction to {Haskell} and {Naproche-SAD}},
   year={2019}
@@ -1963,7 +1972,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Makarius Wenzel <a href="https://orcid.org/0000-0002-3753-8280"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Makarius Wenzel <a href="https://orcid.org/0000-0002-3753-8280"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <a href="https://link.springer.com/chapter/10.1007/978-3-030-23250-4_1"><i>Interaction with Formal Mathematical Documents in Isabelle/PIDE</i></a>;
     in: Cezary Kaliszyk, Edwin Brady, Andrea Kohlhase, Claudio Sacerdoti Coen (eds.);
     <a href="https://link.springer.com/book/10.1007/978-3-030-23250-4"><i> Intelligent Computer Mathematics. 12th International Conference</i></a>;
@@ -1974,7 +1983,7 @@ year={2020},
       Preprint: <a href="https://arxiv.org/pdf/1905.01735">PDF</a>, <a href="https://arxiv.org/src/1905.01735">T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</a><br>
       Slides: <a href="https://sketis.net/wp-content/uploads/2019/06/isabelle-pide-cachan2019.pdf">PDF</a>
     </details>
-    <details class="abstract"> 
+    <details class="abstract">
       <summary><b>Abstract</b></summary>
       <div>
         <p>
@@ -1995,7 +2004,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{Wen2019:IntWitForMatDocInIsaPid,
+      <pre>@InProceedings{Wen2019:IntWitForMatDocInIsaPid,
   author={Wenzel, Makarius},
   editor={Kaliszyk, Cezary and Brady, Edwin and Kohlhase, Andrea and Sacerdoti Coen, Claudio},
   title={Interaction with Formal Mathematical Documents in {Isabelle}/{PIDE}},
@@ -2008,7 +2017,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Makarius Wenzel <a href="https://orcid.org/0000-0002-3753-8280"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Makarius Wenzel <a href="https://orcid.org/0000-0002-3753-8280"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Makarius plaudert über Isabelle/{Naproche,Haskell}</i>;
     <a href="https://curry-club-augsburg.de/"><i>Curry Club Augsburg</i></a>,
     Augsburg, Germany.
@@ -2018,7 +2027,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Wen2019:MakPlaUebIsaNapHas,
+      <pre>@Misc{Wen2019:MakPlaUebIsaNapHas,
   author={Wenzel, Makarius},
   title={{Makarius plaudert über {Isabelle}/\{{Naproche},{Haskell}\}}},
   year={2019},
@@ -2034,7 +2043,7 @@ year={2020},
 <ul>
   <li>
     Steffen Frerix,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Automatic Proof-Checking of Ordinary Mathematical Texts</i>;
     in: Osman Hasan et al. (eds.);
     <a href="https://ceur-ws.org/Vol-2307/"><i>Workshop Papers at 11th Conference on Intelligent Computer Mathematics CICM 2018</i></a>;
@@ -2068,7 +2077,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>TeX</b></summary>
-<pre>@Article{FreKoe2018:AutProCheOfOrdMatTex,
+      <pre>@Article{FreKoe2018:AutProCheOfOrdMatTex,
   title={Automatic Proof-Checking of Ordinary Mathematical Texts},
   author={Frerix, Steffen and Koepke, Peter},
   year={2018}
@@ -2077,7 +2086,7 @@ year={2020},
   </li>
   <li>
     Steffen Frerix,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <a href="http://www.t-news.cn/Floc2018/FLoC2018-pages/paper2694.html"><i>Text-Orientated Formal Mathematics</i></a>;
     <a href="http://www.t-news.cn/Floc2018/FLoC2018-pages/UITP-program.html"><i>UITP</i></a>,
     <a href="https://www.floc2018.org/"><i>FLoC 2018</i></a>,
@@ -2106,7 +2115,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Article{FreKoe2018:TexOriForMat,
+      <pre>@Article{FreKoe2018:TexOriForMat,
   title={Text-Orientated Formal Mathematics},
   author={Frerix, Steffen and Koepke, Peter},
   year={2018}
@@ -2115,7 +2124,7 @@ year={2020},
   </li>
   <li>
     Steffen Frerix,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Revisiting SAD</i>;
     <a href="https://aitp-conference.org/2018/"><i>AITP 2018</i></a>,
     Aussois, France.
@@ -2125,7 +2134,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{FreKoe2018:RevSad,
+      <pre>@Misc{FreKoe2018:RevSad,
   title={Revisiting {SAD}},
   author={Frerix, Steffen and Koepke, Peter},
   year={2018},
@@ -2135,7 +2144,7 @@ year={2020},
   </li>
   <li>
     Steffen Frerix,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Making Set Theory Great Again: The Naproche-SAD Project</i>.
     <details class="resources">
       <summary><b>Resources</b></summary>
@@ -2143,7 +2152,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>TeX</b></summary>
-<pre>@Misc{FreKoe2018:MakSetTheGreAgaTheNapSadPro,
+      <pre>@Misc{FreKoe2018:MakSetTheGreAgaTheNapSadPro,
   title={Making Set Theory Great Again: The {Naproche-SAD} Project},
   author={Frerix, Steffen and Koepke, Peter},
   year={2018}
@@ -2151,7 +2160,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Legible Formal Mathematics Based on SAD</i>.
     <details class="resources">
       <summary><b>Resources</b></summary>
@@ -2159,7 +2168,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>TeX</b></summary>
-<pre>@Misc{Koe2018:LegForMatBasOnSad,
+      <pre>@Misc{Koe2018:LegForMatBasOnSad,
   title={Legible Formal Mathematics Based on {SAD}},
   author={Koepke, Peter},
   year={2018}
@@ -2189,7 +2198,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@mastersthesis{Fre2018:TexOriForMet,
+      <pre>@mastersthesis{Fre2018:TexOriForMet,
   author={Frerix, Steffen},
   title={Text-orientated Formalization Methods},
   school={Rheinische Friedrich-Wilhelms-Universität Bonn},
@@ -2204,7 +2213,7 @@ year={2020},
 <ul>
   <li>
     Ioanna M. Dimitriou H.,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Revisiting Paulson's Theory of the Constructible Universe with Isar and Sledgehammer</i>;
     <a href="https://aitp-conference.org/2016/"><i>AITP 2016</i></a>,
     Obergurgl, Austria.
@@ -2214,7 +2223,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{DimKoe2016:RevPauTheOfTheConUniWitIsaAndSle,
+      <pre>@Misc{DimKoe2016:RevPauTheOfTheConUniWitIsaAndSle,
   title={Revisiting Paulson's Theory of the Constructible Universe with Isar and Sledgehammer},
   author={Dimitriou H., Ioanna M. and Koepke, Peter},
   year={2016},
@@ -2223,7 +2232,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Set Theory and Formal Mathematics</i>;
     <a href="https://math.huji.ac.il/~mm70/"><i>Menachem Magidor 70th Birthday Conference</i></a>,
     Jerusalem, Israel.
@@ -2233,7 +2242,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2016:SetTheAndForMat,
+      <pre>@Misc{Koe2016:SetTheAndForMat,
   title={Set Theory and Formal Mathematics},
   author={Koepke, Peter},
   year={2016},
@@ -2247,7 +2256,7 @@ year={2020},
 
 <ul>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Formalism and Computations</i>;
     <a href="https://www.filosofinenyhdistys.fi/clmps2015/"><i>CLMPS 2015</i></a>,
     Helsinki, Finland.
@@ -2257,7 +2266,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2015:ForAndCom,
+      <pre>@Misc{Koe2015:ForAndCom,
   title={Formalism and Computations},
   author={Koepke, Peter},
   year={2015},
@@ -2266,7 +2275,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Foundations for Formal Mathematics</i>;
     <i>5<sup>th</sup> Colloquium of HCM Research Area KL</i>,
     Bonn, Germany.
@@ -2276,7 +2285,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2015:FouForForMat,
+      <pre>@Misc{Koe2015:FouForForMat,
   title={Foundations for Formal Mathematics},
   author={Koepke, Peter},
   year={2015},
@@ -2285,7 +2294,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Natural Formalism</i>;
     <i>Philosophy of Mathematics Seminar</i>,
     Oxford, UK.
@@ -2295,7 +2304,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2015:NatFor,
+      <pre>@Misc{Koe2015:NatFor,
   title={Natural Formalism},
   author={Koepke, Peter},
   year={2015},
@@ -2309,7 +2318,7 @@ year={2020},
 
 <ul>
   <li>
-    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>The Naproche System: Proof-Checking Mathematical Texts in Controlled Natural Language</i>;
     in: Hermann Cölfen; Ulrich Schmitz; Bernhard Schröder (eds.);
     <i>Sprache und Datenverarbeitung</i> 38-1.
@@ -2317,7 +2326,7 @@ year={2020},
       <summary><b>Resources</b></summary>
       Prepring: <a href="https://naproche-net.github.io/downloads/2014-SDV.pdf">PDF</a>
     </details>
-    <details> 
+    <details>
       <summary><b>Abstract</b></summary>
       <div>
         <p>
@@ -2336,7 +2345,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InCollection{Cra2014:TheNapSysProCheMatTexInConNatLan,
+      <pre>@InCollection{Cra2014:TheNapSysProCheMatTexInConNatLan,
   author={Cramer, Marcos},
   title={The {Naproche} System: Proof-Checking Mathematical Texts in Controlled Natural Language},
   booktitle={Sprache und Datenverarbeitung},
@@ -2356,7 +2365,7 @@ year={2020},
 
 <ul>
   <li>
-    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Proof-Checking Mathematical Texts in Controlled Natural Language</i>;
     PhD thesis.
     <details class="resources">
@@ -2408,7 +2417,7 @@ year={2020},
           Ackermann-like Function Theory, which is equiconsistent to ZFC
           (Zermelo-Fraenkel set theory with the Axiom of Choice) and can be used
           for imposing limitations to implicit dynamic function introduction in
-          order to avoid this paradox. 
+          order to avoid this paradox.
         </p>
         <p>
           We give a formal account of implicit dynamic function introduction by
@@ -2445,7 +2454,7 @@ year={2020},
           instead of being based on Ackermann-like Function Theory, it is based
           on a richer foundational theory called Class-Map-Tuple-Number Theory,
           which does not only have maps/functions, but also classes/sets,
-          tuples, numbers and Booleans as primitives. 
+          tuples, numbers and Booleans as primitives.
         </p>
         <p>
           The proof checking algorithm checks the deductive correctness of proof
@@ -2476,7 +2485,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@phdthesis{Cra2013:ProCheMatTexInConNatLan,
+      <pre>@phdthesis{Cra2013:ProCheMatTexInConNatLan,
   author={Cramer, Marcos},
   title={Proof-Checking Mathematical Texts in Controlled Natural Language},
   school={Rheinische Friedrich-Wilhelms-Universität Bonn},
@@ -2490,17 +2499,17 @@ year={2020},
 
 <ul>
   <li>
-    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Implicit Dynamic Function Introduction and Its Connections to the Foundations of Mathematics</i>;
     in: Oleg Prosorov (ed.);
     <a href="https://www.collegepublications.co.uk/logic/?00037"><i>Proceedings of the International Conference Philosophy, Mathematics, Linguistics: Aspects of Interaction, 2012 (PhML-2012)</i></a>;
     <a href="https://www.pdmi.ras.ru/EIMI/2012/PhML/index.htm"><i>PhML 2012</i></a>,
     St. Petersburg, Russia.
-    <details class="resources"> 
+    <details class="resources">
       <summary><b>Resources</b></summary>
       Article: <a href="https://naproche-net.github.io/downloads/2012-PhML.pdf">PDF</a>
     </details>
-    <details> 
+    <details>
       <summary><b>Abstract</b></summary>
       <div>
         <p>
@@ -2520,7 +2529,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{Cra2012:ImpDynFunIntAndItsConToTheFouOfMat,
+      <pre>@InProceedings{Cra2012:ImpDynFunIntAndItsConToTheFouOfMat,
   author={Cramer, Marcos},
   editor={Prosorov, Oleg},
   title={Implicit Dynamic Function Introduction and Its Connections to the Foundations of Mathematics},
@@ -2537,17 +2546,17 @@ year={2020},
 
 <ul>
   <li>
-    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Higher-Order Dynamic Predicate Logic</i>;
     <a href="https://naturalreasoning.wordpress.com/"><i>COCONAT 2011</i></a>,
     Tilburg, Netherlands.
-    <details class="resources"> 
+    <details class="resources">
       <summary><b>Resources</b></summary>
       Extended abstract: <a href="https://naproche-net.github.io/downloads/2011-COCONAT.pdf">PDF</a>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Cra2011:HigOrdDynPreLog,
+      <pre>@Misc{Cra2011:HigOrdDynPreLog,
   author={Cramer, Marcos},
   title={Higher-Order Dynamic Predicate Logic},
   year={2011}
@@ -2558,13 +2567,13 @@ year={2020},
     Sebastian Zittermann;
     <i>Entwicklung des Naproche-Proof-State-Datentyps</i>;
     Master's thesis.
-    <details class="resources"> 
+    <details class="resources">
       <summary><b>Resources</b></summary>
       Thesis: <a href="https://naproche-net.github.io/downloads/2011-MA-Thesis_Zittermann.pdf">PDF</a>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@mastersthesis{Zit2011:EntDesNapProStaDat,
+      <pre>@mastersthesis{Zit2011:EntDesNapProStaDat,
   author={Zittermann, Sebastian},
   title={Entwicklung des Naproche-Proof-State-Datentyps},
   school={Fachhochschule Köln},
@@ -2573,19 +2582,19 @@ year={2020},
     </details>
   </li>
   <li>
-    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Bernhard Schröder <a href="https://orcid.org/0000-0002-7847-1393"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Bernhard Schröder <a href="https://orcid.org/0000-0002-7847-1393"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <a href="https://link.springer.com/chapter/10.1007/978-3-642-22673-1_13"><i>Parsing and Disambiguation of Symbolic Mathematics in the Naproche System</i></a>;
     in: James H. Davenport, William M. Farmer, Florian Rabe, Josef Urban (eds.);
     <a href="https://link.springer.com/book/10.1007/978-3-642-22673-1"><i>Intelligent Computer Mathematics. 18th Symposium, Calculemus 2011, and 10th International Conference, MKM 2011</i></a>;
     <a href="http://cicm11.cs.unibo.it/cicm11/"><i>CICM 2011</i></a>,
     Bertinoro, Italy.
-    <details class="resources"> 
+    <details class="resources">
       <summary><b>Resources</b></summary>
       Prepring: <a href="https://naproche-net.github.io/downloads/2011-MKM.pdf">PDF</a>
     </details>
-    <details class="abstract"> 
+    <details class="abstract">
       <summary><b>Abstract</b></summary>
       <div>
         <p>
@@ -2610,7 +2619,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{CraKoeSch2011:ParAndDisOfSymMatInTheNapSys,
+      <pre>@InProceedings{CraKoeSch2011:ParAndDisOfSymMatInTheNapSys,
   author={Cramer, Marcos and Koepke, Peter and Schröder, Bernhard},
   editor={Davenport, James H. and Farmer, William M. and Urban, Josef and Rabe, Florian},
   title={Parsing and Disambiguation of Symbolic Mathematics in the Naproche System},
@@ -2623,7 +2632,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Formal Mathematics and Mathematical Practice</i>;
     <i>14th Congress of Logic, Methodology, and Philosophy of Science</i>, Nancy, France.
     <details class="resources">
@@ -2632,7 +2641,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2011:ForMatAndMatPra,
+      <pre>@Misc{Koe2011:ForMatAndMatPra,
   author={Koepke, Peter},
   title={Formal Mathematics and Mathematical Practice},
   year={2011},
@@ -2642,7 +2651,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Formal Mathematics and Controlled Natural Language</i>;
     <i>Oberseminar Diskrete Optimierung</i>, Bonn, Germany.
     <details class="resources">
@@ -2651,7 +2660,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2011:ForMatAndConNatLan,
+      <pre>@Misc{Koe2011:ForMatAndConNatLan,
   author={Koepke, Peter},
   title={Formal Mathematics and Controlled Natural Language},
   year={2011},
@@ -2667,17 +2676,17 @@ year={2020},
 <ul>
   <li>
     Merlin Carl,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Interpreting Naproche &ndash; An Algorithmic Approach to the Derivation-Indicator View</i>;
     in: Alison Pease, Markus Guhe, and Alan Smaill (eds.);
     <i>Mathematical practice and cognition. Proceedings of the International Symposium on Mathematical Practice and Cognition</i>;
     <a href="https://web.archive.org/web/20170124084123/http://www.aisb.org.uk/convention/aisb10/AISB2010.html"><i>AISB 2010</i></a>,
     Leicester, UK.
-    <details class="resources"> 
+    <details class="resources">
       <summary><b>Resources</b></summary>
       Article: <a href="https://www.math.uni-bonn.de/people/koepke/Preprints/Interpreting_Naproche-an_algorithmic_approach_to_the_derivation-indicator_view.pdf">PDF</a>
     </details>
-    <details class="abstract"> 
+    <details class="abstract">
       <summary><b>Abstract</b></summary>
       <div>
         <p>
@@ -2702,23 +2711,23 @@ year={2020},
         </p>
         <hr>
         <p>
-          <ul>
-            <li>
-                <span id="ref_270328">[1]</span> Azzouni, Jody (2006):
-                Tracking Reason
-                (Oxford University Press)
-            </li>
-            <li>
-                <span id="ref_092358">[5]</span>  The Naproche homepage:
-                <a href="www.naproche.net">www.naproche.net</a>
-            </li>
-          </ul>
+        <ul>
+          <li>
+            <span id="ref_270328">[1]</span> Azzouni, Jody (2006):
+            Tracking Reason
+            (Oxford University Press)
+          </li>
+          <li>
+            <span id="ref_092358">[5]</span> The Naproche homepage:
+            <a href="www.naproche.net">www.naproche.net</a>
+          </li>
+        </ul>
         </p>
       </div>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{CarKoe2011:IntNapAnAlgAppToTheDerIndVie,
+      <pre>@InProceedings{CarKoe2011:IntNapAnAlgAppToTheDerIndVie,
   author={Car, Merlin and Koepke, Peter},
   editor={Pease, Alison and Guhe, Markus and Smaill, Alan},
   title={Interpreting {Naproche} -- An Algorithmic Approach to the Derivation-Indicator View},
@@ -2729,20 +2738,20 @@ year={2020},
     </details>
   </li>
   <li>
-    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Daniel Kühlwein,
-    Bernhard Schröder <a href="https://orcid.org/0000-0002-7847-1393"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Bernhard Schröder <a href="https://orcid.org/0000-0002-7847-1393"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <a href="https://link.springer.com/chapter/10.1007/978-3-642-14203-1_37"><i>Premise Selection in the Naproche System</i></a>;
     in: Jürgen Giesl, Reiner Hähnle (eds.);
     <a href="https://link.springer.com/book/10.1007/978-3-642-14203-1"><i>Automated Reasoning. 5th International Joint Conference</i></a>;
     <i>IJCAR 2010</i>,
     Edinburgh, UK.
-    <details class="resources"> 
+    <details class="resources">
       <summary><b>Resources</b></summary>
       Preprint: <a href="https://naproche-net.github.io/downloads/2010-IJCAR.pdf">PDF</a>
     </details>
-    <details class="abstract"> 
+    <details class="abstract">
       <summary><b>Abstract</b></summary>
       <div>
         <p>
@@ -2760,7 +2769,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{CraKoeKueSch2010:PreSelInTheNapSys,
+      <pre>@InProceedings{CraKoeKueSch2010:PreSelInTheNapSys,
   author={Cramer, Marcos and Koepke, Peter and Kühlwein, Daniel and Schröder, Bernhard}",
   editor={Giesl, Jürgen and Hähnle, Reiner},
   title={Premise Selection in the {Naproche} System},
@@ -2773,20 +2782,20 @@ year={2020},
     </details>
   </li>
   <li>
-    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Daniel Kühlwein,
-    Bernhard Schröder <a href="https://orcid.org/0000-0002-7847-1393"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Bernhard Schröder <a href="https://orcid.org/0000-0002-7847-1393"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Presupposition Projection and Accommodation in Mathematical Texts</i>;
     in: Manfred Pinkal, Ines Rehbein, Sabine Schulte im Walde, Angelika Storrer (eds.);
     <a href="https://dblp.org/db/conf/konvens/konvens2010.html"><i>Semantic Approaches in Natural Language Processing</i></a>;
     <i>KONVENS 2010</i>,
     Saarbrücken, Germany.
-    <details class="resources"> 
+    <details class="resources">
       <summary><b>Resources</b></summary>
       Preprint: <a href="https://naproche-net.github.io/downloads/2010-konvens10.pdf">PDF</a><br>
       Proceedings: <a href="https://www.ims.uni-stuttgart.de/documents/team/schulte/publications/proceedings/konvens-10.pdf">PDF</a>
     </details>
-    <details class="abstract"> 
+    <details class="abstract">
       <summary><b>Abstract</b></summary>
       <div>
         <p>
@@ -2807,7 +2816,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{DBLP:conf/konvens/2010,
+      <pre>@InProceedings{DBLP:conf/konvens/2010,
   author={Cramer, Marcos and Kühlwein, Daniel and Schröder, Bernhard},
   editor={Pinkal, Manfred and Rehbein, Ines and Schulte im Walde, Sabine and Storrer, Angelika},
   title={Presupposition Projection and Accommodation in Mathematical Texts},
@@ -2819,18 +2828,18 @@ year={2020},
     </details>
   </li>
   <li>
-    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Bernhard Schröder <a href="https://orcid.org/0000-0002-7847-1393"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Bernhard Schröder <a href="https://orcid.org/0000-0002-7847-1393"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <a href="https://link.springer.com/chapter/10.1007/978-3-642-31175-8_3"><i>Interpreting Plurals in the Naproche CNL</i></a>;
-    in:  Michael Rosner, Norbert E. Fuchs (eds.);
+    in: Michael Rosner, Norbert E. Fuchs (eds.);
     <a href="https://link.springer.com/book/10.1007/978-3-642-31175-8"><i> Controlled Natural Language. Second International Workshop</i></a>;
     <a href="https://staff.um.edu.mt/mros1/cnl2010/"><i>CNL 2010</i></a>,
     Marettimo Island, Italy.
-    <details class="resources"> 
+    <details class="resources">
       <summary><b>Resources</b></summary>
       Preprint: <a href="https://naproche-net.github.io/downloads/2010-CNL.pdf">PDF</a>
     </details>
-    <details class="abstract"> 
+    <details class="abstract">
       <summary><b>Abstract</b></summary>
       <div>
         <p>
@@ -2848,7 +2857,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{CraSch2010:IntPluInTheNapCnl,
+      <pre>@InProceedings{CraSch2010:IntPluInTheNapCnl,
   author={Cramer, Marcos and Schröder, Bernhard},
   editor={Rosner, Michael and Fuchs, Norbert E.},
   title={Interpreting Plurals in the {Naproche} CNL},
@@ -2861,7 +2870,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Combining Linguistics and Proof Checking of Mathematical Texts</i>;
     <i>Philosophy of Mathematical Practice</i>, Brussels, Belgium.
     <details class="resources">
@@ -2870,7 +2879,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2010:ComLinAndProCheOfMatTex,
+      <pre>@Misc{Koe2010:ComLinAndProCheOfMatTex,
   author={Koepke, Peter},
   title={Combining Linguistics and Proof Checking of Mathematical Texts},
   year={2010},
@@ -2880,7 +2889,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Checking Natural Language Proofs</i>;
     <i>Meeting in Honor of Jouko Väänänen's Sixtieth Birthday</i>, Helsinki, Finland.
     <details class="resources">
@@ -2889,7 +2898,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2010:CheNatLanPro,
+      <pre>@Misc{Koe2010:CheNatLanPro,
   author={Koepke, Peter},
   title={Checking Natural Language Proofs},
   year={2010},
@@ -2904,22 +2913,22 @@ year={2020},
 
 <ul>
   <li>
-    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Bernhard Fisseni <a href="https://orcid.org/0000-0003-3434-8964"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Bernhard Fisseni <a href="https://orcid.org/0000-0003-3434-8964"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Daniel Kühlwein,
-    Bernhard Schröder <a href="https://orcid.org/0000-0002-7847-1393"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Bernhard Schröder <a href="https://orcid.org/0000-0002-7847-1393"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Jip Veldman;
     <a href="https://link.springer.com/chapter/10.1007/978-3-642-14418-9_11"><i>The Naproche Project Controlled Natural Language Proof Checking of Mathematical Texts</i></a>
     in: Norbert E. Fuchs (ed.);
     <a href="https://link.springer.com/book/10.1007/978-3-642-14418-9"><i>Controlled Natural Language. Workshop on Controlled Natural Language</i></a>;
     <a href="http://attempto.ifi.uzh.ch/site/cnl2009/"><i>CNL 2009</i></a>,
     Marettimo Island, Italy.
-    <details class="resources"> 
+    <details class="resources">
       <summary><b>Resources</b></summary>
       Preprint: <a href="https://icr.uni.lu/mcramer/downloads/CNL-paper.pdf">PDF</a>
     </details>
-    <details class="abstract"> 
+    <details class="abstract">
       <summary><b>Abstract</b></summary>
       <div>
         <p>
@@ -2937,7 +2946,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{CraFisKoeKueSchVel2009:TheNapProConNatLanProCheOfMatTex,
+      <pre>@InProceedings{CraFisKoeKueSchVel2009:TheNapProConNatLanProCheOfMatTex,
   author={Cramer, Marcos and Fisseni, Bernhard and Koepke, Peter and Kühlwein, Daniel and Schröder, Bernhard and Veldman, Jip},
   editor={Fuchs, Norbert E.},
   title={The Naproche Project Controlled Natural Language Proof Checking of Mathematical Texts},
@@ -2959,7 +2968,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@mastersthesis{Arn2009:SemUndKorVonProProImNapPro,
+      <pre>@mastersthesis{Arn2009:SemUndKorVonProProImNapPro,
   title={Semantik und Korrektheit von {Prolog}-Programmen im {Naproche}-Projekt},
   author={Arndt, Doerthe},
   school={Rheinische Friedrich-Wilhelms-Universität Bonn},
@@ -2970,7 +2979,7 @@ year={2020},
   </li>
   <li>
     Merlin Carl,
-    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Daniel Kühlwein;
     <i>Chapter 1 of Landau in Naproche</i>.
     <details class="resources">
@@ -2979,7 +2988,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Article{CarCraKue2009:ChaOneOfLanInNap,
+      <pre>@Article{CarCraKue2009:ChaOneOfLanInNap,
   title={Chapter 1 of {Landau} in {Naproche}},
   author={Carl, Merlin and Cramer, Marcos and Kühlwein, Daniel},
   year={2009}
@@ -2987,10 +2996,10 @@ year={2020},
     </details>
   </li>
   <li>
-    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Daniel Kühlwein,
-    Bernhard Schröder <a href="https://orcid.org/0000-0002-7847-1393"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Bernhard Schröder <a href="https://orcid.org/0000-0002-7847-1393"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>The Naproche System</i>;
     <a href="https://orcca.on.ca/conferences/cicm2009/calculemus09/important.html"><i>Calculemus</i></a>,
     <a href="https://orcca.on.ca/conferences/cicm2009/cicm09/index.html"><i>CICM 2009</i></a>,
@@ -3026,9 +3035,9 @@ year={2020},
         </p>
       </div>
     </details>
-    <details class="bibtex" >
+    <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Article{CraKoeKueSch2009:TheNapSys,
+      <pre>@Article{CraKoeKueSch2009:TheNapSys,
   title={The Naproche System},
   author={Cramer, Marcos and Koepke, Peter and Kühlwein, Daniel and Schröder, Bernhard},
   year={2009}
@@ -3036,7 +3045,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Marcos Cramer <a href="https://orcid.org/0000-0002-9461-1245"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Mathematisch-logische Aspekte von Beweisrepräsentationsstrukturen</i>;
     Master's thesis.
     <details class="resources">
@@ -3045,7 +3054,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@mastersthesis{Cra2009:MatLogAspVonBew,
+      <pre>@mastersthesis{Cra2009:MatLogAspVonBew,
   title={Mathematisch-logische Aspekte von Beweisrepräsentationsstrukturen},
   author={Cramer, Marcos},
   school={Rheinische Friedrich-Wilhelms-Universität Bonn},
@@ -3244,7 +3253,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@mastersthesis{Kue2009:ACalForProRepStr,
+      <pre>@mastersthesis{Kue2009:ACalForProRepStr,
   title={A Calculus for Proof Representation Structures},
   author={Kühlwein, Daniel},
   school={Rheinische Friedrich-Wilhelms-Universität Bonn},
@@ -3255,9 +3264,9 @@ year={2020},
   </li>
   <li>
     Jip Veldman,
-    Bernhard Fisseni <a href="https://orcid.org/0000-0003-3434-8964"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Bernhard Schröder <a href="https://orcid.org/0000-0002-7847-1393"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Bernhard Fisseni <a href="https://orcid.org/0000-0003-3434-8964"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Bernhard Schröder <a href="https://orcid.org/0000-0002-7847-1393"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <a href="https://ids-pub.bsz-bw.de/frontdoor/index/index/docId/8257"><i>From Proof Texts to Logic</i></a>;
     in: Christian Chiarcos, Richard Eckart de Castilho und Manfred Stede (eds.);
     <i>Von der Form zur Bedeutung: Texte automatisch verarbeiten &ndash; From Form to Meaning: Processing Texts Automatically. Proceedings of the Biennial GSCL Conference 2009</i>.
@@ -3280,7 +3289,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InCollection{VelFisSchKoe2009:FroProoTexToLog,
+      <pre>@InCollection{VelFisSchKoe2009:FroProoTexToLog,
   author={Veldman, Jip and Fisseni, Bernhard and Schröder, Bernhard and Koepke, Peter},
   title={From Proof Texts to Logic. Discourse Representation Structures for Proof Texts in Mathematics},
   series={Von der Form zur Bedeutung: Texte automatisch verarbeiten. From Form to Meaning: Processing Texts Automatically. Proceedings of the Biennial {GSCL} Conference 2009},
@@ -3293,7 +3302,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Mathematical Proofs as Derivation-Indicators: Theory and Implementation</i>;
     <i>Philosophy of Mathematical Practice</i>, Brussels, Belgium.
     <details class="resources">
@@ -3302,7 +3311,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2009:MatProAsDerIndTheAndImp,
+      <pre>@Misc{Koe2009:MatProAsDerIndTheAndImp,
   author={Koepke, Peter},
   title={Mathematical Proofs as Derivation-Indicators: Theory and Implementation},
   year={2009},
@@ -3312,7 +3321,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Understanding Natural Language Mathematical Proofs</i>;
     <i>CUNY Graduate Center</i>, New York City, USA and <i>Oberseminar Mathematische Logik</i>, München, Germany.
     <details class="resources">
@@ -3321,7 +3330,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2009:UndNatLanMatPro,
+      <pre>@Misc{Koe2009:UndNatLanMatPro,
   author={Koepke, Peter},
   title={Understanding Natural Language Mathematical Proofs},
   year={2009},
@@ -3337,9 +3346,9 @@ year={2020},
 <ul>
   <li>
     Konstantin Verchinine,
-    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Andrei Paskevich,
-    Anatoly Anisimov <a href="https://orcid.org/0000-0002-1467-2006"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Anatoly Anisimov <a href="https://orcid.org/0000-0002-1467-2006"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <a href="https://link.springer.com/chapter/10.1007/978-3-540-85110-3_47"><i>On Correctness of Mathematical Texts From a Logical and Practical Point of View</i></a>;
     in: Serge Autexier, John Campbell, Julio Rubio, Volker Sorge, Masakazu Suzuki, Freek Wiedijk (eds.);
     <a href="Intelligent Computer Mathematics "><i> Intelligent Computer Mathematics. 9th International Conference</i></a>;
@@ -3378,13 +3387,13 @@ year={2020},
           notion of correctness is formalized with the help of a calculus.
           Practically, these ideas, methods and algorithms are implemented in a
           proof assistant called SAD. We give a short description of SAD and a
-          series of examples showing what can be done with it. 
+          series of examples showing what can be done with it.
         </p>
       </div>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{VerLyaPasAni2008:OnCorOfMatTexFroALogAndPraPoiOfVie,
+      <pre>@InProceedings{VerLyaPasAni2008:OnCorOfMatTexFroALogAndPraPoiOfVie,
   author={Verchinine, Konstantin and Lyaletski, Alexander and Paskevich, Andrei and Anisimov, Anatoly},
   title={On Correctness of Mathematical Texts From a Logical and Practical Point of View},
   booktitle={Intelligent Computer Mathematics, AISC/Calculemus/MKM 2008},
@@ -3407,7 +3416,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@techreport{Kue2008:AShoIntToNap,
+      <pre>@techreport{Kue2008:AShoIntToNap,
   title={A Short Introduction To {Naproche} v0.1},
   author={Kühlwein, Daniel},
   year={2008}
@@ -3424,7 +3433,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@mastersthesis{Kol2008:GenProRepStrInTheProNap,
+      <pre>@mastersthesis{Kol2008:GenProRepStrInTheProNap,
   title={Generating Proof Representation Structures in the Project {NAPROCHE}},
   author={Kolev, Nickolay},
   school={Rheinische Friedrich-Wilhelms-Universität Bonn},
@@ -3453,37 +3462,37 @@ year={2020},
           We study the means of presentation of mathematical knowledge and reasoning
           schemes. Our research aims at an automated system for verification of
           formalized mathematical texts.
-          
+
           In this system, a text to verify is written in a formal language which is
           close to the natural language and style of mathematical publications. Our
           intention is to exploit the hint which are given to us by the «human» form
           of the problem: definitions, proof schemes, nouns denoting classes of
           objects, etc. We describe such a language, called ForTheL.
-          
+
           Verification consists in showing that the text is «sensible» and «grounded»,
           that functions and relations are applied within the domain, according to the
           definitions, and assertions follow from their respective premises. A formal
           definition of a correct text relies on a sound sequent calculus and on the
           notion of local validity (local with respect to some occurrence inside a
           formula).
-          
+
           Proof search is carried out on two levels. The lower level is an automated
           theorem prover based on a combinatorial procedure. We introduce a variant of
           connection tableaux which is sound and complete in the first-order logic
           with equality.
-          
+
           The higher level is a «reasoner» which employs natural proving techniques in
           order to filter, simplify, decompose a proof task before passing it to the
           prover. The algorithms of the reasoner are based on transformations that
           preserve the locally valid propositions.
-          
+
           The proposed methods are implemented in the proof assistant SAD.
         </p>
       </div>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@phdthesis{Pas2007:MetDeForDesconnEtDesRaiMat,
+      <pre>@phdthesis{Pas2007:MetDeForDesconnEtDesRaiMat,
   author={Paskevych, Andriy},
   title={Méthodes de formalisation des connaissances et des raisonnements mathématiques: aspects appliqués et théoriques},
   school={Université Paris 12},
@@ -3500,7 +3509,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Article{Pas2007:TheSynAndSemOfTheForLan,
+      <pre>@Article{Pas2007:TheSynAndSemOfTheForLan,
   title={The Syntax and Semantics of the {ForTheL} Language},
   author={Paskevich, Andrei},
   year={2007}
@@ -3509,7 +3518,7 @@ year={2020},
   </li>
   <li>
     Konstantin Verchinine,
-    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Andrei Paskevich;
     <a href="https://link.springer.com/chapter/10.1007/978-3-540-73595-3_29"><i>System for Automated Deduction (SAD): A Tool for Proof Verification</i></a>;
     in: Frank Pfenning (ed.);
@@ -3536,7 +3545,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{VerLyaPas2007:SysForAutDed,
+      <pre>@InProceedings{VerLyaPas2007:SysForAutDed,
   author={Verchinine, Konstantin and Lyaletski, Alexander and Paskevich, Andrei},
   editor={Pfenning, Frank},
   title={System for Automated Deduction ({SAD}): A Tool for Proof Verification},
@@ -3551,8 +3560,8 @@ year={2020},
   <li>
     Andrei Paskevich,
     Konstantin Verchinine,
-    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
-    Anatoly Anisimov <a href="https://orcid.org/0000-0002-1467-2006"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
+    Anatoly Anisimov <a href="https://orcid.org/0000-0002-1467-2006"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Reasoning Inside a Formula and Ontological Correctness of a Formal Mathematical Text</i>;
     in: Manuel Kauers, Manfred Kerber, Robert Miner, Wolfgang Windsteiger (eds.);
     <i>Calculemus/MKM 2007 &ndash; Work in Progress</i>;
@@ -3586,13 +3595,13 @@ year={2020},
           sufficient condition for an equivalent transformation of a subformula.
           Using the notion of local validity, we give a formal definition of
           ontological correctness for a text written in a special formal
-          language called ForTheL. 
+          language called ForTheL.
         </p>
       </div>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{PasVerLyaAni2007:ReaInsAForAndOntCorOfAForMatTex,
+      <pre>@InProceedings{PasVerLyaAni2007:ReaInsAForAndOntCorOfAForMatTex,
   author={Paskevich, Andrei and Verchinine, Konstantin and Lyaletski, Alexander and Anisimov, Anatoly},
   title={Reasoning Inside a Formula and Ontological Correctness of a Formal Mathematical Text},
   booktitle={Calculemus/MKM 2007 -- Work in Progress},
@@ -3606,7 +3615,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>The NAPROCHE project</i>;
     <i>Workshop Deduction in Semantics</i>, Stuttgart, Germany.
     <details class="resources">
@@ -3615,7 +3624,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2007:TheNapPro,
+      <pre>@Misc{Koe2007:TheNapPro,
   author={Koepke, Peter},
   title={The {NAPROCHE} project},
   year={2007},
@@ -3625,7 +3634,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>The Language of Proofs</i>;
     <i>Trimestre on Methods of Proof Theory in Mathematics</i>, Bonn, Germany.
     <details class="resources">
@@ -3634,7 +3643,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2007:TheLanOfPro,
+      <pre>@Misc{Koe2007:TheLanOfPro,
   author={Koepke, Peter},
   title={The Language of Proofs},
   year={2007},
@@ -3649,7 +3658,7 @@ year={2020},
 
 <ul>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Linguistics and Logic of Common Mathematical Language</i>;
     <i>Brouwer Seminar</i>, Nijmegen, Netherlands.
     <details class="resources">
@@ -3658,7 +3667,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2006:LinAndLogOfComMatLan,
+      <pre>@Misc{Koe2006:LinAndLogOfComMatLan,
   author={Koepke, Peter},
   title={Linguistics and Logic of Common Mathematical Language},
   year={2006},
@@ -3668,7 +3677,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>;
+    Peter Koepke <a href="https://orcid.org/0000-0002-2266-134X"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>;
     <i>Proof Checking with a Natural Language Interface</i>;
     <i>Logical Methods in the Humanities Workshop</i>, Stanford, USA.
     <details class="resources">
@@ -3677,7 +3686,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Misc{Koe2006:ProCheWitANatLanInt,
+      <pre>@Misc{Koe2006:ProCheWitANatLanInt,
   author={Koepke, Peter},
   title={Proof Checking with a Natural Language Interface},
   year={2006},
@@ -3687,7 +3696,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Andrey Paskevich,
     Konstantin Verchinine;
     <a href="https://www.sciencedirect.com/science/article/pii/S1570868305000741?ref=pdf_download&fr=RR-2&rr=8e7920abdd54d389"><i>SAD As a Mathematical Aassistant &ndash; How Should We Go From Here to There?</i></a>;
@@ -3712,17 +3721,27 @@ year={2020},
           the system's design, and the process of problem formalization in the
           fashion of SAD. We show that the choice of classical first-order logic
           as the background logic of SAD is not too restrictive. For example, we
-          can handle binders like <math display="inline"><mo>Σ</mo></math> or
-          <math display="inline"><mo>lim</mo></math> without resort to second
+          can handle binders like <math display="inline">
+            <mo>Σ</mo>
+          </math> or
+          <math display="inline">
+            <mo>lim</mo>
+          </math> without resort to second
           order or to a full-powered set theory. We illustrate our approach with
           a series of examples, in particular, with the classical problem
-          <math display="inline"><msqrt><mn>2</mn></msqrt><mo>∉</mo><mi>ℚ</mi></math>.
+          <math display="inline">
+            <msqrt>
+              <mn>2</mn>
+            </msqrt>
+            <mo>∉</mo>
+            <mi>ℚ</mi>
+          </math>.
         </p>
       </div>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{LyaPasVer2006SasAsAMatAssHowShoWeGoFroHerToThe,
+      <pre>@InProceedings{LyaPasVer2006SasAsAMatAssHowShoWeGoFroHerToThe,
   author={Lyaletski, Alexander and Paskevich, Andrey and Verchinine, Konstantin},
   editor={Benzmüller, Christoph},
   title={{SAD} As a Mathematical Assistant -- How Should We Go From Here to There?},
@@ -3740,7 +3759,7 @@ year={2020},
 
 <ul>
   <li>
-    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Andrey Paskevich,
     Konstantin Verchinine;
     <a href="https://link.springer.com/chapter/10.1007/978-3-540-27818-4_17"><i>Theorem Proving and Proof Verification in the System SAD</i></a>;
@@ -3775,7 +3794,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{LyaPasVer2004:TheProAndProVerInTheSysSad,
+      <pre>@InProceedings{LyaPasVer2004:TheProAndProVerInTheSysSad,
   author={Lyaletski, Alexander and Paskevich, Andrey and Verchinine, Konstantin},
   editor={Asperti, Andrea and Bancerek, Grzegorz and Trybulec, Andrzej},
   title={Theorem Proving and Proof Verification in the System {SAD}},
@@ -3788,7 +3807,7 @@ year={2020},
     </details>
   </li>
   <li>
-    Alexander V. Lyaletski <a href="https://orcid.org/0000-0002-1467-2006"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Alexander V. Lyaletski <a href="https://orcid.org/0000-0002-1467-2006"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Anatoly E. Doroshenko,
     Andrey Paskevich,
     Konstantin Verchinine;
@@ -3820,13 +3839,13 @@ year={2020},
           (checking specifications, proving safety properties of network
           protocols, etc), the paper illustrates some principles and
           peculiarities of the evidential paradigm by means of exemplifying the
-          verification of a part of a non-trivial mathematical text. 
+          verification of a part of a non-trivial mathematical text.
         </p>
       </div>
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{LayDorPasVer2004:EviParAndIntMatTexPro,
+      <pre>@InProceedings{LayDorPasVer2004:EviParAndIntMatTexPro,
   author={Lyaletski, Alexander V. and Doroshenko, Anatoly E. and Paskevich, Andrey and Verchinine, Konstantin},
   title={Evidential Paradigm and Intelligent Mathematical Text Processing},
   booktitle={Information Systems Technology and its Applications, 3rd International Conference, ISTA 2004},
@@ -3846,7 +3865,7 @@ year={2020},
 
 <ul>
   <li>
-    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Konstantin Verchinine,
     Andrey Paskevich;
     <i>On Verification Tools Implemented in the System for Automated Deduction</i>;
@@ -3876,7 +3895,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Article{LyaVerPas2003:OnVerTooImpInTheSysForAutDed,
+      <pre>@Article{LyaVerPas2003:OnVerTooImpInTheSysForAutDed,
   author={Lyaletski, Alexander and Verchinine, Konstantin and Paskevich, Andrey},
   title={On Verification Tools Implemented in the {System} for {Automated} {Deduction}},
   year={2003}
@@ -3892,7 +3911,7 @@ year={2020},
     Zainutdin Aselderov,
     Konstantin Verchinine,
     Anatoli Degtyarev,
-    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Andrey Paskevich,
     Alexandre Pavlov;
     <i>Linguistic Tools and Deductive Technique of the System for Automated Deduction</i>.
@@ -3923,7 +3942,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Article{AseVerDegLyaPasPav2002:LinTooAndDedTecOfTheSysForAutDed,
+      <pre>@Article{AseVerDegLyaPasPav2002:LinTooAndDedTecOfTheSysForAutDed,
   author={Aselderov, Zainutdin and Verchinine Konstantin and Degtyarev Anatoli and Lyaletski Alexander and Paskevich Andrey and Pavlov Alexandre},
   title={Linguistic Tools and Deductive Technique of the {System} for {Automated} {Deduction}},
   year={2002}
@@ -3931,12 +3950,12 @@ year={2020},
     </details>
   </li>
   <li>
-    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg"/></a>,
+    Alexander Lyaletski <a href="https://orcid.org/0000-0003-0370-5041"><img class="orcid-icon" src="ORCID-iD_icon_vector.svg" /></a>,
     Konstantin Verchinine,
     Anatoli Degtyarev,
     Andrey Paskevich;
     <i>System for Automated Deduction (SAD): Linguistic and Deductive Peculiarities</i>;
-    in:  Mieczysław A. Kłopotek, Sławomir T. Wierzchoń, Maciej Michalewicz (eds.);
+    in: Mieczysław A. Kłopotek, Sławomir T. Wierzchoń, Maciej Michalewicz (eds.);
     <a href="https://link.springer.com/book/10.1007/978-3-7908-1777-5"><i>Intelligent Information Systems 2002 </i></a>;
     <i>IIS 2002</i>,
     Sopot, Poland.
@@ -3972,7 +3991,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@InProceedings{LyaVerPas2002:SysForAutDedSadLinAndDedPec,
+      <pre>@InProceedings{LyaVerPas2002:SysForAutDedSadLinAndDedPec,
   author={Lyaletski, Alexander and Verchinine, Konstantin and Degtyarev, Anatoli and Paskevich, Andrey},
   title={{System} for {Automated} {Deduction} ({SAD}): Linguistic and Deductive Peculiarities},
   booktitle={Intelligent Information Systems, 11th International Symposium, IIS 2002},
@@ -4000,7 +4019,7 @@ year={2020},
     </details>
     <details class="bibtex">
       <summary><b><span style="font-variant: small-caps;">Bib</span>T<span style="vertical-align: -0.25em; margin-left: -0.1667em; margin-right: -0.125em; line-height: 1ex;">E</span>X</b></summary>
-<pre>@Article{VerPas2000:ForTheLanOfForThe,
+      <pre>@Article{VerPas2000:ForTheLanOfForThe,
   title={{{ForTheL} -- the Language of Formal Theories}},
   author={Vershinin, Konstantin and Paskevich, Andrey},
   journal={International Journal of Information Theories and Applications},
@@ -4011,14 +4030,13 @@ year={2020},
 }</pre>
     </details>
   </li>
-</ul>
-
-    </main>
-    <footer>
-        <ol>
-            <li><a href="impressum.html">Impressum</a></li>
-            <li><a href="privacy.html">Privacy</a></li>
-        </ol>
-    </footer>
+</ul></main>
+<footer>
+  <ol>
+    <li><a href="impressum.html">Impressum</a></li>
+    <li><a href="privacy.html">Privacy</a></li>
+  </ol>
+</footer>
 </body>
+
 </html>
