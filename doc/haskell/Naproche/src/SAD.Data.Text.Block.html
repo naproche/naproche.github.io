@@ -1,0 +1,817 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.Data.Text.Block</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2001 - 2008, Andrei Paskevich,</span><span>
+</span><span id="line-4"></span><span class="hs-comment">--               (c) 2017 - 2018, Steffen Frerix</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-6"></span><span class="hs-comment">--</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- TODO: Add description.</span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns #-}</span><span>
+</span><span id="line-11"></span><span class="hs-pragma">{-# LANGUAGE GADTs #-}</span><span>
+</span><span id="line-12"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.Data.Text.Block</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-15"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier">ProofText</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier">Block</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Block.html#makeBlock"><span class="hs-identifier">makeBlock</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Block.html#position"><span class="hs-identifier">position</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Block.html#declaredNames"><span class="hs-identifier">declaredNames</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Block.html#text"><span class="hs-identifier">text</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Block.html#Section"><span class="hs-identifier">Section</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Block.html#showForm"><span class="hs-identifier">showForm</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-23"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Block.html#formulate"><span class="hs-identifier">formulate</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-24"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Block.html#compose"><span class="hs-identifier">compose</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Block.html#needsProof"><span class="hs-identifier">needsProof</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-26"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Block.html#isTopLevel"><span class="hs-identifier">isTopLevel</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-27"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Block.html#file"><span class="hs-identifier">file</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-28"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Block.html#parseErrors"><span class="hs-identifier">parseErrors</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-29"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Block.html#canDeclare"><span class="hs-identifier">canDeclare</span></a></span><span>
+</span><span id="line-30"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Set</span></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Text</span></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">fromMaybe</span></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Formula.html"><span class="hs-identifier">SAD.Data.Formula</span></a></span><span> </span><span class="hs-keyword">hiding</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Tag.html#CaseHypothesis"><span class="hs-identifier">CaseHypothesis</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Instr.html"><span class="hs-identifier">SAD.Data.Instr</span></a></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.Token.html"><span class="hs-identifier">SAD.Parser.Token</span></a></span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Text.Decl.html"><span class="hs-identifier">SAD.Data.Text.Decl</span></a></span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.Error.html"><span class="hs-identifier">SAD.Parser.Error</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Parser.Error.html#ParseError"><span class="hs-identifier">ParseError</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Export.TPTP.html"><span class="hs-identifier">SAD.Export.TPTP</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">TPTP</span></span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html"><span class="hs-identifier">Isabelle.Bytes</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Bytes</span></span><span>
+</span><span id="line-46"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Position.html"><span class="hs-identifier">Isabelle.Position</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Position</span></span><span>
+</span><span id="line-47"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Library.html"><span class="hs-identifier">Isabelle.Library</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Isabelle.Library.html#make_text"><span class="hs-identifier">make_text</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span class="hs-keyword">data</span><span> </span><span id="ProofText"><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-var">ProofText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-51"></span><span>    </span><span id="ProofTextBlock"><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextBlock"><span class="hs-identifier hs-var">ProofTextBlock</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span>
+</span><span id="line-52"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ProofTextInstr"><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-var">ProofTextInstr</span></a></span></span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span> </span><span class="annot"><a href="SAD.Data.Instr.html#Instr"><span class="hs-identifier hs-type">Instr</span></a></span><span>
+</span><span id="line-53"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ProofTextDrop"><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextDrop"><span class="hs-identifier hs-var">ProofTextDrop</span></a></span></span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span> </span><span class="annot"><a href="SAD.Data.Instr.html#Drop"><span class="hs-identifier hs-type">Drop</span></a></span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ProofTextSynonym"><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextSynonym"><span class="hs-identifier hs-var">ProofTextSynonym</span></a></span></span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ProofTextPretyping"><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextPretyping"><span class="hs-identifier hs-var">ProofTextPretyping</span></a></span></span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><a href="SAD.Data.VarName.html#PosVar"><span class="hs-identifier hs-type">PosVar</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ProofTextMacro"><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextMacro"><span class="hs-identifier hs-var">ProofTextMacro</span></a></span></span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span>
+</span><span id="line-57"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="ProofTextError"><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextError"><span class="hs-identifier hs-var">ProofTextError</span></a></span></span><span> </span><span class="annot"><a href="SAD.Parser.Error.html#ParseError"><span class="hs-identifier hs-type">ParseError</span></a></span><span>
+</span><span id="line-58"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679245240"><span id="local-6989586621679245259"><span class="annot"><span class="annottext">ProofText -&gt; ProofText -&gt; Bool
+(ProofText -&gt; ProofText -&gt; Bool)
+-&gt; (ProofText -&gt; ProofText -&gt; Bool) -&gt; Eq ProofText
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: ProofText -&gt; ProofText -&gt; Bool
+== :: ProofText -&gt; ProofText -&gt; Bool
+$c/= :: ProofText -&gt; ProofText -&gt; Bool
+/= :: ProofText -&gt; ProofText -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679245267"><span id="local-6989586621679245286"><span id="local-6989586621679245290"><span id="local-6989586621679245293"><span id="local-6989586621679245296"><span id="local-6989586621679245299"><span id="local-6989586621679245302"><span class="annot"><span class="annottext">Eq ProofText
+Eq ProofText =&gt;
+(ProofText -&gt; ProofText -&gt; Ordering)
+-&gt; (ProofText -&gt; ProofText -&gt; Bool)
+-&gt; (ProofText -&gt; ProofText -&gt; Bool)
+-&gt; (ProofText -&gt; ProofText -&gt; Bool)
+-&gt; (ProofText -&gt; ProofText -&gt; Bool)
+-&gt; (ProofText -&gt; ProofText -&gt; ProofText)
+-&gt; (ProofText -&gt; ProofText -&gt; ProofText)
+-&gt; Ord ProofText
+ProofText -&gt; ProofText -&gt; Bool
+ProofText -&gt; ProofText -&gt; Ordering
+ProofText -&gt; ProofText -&gt; ProofText
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: ProofText -&gt; ProofText -&gt; Ordering
+compare :: ProofText -&gt; ProofText -&gt; Ordering
+$c&lt; :: ProofText -&gt; ProofText -&gt; Bool
+&lt; :: ProofText -&gt; ProofText -&gt; Bool
+$c&lt;= :: ProofText -&gt; ProofText -&gt; Bool
+&lt;= :: ProofText -&gt; ProofText -&gt; Bool
+$c&gt; :: ProofText -&gt; ProofText -&gt; Bool
+&gt; :: ProofText -&gt; ProofText -&gt; Bool
+$c&gt;= :: ProofText -&gt; ProofText -&gt; Bool
+&gt;= :: ProofText -&gt; ProofText -&gt; Bool
+$cmax :: ProofText -&gt; ProofText -&gt; ProofText
+max :: ProofText -&gt; ProofText -&gt; ProofText
+$cmin :: ProofText -&gt; ProofText -&gt; ProofText
+min :: ProofText -&gt; ProofText -&gt; ProofText
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span class="hs-keyword">data</span><span> </span><span id="Block"><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Block"><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-61"></span><span>  </span><span id="formula"><span class="annot"><span class="annottext">Block -&gt; Formula
+</span><a href="SAD.Data.Text.Block.html#formula"><span class="hs-identifier hs-var hs-var">formula</span></a></span></span><span>           </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-62"></span><span>  </span><span id="body"><span class="annot"><span class="annottext">Block -&gt; [ProofText]
+</span><a href="SAD.Data.Text.Block.html#body"><span class="hs-identifier hs-var hs-var">body</span></a></span></span><span>              </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-63"></span><span>  </span><span id="kind"><span class="annot"><span class="annottext">Block -&gt; Section
+</span><a href="SAD.Data.Text.Block.html#kind"><span class="hs-identifier hs-var hs-var">kind</span></a></span></span><span>              </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Section"><span class="hs-identifier hs-type">Section</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-64"></span><span>  </span><span id="declaredVariables"><span class="annot"><span class="annottext">Block -&gt; Set Decl
+</span><a href="SAD.Data.Text.Block.html#declaredVariables"><span class="hs-identifier hs-var hs-var">declaredVariables</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><a href="SAD.Data.Text.Decl.html#Decl"><span class="hs-identifier hs-type">Decl</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-65"></span><span>  </span><span id="name"><span class="annot"><span class="annottext">Block -&gt; Text
+</span><a href="SAD.Data.Text.Block.html#name"><span class="hs-identifier hs-var hs-var">name</span></a></span></span><span>              </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">,</span><span>
+</span><span id="line-66"></span><span>  </span><span id="link"><span class="annot"><span class="annottext">Block -&gt; [Text]
+</span><a href="SAD.Data.Text.Block.html#link"><span class="hs-identifier hs-var hs-var">link</span></a></span></span><span>              </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-67"></span><span>  </span><span id="tokens"><span class="annot"><span class="annottext">Block -&gt; [Token]
+</span><a href="SAD.Data.Text.Block.html#tokens"><span class="hs-identifier hs-var hs-var">tokens</span></a></span></span><span>            </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Parser.Token.html#Token"><span class="hs-identifier hs-type">Token</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-68"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679245315"><span id="local-6989586621679245331"><span class="annot"><span class="annottext">Block -&gt; Block -&gt; Bool
+(Block -&gt; Block -&gt; Bool) -&gt; (Block -&gt; Block -&gt; Bool) -&gt; Eq Block
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Block -&gt; Block -&gt; Bool
+== :: Block -&gt; Block -&gt; Bool
+$c/= :: Block -&gt; Block -&gt; Bool
+/= :: Block -&gt; Block -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679245338"><span id="local-6989586621679245353"><span id="local-6989586621679245364"><span id="local-6989586621679245367"><span id="local-6989586621679245370"><span id="local-6989586621679245373"><span id="local-6989586621679245376"><span class="annot"><span class="annottext">Eq Block
+Eq Block =&gt;
+(Block -&gt; Block -&gt; Ordering)
+-&gt; (Block -&gt; Block -&gt; Bool)
+-&gt; (Block -&gt; Block -&gt; Bool)
+-&gt; (Block -&gt; Block -&gt; Bool)
+-&gt; (Block -&gt; Block -&gt; Bool)
+-&gt; (Block -&gt; Block -&gt; Block)
+-&gt; (Block -&gt; Block -&gt; Block)
+-&gt; Ord Block
+Block -&gt; Block -&gt; Bool
+Block -&gt; Block -&gt; Ordering
+Block -&gt; Block -&gt; Block
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: Block -&gt; Block -&gt; Ordering
+compare :: Block -&gt; Block -&gt; Ordering
+$c&lt; :: Block -&gt; Block -&gt; Bool
+&lt; :: Block -&gt; Block -&gt; Bool
+$c&lt;= :: Block -&gt; Block -&gt; Bool
+&lt;= :: Block -&gt; Block -&gt; Bool
+$c&gt; :: Block -&gt; Block -&gt; Bool
+&gt; :: Block -&gt; Block -&gt; Bool
+$c&gt;= :: Block -&gt; Block -&gt; Bool
+&gt;= :: Block -&gt; Block -&gt; Bool
+$cmax :: Block -&gt; Block -&gt; Block
+max :: Block -&gt; Block -&gt; Block
+$cmin :: Block -&gt; Block -&gt; Block
+min :: Block -&gt; Block -&gt; Block
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-69"></span><span>
+</span><span id="line-70"></span><span class="annot"><a href="SAD.Data.Text.Block.html#makeBlock"><span class="hs-identifier hs-type">makeBlock</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Section"><span class="hs-identifier hs-type">Section</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Parser.Token.html#Token"><span class="hs-identifier hs-type">Token</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span>
+</span><span id="line-71"></span><span id="makeBlock"><span class="annot"><span class="annottext">makeBlock :: Formula
+-&gt; [ProofText] -&gt; Section -&gt; Text -&gt; [Text] -&gt; [Token] -&gt; Block
+</span><a href="SAD.Data.Text.Block.html#makeBlock"><span class="hs-identifier hs-var hs-var">makeBlock</span></a></span></span><span> </span><span id="local-6989586621679245379"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245379"><span class="hs-identifier hs-var">form</span></a></span></span><span> </span><span id="local-6989586621679245380"><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679245380"><span class="hs-identifier hs-var">body</span></a></span></span><span> </span><span id="local-6989586621679245381"><span class="annot"><span class="annottext">Section
+</span><a href="#local-6989586621679245381"><span class="hs-identifier hs-var">kind</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+-&gt; [ProofText]
+-&gt; Section
+-&gt; Set Decl
+-&gt; Text
+-&gt; [Text]
+-&gt; [Token]
+-&gt; Block
+</span><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-var">Block</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245379"><span class="hs-identifier hs-var">form</span></a></span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679245380"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="#local-6989586621679245381"><span class="hs-identifier hs-var">kind</span></a></span><span> </span><span class="annot"><span class="annottext">Set Decl
+forall a. Monoid a =&gt; a
+</span><span class="hs-identifier hs-var">mempty</span></span><span>
+</span><span id="line-72"></span><span>
+</span><span id="line-73"></span><span class="annot"><a href="SAD.Data.Text.Block.html#position"><span class="hs-identifier hs-type">position</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span>
+</span><span id="line-74"></span><span id="position"><span class="annot"><span class="annottext">position :: Block -&gt; T
+</span><a href="SAD.Data.Text.Block.html#position"><span class="hs-identifier hs-var hs-var">position</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Range -&gt; T
+</span><a href="Isabelle.Position.html#range_position"><span class="hs-identifier hs-var">Position.range_position</span></a></span><span> </span><span class="annot"><span class="annottext">(Range -&gt; T) -&gt; (Block -&gt; Range) -&gt; Block -&gt; T
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[Token] -&gt; Range
+</span><a href="SAD.Parser.Token.html#tokensRange"><span class="hs-identifier hs-var">tokensRange</span></a></span><span> </span><span class="annot"><span class="annottext">([Token] -&gt; Range) -&gt; (Block -&gt; [Token]) -&gt; Block -&gt; Range
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Block -&gt; [Token]
+</span><a href="SAD.Data.Text.Block.html#tokens"><span class="hs-identifier hs-var">tokens</span></a></span><span>
+</span><span id="line-75"></span><span>
+</span><span id="line-76"></span><span class="annot"><a href="SAD.Data.Text.Block.html#isTopLevel"><span class="hs-identifier hs-type">isTopLevel</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-77"></span><span id="isTopLevel"><span class="annot"><span class="annottext">isTopLevel :: Block -&gt; Bool
+</span><a href="SAD.Data.Text.Block.html#isTopLevel"><span class="hs-identifier hs-var hs-var">isTopLevel</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Bool
+</span><a href="SAD.Data.Formula.Base.html#isHole"><span class="hs-identifier hs-var">isHole</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Bool) -&gt; (Block -&gt; Formula) -&gt; Block -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Block -&gt; Formula
+</span><a href="SAD.Data.Text.Block.html#formula"><span class="hs-identifier hs-var">formula</span></a></span><span>
+</span><span id="line-78"></span><span>
+</span><span id="line-79"></span><span class="annot"><a href="SAD.Data.Text.Block.html#text"><span class="hs-identifier hs-type">text</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-80"></span><span id="text"><span class="annot"><span class="annottext">text :: Block -&gt; Text
+</span><a href="SAD.Data.Text.Block.html#text"><span class="hs-identifier hs-var hs-var">text</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679245386"><span class="annot"><span class="annottext">[Token]
+tokens :: Block -&gt; [Token]
+tokens :: [Token]
+</span><a href="SAD.Data.Text.Block.html#tokens"><span class="hs-identifier hs-var hs-var">tokens</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Token] -&gt; Text
+</span><a href="SAD.Parser.Token.html#composeTokens"><span class="hs-identifier hs-var">composeTokens</span></a></span><span> </span><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679245386"><span class="hs-identifier hs-var">tokens</span></a></span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span class="hs-comment">{- All possible types that a ForTheL block can have. -}</span><span>
+</span><span id="line-83"></span><span class="hs-keyword">data</span><span> </span><span id="Section"><span class="annot"><a href="SAD.Data.Text.Block.html#Section"><span class="hs-identifier hs-var">Section</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-84"></span><span>  </span><span id="Definition"><span class="annot"><a href="SAD.Data.Text.Block.html#Definition"><span class="hs-identifier hs-var">Definition</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Signature"><span class="annot"><a href="SAD.Data.Text.Block.html#Signature"><span class="hs-identifier hs-var">Signature</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Axiom"><span class="annot"><a href="SAD.Data.Text.Block.html#Axiom"><span class="hs-identifier hs-var">Axiom</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Theorem"><span class="annot"><a href="SAD.Data.Text.Block.html#Theorem"><span class="hs-identifier hs-var">Theorem</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="CaseHypothesis"><span class="annot"><a href="SAD.Data.Text.Block.html#CaseHypothesis"><span class="hs-identifier hs-var">CaseHypothesis</span></a></span></span><span> </span><span class="hs-glyph">|</span><span>
+</span><span id="line-85"></span><span>  </span><span id="Assumption"><span class="annot"><a href="SAD.Data.Text.Block.html#Assumption"><span class="hs-identifier hs-var">Assumption</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Choice"><span class="annot"><a href="SAD.Data.Text.Block.html#Choice"><span class="hs-identifier hs-var">Choice</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Affirmation"><span class="annot"><a href="SAD.Data.Text.Block.html#Affirmation"><span class="hs-identifier hs-var">Affirmation</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Posit"><span class="annot"><a href="SAD.Data.Text.Block.html#Posit"><span class="hs-identifier hs-var">Posit</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="LowDefinition"><span class="annot"><a href="SAD.Data.Text.Block.html#LowDefinition"><span class="hs-identifier hs-var">LowDefinition</span></a></span></span><span> </span><span class="hs-glyph">|</span><span>
+</span><span id="line-86"></span><span>  </span><span id="ProofByContradiction"><span class="annot"><a href="SAD.Data.Text.Block.html#ProofByContradiction"><span class="hs-identifier hs-var">ProofByContradiction</span></a></span></span><span>
+</span><span id="line-87"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679245400"><span id="local-6989586621679245402"><span class="annot"><span class="annottext">Section -&gt; Section -&gt; Bool
+(Section -&gt; Section -&gt; Bool)
+-&gt; (Section -&gt; Section -&gt; Bool) -&gt; Eq Section
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Section -&gt; Section -&gt; Bool
+== :: Section -&gt; Section -&gt; Bool
+$c/= :: Section -&gt; Section -&gt; Bool
+/= :: Section -&gt; Section -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679245407"><span id="local-6989586621679245409"><span id="local-6989586621679245411"><span id="local-6989586621679245414"><span id="local-6989586621679245417"><span id="local-6989586621679245420"><span id="local-6989586621679245423"><span class="annot"><span class="annottext">Eq Section
+Eq Section =&gt;
+(Section -&gt; Section -&gt; Ordering)
+-&gt; (Section -&gt; Section -&gt; Bool)
+-&gt; (Section -&gt; Section -&gt; Bool)
+-&gt; (Section -&gt; Section -&gt; Bool)
+-&gt; (Section -&gt; Section -&gt; Bool)
+-&gt; (Section -&gt; Section -&gt; Section)
+-&gt; (Section -&gt; Section -&gt; Section)
+-&gt; Ord Section
+Section -&gt; Section -&gt; Bool
+Section -&gt; Section -&gt; Ordering
+Section -&gt; Section -&gt; Section
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: Section -&gt; Section -&gt; Ordering
+compare :: Section -&gt; Section -&gt; Ordering
+$c&lt; :: Section -&gt; Section -&gt; Bool
+&lt; :: Section -&gt; Section -&gt; Bool
+$c&lt;= :: Section -&gt; Section -&gt; Bool
+&lt;= :: Section -&gt; Section -&gt; Bool
+$c&gt; :: Section -&gt; Section -&gt; Bool
+&gt; :: Section -&gt; Section -&gt; Bool
+$c&gt;= :: Section -&gt; Section -&gt; Bool
+&gt;= :: Section -&gt; Section -&gt; Bool
+$cmax :: Section -&gt; Section -&gt; Section
+max :: Section -&gt; Section -&gt; Section
+$cmin :: Section -&gt; Section -&gt; Section
+min :: Section -&gt; Section -&gt; Section
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679245426"><span id="local-6989586621679245428"><span id="local-6989586621679245432"><span class="annot"><span class="annottext">Int -&gt; Section -&gt; ShowS
+[Section] -&gt; ShowS
+Section -&gt; String
+(Int -&gt; Section -&gt; ShowS)
+-&gt; (Section -&gt; String) -&gt; ([Section] -&gt; ShowS) -&gt; Show Section
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Section -&gt; ShowS
+showsPrec :: Int -&gt; Section -&gt; ShowS
+$cshow :: Section -&gt; String
+show :: Section -&gt; String
+$cshowList :: [Section] -&gt; ShowS
+showList :: [Section] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-88"></span><span>
+</span><span id="line-89"></span><span class="annot"><a href="SAD.Data.Text.Block.html#renderSection"><span class="hs-identifier hs-type">renderSection</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Section"><span class="hs-identifier hs-type">Section</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-90"></span><span id="renderSection"><span class="annot"><span class="annottext">renderSection :: Section -&gt; String
+</span><a href="SAD.Data.Text.Block.html#renderSection"><span class="hs-identifier hs-var hs-var">renderSection</span></a></span></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Definition"><span class="hs-identifier hs-var">Definition</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Definition&quot;</span></span><span>
+</span><span id="line-91"></span><span class="annot"><a href="SAD.Data.Text.Block.html#renderSection"><span class="hs-identifier hs-var">renderSection</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Signature"><span class="hs-identifier hs-var">Signature</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Signature&quot;</span></span><span>
+</span><span id="line-92"></span><span class="annot"><a href="SAD.Data.Text.Block.html#renderSection"><span class="hs-identifier hs-var">renderSection</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Axiom"><span class="hs-identifier hs-var">Axiom</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Axiom&quot;</span></span><span>
+</span><span id="line-93"></span><span class="annot"><a href="SAD.Data.Text.Block.html#renderSection"><span class="hs-identifier hs-var">renderSection</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Theorem"><span class="hs-identifier hs-var">Theorem</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Theorem&quot;</span></span><span>
+</span><span id="line-94"></span><span class="annot"><a href="SAD.Data.Text.Block.html#renderSection"><span class="hs-identifier hs-var">renderSection</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#CaseHypothesis"><span class="hs-identifier hs-var">CaseHypothesis</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Case hypothesis&quot;</span></span><span>
+</span><span id="line-95"></span><span class="annot"><a href="SAD.Data.Text.Block.html#renderSection"><span class="hs-identifier hs-var">renderSection</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Assumption"><span class="hs-identifier hs-var">Assumption</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Assumption&quot;</span></span><span>
+</span><span id="line-96"></span><span class="annot"><a href="SAD.Data.Text.Block.html#renderSection"><span class="hs-identifier hs-var">renderSection</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Choice"><span class="hs-identifier hs-var">Choice</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Choice&quot;</span></span><span>
+</span><span id="line-97"></span><span class="annot"><a href="SAD.Data.Text.Block.html#renderSection"><span class="hs-identifier hs-var">renderSection</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Affirmation"><span class="hs-identifier hs-var">Affirmation</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Affirmation&quot;</span></span><span>
+</span><span id="line-98"></span><span class="annot"><a href="SAD.Data.Text.Block.html#renderSection"><span class="hs-identifier hs-var">renderSection</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Posit"><span class="hs-identifier hs-var">Posit</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Posit&quot;</span></span><span>
+</span><span id="line-99"></span><span class="annot"><a href="SAD.Data.Text.Block.html#renderSection"><span class="hs-identifier hs-var">renderSection</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#LowDefinition"><span class="hs-identifier hs-var">LowDefinition</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Low-level definition&quot;</span></span><span>
+</span><span id="line-100"></span><span class="annot"><a href="SAD.Data.Text.Block.html#renderSection"><span class="hs-identifier hs-var">renderSection</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#ProofByContradiction"><span class="hs-identifier hs-var">ProofByContradiction</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Proof by contradiction&quot;</span></span><span>
+</span><span id="line-101"></span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span class="hs-comment">-- Composition</span><span>
+</span><span id="line-104"></span><span>
+</span><span id="line-105"></span><span class="hs-comment">{- form the formula image of a whole block -}</span><span>
+</span><span id="line-106"></span><span class="annot"><a href="SAD.Data.Text.Block.html#formulate"><span class="hs-identifier hs-type">formulate</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-107"></span><span id="formulate"><span class="annot"><span class="annottext">formulate :: Block -&gt; Formula
+</span><a href="SAD.Data.Text.Block.html#formulate"><span class="hs-identifier hs-var hs-var">formulate</span></a></span></span><span> </span><span id="local-6989586621679245436"><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245436"><span class="hs-identifier hs-var">block</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-108"></span><span>  </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Block -&gt; Bool
+</span><a href="SAD.Data.Text.Block.html#isTopLevel"><span class="hs-identifier hs-var">isTopLevel</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245436"><span class="hs-identifier hs-var">block</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">[ProofText] -&gt; Formula
+</span><a href="SAD.Data.Text.Block.html#compose"><span class="hs-identifier hs-var">compose</span></a></span><span> </span><span class="annot"><span class="annottext">([ProofText] -&gt; Formula) -&gt; [ProofText] -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Block -&gt; [ProofText]
+</span><a href="SAD.Data.Text.Block.html#body"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245436"><span class="hs-identifier hs-var">block</span></a></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Block -&gt; Formula
+</span><a href="SAD.Data.Text.Block.html#formula"><span class="hs-identifier hs-var">formula</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245436"><span class="hs-identifier hs-var">block</span></a></span><span>
+</span><span id="line-109"></span><span>
+</span><span id="line-110"></span><span class="annot"><a href="SAD.Data.Text.Block.html#compose"><span class="hs-identifier hs-type">compose</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-111"></span><span id="compose"><span class="annot"><span class="annottext">compose :: [ProofText] -&gt; Formula
+</span><a href="SAD.Data.Text.Block.html#compose"><span class="hs-identifier hs-var hs-var">compose</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(ProofText -&gt; Formula -&gt; Formula)
+-&gt; Formula -&gt; [ProofText] -&gt; Formula
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; [a] -&gt; b
+forall (t :: * -&gt; *) a b.
+Foldable t =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldr</span></span><span> </span><span class="annot"><span class="annottext">ProofText -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679245438"><span class="hs-identifier hs-var">comp</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Data.Formula.Base.html#Top"><span class="hs-identifier hs-var">Top</span></a></span><span>
+</span><span id="line-112"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-113"></span><span>    </span><span id="local-6989586621679245438"><span class="annot"><span class="annottext">comp :: ProofText -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679245438"><span class="hs-identifier hs-var hs-var">comp</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextBlock"><span class="hs-identifier hs-type">ProofTextBlock</span></a></span><span> </span><span id="local-6989586621679245443"><span class="annot"><span class="annottext">block :: Block
+</span><a href="#local-6989586621679245443"><span class="hs-identifier hs-var">block</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">declaredVariables :: Block -&gt; Set Decl
+</span><a href="SAD.Data.Text.Block.html#declaredVariables"><span class="hs-identifier hs-var">declaredVariables</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679245444"><span class="annot"><span class="annottext">Set Decl
+</span><a href="#local-6989586621679245444"><span class="hs-identifier hs-var">dvs</span></a></span></span><span> </span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span id="local-6989586621679245445"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245445"><span class="hs-identifier hs-var">f</span></a></span></span><span>
+</span><span id="line-114"></span><span>      </span><span class="hs-comment">-- In this case, we give the formula 'exists x_1,...,x_n . (formulate block) ^ f'.</span><span>
+</span><span id="line-115"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Block -&gt; Bool
+</span><a href="SAD.Data.Text.Block.html#needsProof"><span class="hs-identifier hs-var">needsProof</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245443"><span class="hs-identifier hs-var">block</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="annot"><span class="annottext">Block -&gt; Section
+</span><a href="SAD.Data.Text.Block.html#kind"><span class="hs-identifier hs-var">kind</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245443"><span class="hs-identifier hs-var">block</span></a></span><span> </span><span class="annot"><span class="annottext">Section -&gt; Section -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Posit"><span class="hs-identifier hs-var">Posit</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-116"></span><span>          </span><span class="annot"><span class="annottext">(VariableName -&gt; Formula -&gt; Formula)
+-&gt; Formula -&gt; Set VariableName -&gt; Formula
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Set a -&gt; b
+</span><span class="hs-identifier hs-var">Set.foldr</span></span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkExi"><span class="hs-identifier hs-var">mkExi</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#blAnd"><span class="hs-identifier hs-var">blAnd</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; Formula
+</span><a href="SAD.Data.Text.Block.html#formulate"><span class="hs-identifier hs-var">formulate</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245443"><span class="hs-identifier hs-var">block</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245445"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Set VariableName -&gt; Formula) -&gt; Set VariableName -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Decl -&gt; VariableName) -&gt; Set Decl -&gt; Set VariableName
+forall b a. Ord b =&gt; (a -&gt; b) -&gt; Set a -&gt; Set b
+</span><span class="hs-identifier hs-var">Set.map</span></span><span> </span><span class="annot"><span class="annottext">Decl -&gt; VariableName
+</span><a href="SAD.Data.Text.Decl.html#declName"><span class="hs-identifier hs-var">declName</span></a></span><span> </span><span class="annot"><span class="annottext">Set Decl
+</span><a href="#local-6989586621679245444"><span class="hs-identifier hs-var">dvs</span></a></span><span>
+</span><span id="line-117"></span><span>      </span><span class="hs-comment">-- Otherwise, we give the formula 'forall x_1,...,x_n . (formulate block) =&gt; f'.</span><span>
+</span><span id="line-118"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(VariableName -&gt; Formula -&gt; Formula)
+-&gt; Formula -&gt; Set VariableName -&gt; Formula
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Set a -&gt; b
+</span><span class="hs-identifier hs-var">Set.foldr</span></span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkAll"><span class="hs-identifier hs-var">mkAll</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#blImp"><span class="hs-identifier hs-var">blImp</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; Formula
+</span><a href="SAD.Data.Text.Block.html#formulate"><span class="hs-identifier hs-var">formulate</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245443"><span class="hs-identifier hs-var">block</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245445"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Set VariableName -&gt; Formula) -&gt; Set VariableName -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Decl -&gt; VariableName) -&gt; Set Decl -&gt; Set VariableName
+forall b a. Ord b =&gt; (a -&gt; b) -&gt; Set a -&gt; Set b
+</span><span class="hs-identifier hs-var">Set.map</span></span><span> </span><span class="annot"><span class="annottext">Decl -&gt; VariableName
+</span><a href="SAD.Data.Text.Decl.html#declName"><span class="hs-identifier hs-var">declName</span></a></span><span> </span><span class="annot"><span class="annottext">Set Decl
+</span><a href="#local-6989586621679245444"><span class="hs-identifier hs-var">dvs</span></a></span><span>
+</span><span id="line-119"></span><span>    </span><span class="annot"><a href="#local-6989586621679245438"><span class="hs-identifier hs-var">comp</span></a></span><span> </span><span class="annot"><span class="annottext">ProofText
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679245454"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245454"><span class="hs-identifier hs-var">fb</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245454"><span class="hs-identifier hs-var">fb</span></a></span><span>
+</span><span id="line-120"></span><span>
+</span><span id="line-121"></span><span>
+</span><span id="line-122"></span><span>
+</span><span id="line-123"></span><span class="hs-comment">{- necessity of proof as derived from the block type -}</span><span>
+</span><span id="line-124"></span><span class="annot"><a href="SAD.Data.Text.Block.html#needsProof"><span class="hs-identifier hs-type">needsProof</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-125"></span><span id="needsProof"><span class="annot"><span class="annottext">needsProof :: Block -&gt; Bool
+</span><a href="SAD.Data.Text.Block.html#needsProof"><span class="hs-identifier hs-var hs-var">needsProof</span></a></span></span><span> </span><span id="local-6989586621679245455"><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245455"><span class="hs-identifier hs-var">block</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Section -&gt; Bool
+</span><a href="#local-6989586621679245456"><span class="hs-identifier hs-var">sign</span></a></span><span> </span><span class="annot"><span class="annottext">(Section -&gt; Bool) -&gt; Section -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Block -&gt; Section
+</span><a href="SAD.Data.Text.Block.html#kind"><span class="hs-identifier hs-var">kind</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245455"><span class="hs-identifier hs-var">block</span></a></span><span>
+</span><span id="line-126"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-127"></span><span>    </span><span id="local-6989586621679245456"><span class="annot"><span class="annottext">sign :: Section -&gt; Bool
+</span><a href="#local-6989586621679245456"><span class="hs-identifier hs-var hs-var">sign</span></a></span></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Definition"><span class="hs-identifier hs-var">Definition</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-128"></span><span>    </span><span class="annot"><a href="#local-6989586621679245456"><span class="hs-identifier hs-var">sign</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Signature"><span class="hs-identifier hs-var">Signature</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-129"></span><span>    </span><span class="annot"><a href="#local-6989586621679245456"><span class="hs-identifier hs-var">sign</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Axiom"><span class="hs-identifier hs-var">Axiom</span></a></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-130"></span><span>    </span><span class="annot"><a href="#local-6989586621679245456"><span class="hs-identifier hs-var">sign</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Assumption"><span class="hs-identifier hs-var">Assumption</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-131"></span><span>    </span><span class="annot"><a href="#local-6989586621679245456"><span class="hs-identifier hs-var">sign</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Posit"><span class="hs-identifier hs-var">Posit</span></a></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-132"></span><span>    </span><span class="annot"><a href="#local-6989586621679245456"><span class="hs-identifier hs-var">sign</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><span class="hs-identifier">_</span></span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-133"></span><span>
+</span><span id="line-134"></span><span>
+</span><span id="line-135"></span><span class="hs-comment">{- which statements can declare variables -}</span><span>
+</span><span id="line-136"></span><span class="annot"><a href="SAD.Data.Text.Block.html#canDeclare"><span class="hs-identifier hs-type">canDeclare</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Section"><span class="hs-identifier hs-type">Section</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-137"></span><span id="canDeclare"><span class="annot"><span class="annottext">canDeclare :: Section -&gt; Bool
+</span><a href="SAD.Data.Text.Block.html#canDeclare"><span class="hs-identifier hs-var hs-var">canDeclare</span></a></span></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Assumption"><span class="hs-identifier hs-var">Assumption</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-138"></span><span class="annot"><a href="SAD.Data.Text.Block.html#canDeclare"><span class="hs-identifier hs-var">canDeclare</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Choice"><span class="hs-identifier hs-var">Choice</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-139"></span><span class="annot"><a href="SAD.Data.Text.Block.html#canDeclare"><span class="hs-identifier hs-var">canDeclare</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#LowDefinition"><span class="hs-identifier hs-var">LowDefinition</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-140"></span><span class="annot"><a href="SAD.Data.Text.Block.html#canDeclare"><span class="hs-identifier hs-var">canDeclare</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-141"></span><span>
+</span><span id="line-142"></span><span>
+</span><span id="line-143"></span><span class="annot"><a href="SAD.Data.Text.Block.html#file"><span class="hs-identifier hs-type">file</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-144"></span><span id="file"><span class="annot"><span class="annottext">file :: Block -&gt; Text
+</span><a href="SAD.Data.Text.Block.html#file"><span class="hs-identifier hs-var hs-var">file</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+</span><span class="hs-identifier hs-var">Text.fromStrict</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Text) -&gt; (Block -&gt; Text) -&gt; Block -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Text
+forall a. TEXT a =&gt; a -&gt; Text
+</span><a href="Isabelle.Library.html#make_text"><span class="hs-identifier hs-var">make_text</span></a></span><span> </span><span class="annot"><span class="annottext">(Bytes -&gt; Text) -&gt; (Block -&gt; Bytes) -&gt; Block -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Maybe Bytes -&gt; Bytes
+forall a. a -&gt; Maybe a -&gt; a
+</span><span class="hs-identifier hs-var">fromMaybe</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="Isabelle.Bytes.html#empty"><span class="hs-identifier hs-var">Bytes.empty</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe Bytes -&gt; Bytes) -&gt; (Block -&gt; Maybe Bytes) -&gt; Block -&gt; Bytes
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">T -&gt; Maybe Bytes
+</span><a href="Isabelle.Position.html#file_of"><span class="hs-identifier hs-var">Position.file_of</span></a></span><span> </span><span class="annot"><span class="annottext">(T -&gt; Maybe Bytes) -&gt; (Block -&gt; T) -&gt; Block -&gt; Maybe Bytes
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Block -&gt; T
+</span><a href="SAD.Data.Text.Block.html#position"><span class="hs-identifier hs-var">position</span></a></span><span>
+</span><span id="line-145"></span><span>
+</span><span id="line-146"></span><span class="annot"><a href="SAD.Data.Text.Block.html#declaredNames"><span class="hs-identifier hs-type">declaredNames</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><a href="SAD.Data.VarName.html#VariableName"><span class="hs-identifier hs-type">VariableName</span></a></span><span>
+</span><span id="line-147"></span><span id="declaredNames"><span class="annot"><span class="annottext">declaredNames :: Block -&gt; Set VariableName
+</span><a href="SAD.Data.Text.Block.html#declaredNames"><span class="hs-identifier hs-var hs-var">declaredNames</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Decl -&gt; VariableName) -&gt; Set Decl -&gt; Set VariableName
+forall b a. Ord b =&gt; (a -&gt; b) -&gt; Set a -&gt; Set b
+</span><span class="hs-identifier hs-var">Set.map</span></span><span> </span><span class="annot"><span class="annottext">Decl -&gt; VariableName
+</span><a href="SAD.Data.Text.Decl.html#declName"><span class="hs-identifier hs-var">declName</span></a></span><span> </span><span class="annot"><span class="annottext">(Set Decl -&gt; Set VariableName)
+-&gt; (Block -&gt; Set Decl) -&gt; Block -&gt; Set VariableName
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Block -&gt; Set Decl
+</span><a href="SAD.Data.Text.Block.html#declaredVariables"><span class="hs-identifier hs-var">declaredVariables</span></a></span><span>
+</span><span id="line-148"></span><span>
+</span><span id="line-149"></span><span class="hs-comment">-- Show instances</span><span>
+</span><span id="line-150"></span><span>
+</span><span id="line-151"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679245462"><span id="local-6989586621679245466"><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-152"></span><span>  </span><span id="local-6989586621679245481"><span class="annot"><span class="annottext">showsPrec :: Int -&gt; ProofText -&gt; ShowS
+</span><a href="#local-6989586621679245481"><span class="hs-identifier hs-var hs-var hs-var hs-var">showsPrec</span></a></span></span><span> </span><span id="local-6989586621679245483"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245483"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextBlock"><span class="hs-identifier hs-type">ProofTextBlock</span></a></span><span> </span><span id="local-6989586621679245484"><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245484"><span class="hs-identifier hs-var">block</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Block -&gt; ShowS
+forall a. Show a =&gt; Int -&gt; a -&gt; ShowS
+</span><span class="hs-identifier hs-var">showsPrec</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245483"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245484"><span class="hs-identifier hs-var">block</span></a></span><span>
+</span><span id="line-153"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">showsPrec</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-type">ProofTextInstr</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679245485"><span class="annot"><span class="annottext">Instr
+</span><a href="#local-6989586621679245485"><span class="hs-identifier hs-var">instr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Instr -&gt; ShowS
+forall a. Show a =&gt; a -&gt; ShowS
+</span><span class="hs-identifier hs-var">shows</span></span><span> </span><span class="annot"><span class="annottext">Instr
+</span><a href="#local-6989586621679245485"><span class="hs-identifier hs-var">instr</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; ShowS
+</span><span class="hs-identifier hs-var">showChar</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\n'</span></span><span>
+</span><span id="line-154"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">showsPrec</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextDrop"><span class="hs-identifier hs-type">ProofTextDrop</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679245488"><span class="annot"><span class="annottext">Drop
+</span><a href="#local-6989586621679245488"><span class="hs-identifier hs-var">instr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Drop -&gt; ShowS
+forall a. Show a =&gt; a -&gt; ShowS
+</span><span class="hs-identifier hs-var">shows</span></span><span> </span><span class="annot"><span class="annottext">Drop
+</span><a href="#local-6989586621679245488"><span class="hs-identifier hs-var">instr</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; ShowS
+</span><span class="hs-identifier hs-var">showChar</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\n'</span></span><span>
+</span><span id="line-155"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">showsPrec</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextError"><span class="hs-identifier hs-type">ProofTextError</span></a></span><span> </span><span id="local-6989586621679245489"><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679245489"><span class="hs-identifier hs-var">err</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParseError -&gt; ShowS
+forall a. Show a =&gt; a -&gt; ShowS
+</span><span class="hs-identifier hs-var">shows</span></span><span> </span><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679245489"><span class="hs-identifier hs-var">err</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; ShowS
+</span><span class="hs-identifier hs-var">showChar</span></span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\n'</span></span><span>
+</span><span id="line-156"></span><span>  </span><span class="annot"><span class="hs-identifier hs-var">showsPrec</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">ProofText
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShowS
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span>
+</span><span id="line-157"></span><span>
+</span><span id="line-158"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679245493"><span id="local-6989586621679245496"><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-159"></span><span>  </span><span id="local-6989586621679245515"><span class="annot"><span class="annottext">showsPrec :: Int -&gt; Block -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">showsPrec</span></span></span><span> </span><span id="local-6989586621679245516"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245516"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span id="local-6989586621679245517"><span class="annot"><span class="annottext">block :: Block
+</span><a href="#local-6989586621679245517"><span class="hs-identifier hs-var">block</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">body :: Block -&gt; [ProofText]
+</span><a href="SAD.Data.Text.Block.html#body"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679245518"><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679245518"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">name :: Block -&gt; Text
+</span><a href="SAD.Data.Text.Block.html#name"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679245519"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679245519"><span class="hs-identifier hs-var">name</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">kind :: Block -&gt; Section
+</span><a href="SAD.Data.Text.Block.html#kind"><span class="hs-identifier hs-var">kind</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679245520"><span class="annot"><span class="annottext">Section
+</span><a href="#local-6989586621679245520"><span class="hs-identifier hs-var">kind</span></a></span></span><span class="hs-special">}</span><span>
+</span><span id="line-160"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">[ProofText] -&gt; Bool
+forall a. [a] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">null</span></span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679245518"><span class="hs-identifier hs-var">b</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Block -&gt; ShowS
+</span><a href="SAD.Data.Text.Block.html#showForm"><span class="hs-identifier hs-var">showForm</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245516"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245517"><span class="hs-identifier hs-var">block</span></a></span><span>
+</span><span id="line-161"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Block -&gt; Bool
+</span><a href="SAD.Data.Text.Block.html#isTopLevel"><span class="hs-identifier hs-var">isTopLevel</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245517"><span class="hs-identifier hs-var">block</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><span class="hs-identifier hs-var">showString</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Section -&gt; String
+</span><a href="SAD.Data.Text.Block.html#renderSection"><span class="hs-identifier hs-var">renderSection</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="#local-6989586621679245520"><span class="hs-identifier hs-var">kind</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679245523"><span class="hs-identifier hs-var">addName</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;:\n&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Block -&gt; ShowS
+</span><a href="SAD.Data.Text.Block.html#showBlockForm"><span class="hs-identifier hs-var">showBlockForm</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245516"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245517"><span class="hs-identifier hs-var">block</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span>
+</span><span id="line-162"></span><span>        </span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Block -&gt; Bool
+</span><a href="SAD.Data.Text.Block.html#needsProof"><span class="hs-identifier hs-var">needsProof</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245517"><span class="hs-identifier hs-var">block</span></a></span><span>
+</span><span id="line-163"></span><span>          </span><span class="hs-keyword">then</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">[ProofText] -&gt; Bool
+forall a. [a] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">null</span></span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679245518"><span class="hs-identifier hs-var">b</span></a></span><span>
+</span><span id="line-164"></span><span>            </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Int -&gt; ShowS
+</span><a href="SAD.Data.Text.Block.html#showIndent"><span class="hs-identifier hs-var">showIndent</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245516"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><span class="hs-identifier hs-var">showString</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Trivial:\n&quot;</span></span><span>
+</span><span id="line-165"></span><span>            </span><span class="hs-keyword">else</span><span> </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679245527"><span class="annot"><span class="annottext">proof :: ProofText
+</span><a href="#local-6989586621679245527"><span class="hs-identifier hs-var hs-var">proof</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[ProofText] -&gt; ProofText
+forall a. HasCallStack =&gt; [a] -&gt; a
+</span><span class="hs-identifier hs-var">last</span></span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679245518"><span class="hs-identifier hs-var">b</span></a></span><span> </span><span class="hs-keyword">in</span><span>
+</span><span id="line-166"></span><span>              </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">ProofText
+</span><a href="#local-6989586621679245527"><span class="hs-identifier hs-var">proof</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-167"></span><span>                </span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextBlock"><span class="hs-identifier hs-type">ProofTextBlock</span></a></span><span> </span><span id="local-6989586621679245529"><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245529"><span class="hs-identifier hs-var">proofBlock</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int -&gt; ShowS
+</span><a href="SAD.Data.Text.Block.html#showIndent"><span class="hs-identifier hs-var">showIndent</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245516"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><span class="hs-identifier hs-var">showString</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Proof:\n&quot;</span></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[ProofText] -&gt; ShowS
+</span><a href="#local-6989586621679245530"><span class="hs-identifier hs-var">showProof</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; [ProofText]
+</span><a href="SAD.Data.Text.Block.html#body"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245529"><span class="hs-identifier hs-var">proofBlock</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; ShowS
+</span><a href="SAD.Data.Text.Block.html#showIndent"><span class="hs-identifier hs-var">showIndent</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245516"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><span class="hs-identifier hs-var">showString</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Qed.\n&quot;</span></span><span>
+</span><span id="line-168"></span><span>                </span><span class="annot"><span class="annottext">ProofText
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ShowS
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span>
+</span><span id="line-169"></span><span>          </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">ShowS
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span class="hs-special">)</span><span>
+</span><span id="line-170"></span><span>    </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Block -&gt; ShowS
+</span><a href="SAD.Data.Text.Block.html#showForm"><span class="hs-identifier hs-var">showForm</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245516"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245517"><span class="hs-identifier hs-var">block</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span>
+</span><span id="line-171"></span><span>        </span><span class="annot"><span class="annottext">Int -&gt; ShowS
+</span><a href="SAD.Data.Text.Block.html#showIndent"><span class="hs-identifier hs-var">showIndent</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245516"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><span class="hs-identifier hs-var">showString</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Proof:\n&quot;</span></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[ProofText] -&gt; ShowS
+</span><a href="#local-6989586621679245530"><span class="hs-identifier hs-var">showProof</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; [ProofText]
+</span><a href="SAD.Data.Text.Block.html#body"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245517"><span class="hs-identifier hs-var">block</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span>
+</span><span id="line-172"></span><span>        </span><span class="annot"><span class="annottext">Int -&gt; ShowS
+</span><a href="SAD.Data.Text.Block.html#showIndent"><span class="hs-identifier hs-var">showIndent</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245516"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><span class="hs-identifier hs-var">showString</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Qed.\n&quot;</span></span><span>
+</span><span id="line-173"></span><span>    </span><span class="hs-keyword">where</span><span>
+</span><span id="line-174"></span><span>      </span><span id="local-6989586621679245530"><span class="annot"><span class="annottext">showProof :: [ProofText] -&gt; ShowS
+</span><a href="#local-6989586621679245530"><span class="hs-identifier hs-var hs-var">showProof</span></a></span></span><span> </span><span id="local-6989586621679245531"><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679245531"><span class="hs-identifier hs-var">proofTexts</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(ProofText -&gt; ShowS -&gt; ShowS) -&gt; ShowS -&gt; [ProofText] -&gt; ShowS
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; [a] -&gt; b
+forall (t :: * -&gt; *) a b.
+Foldable t =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">(.)</span></span><span> </span><span class="annot"><span class="annottext">(ShowS -&gt; ShowS -&gt; ShowS)
+-&gt; (ProofText -&gt; ShowS) -&gt; ProofText -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; ProofText -&gt; ShowS
+forall a. Show a =&gt; Int -&gt; a -&gt; ShowS
+</span><span class="hs-identifier hs-var">showsPrec</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245516"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ShowS
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679245531"><span class="hs-identifier hs-var">proofTexts</span></a></span><span>
+</span><span id="line-175"></span><span>      </span><span id="local-6989586621679245532"><span class="annot"><span class="annottext">name' :: String
+</span><a href="#local-6989586621679245532"><span class="hs-identifier hs-var hs-var">name'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><span class="hs-identifier hs-var">Text.unpack</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679245519"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><span id="line-176"></span><span>      </span><span id="local-6989586621679245523"><span class="annot"><span class="annottext">addName :: String
+</span><a href="#local-6989586621679245523"><span class="hs-identifier hs-var hs-var">addName</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">String -&gt; Bool
+forall a. [a] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">null</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679245532"><span class="hs-identifier hs-var">name'</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&quot;</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot; (&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679245532"><span class="hs-identifier hs-var">name'</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;)&quot;</span></span><span>
+</span><span id="line-177"></span><span>
+</span><span id="line-178"></span><span class="annot"><a href="SAD.Data.Text.Block.html#showForm"><span class="hs-identifier hs-type">showForm</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-179"></span><span id="showForm"><span class="annot"><span class="annottext">showForm :: Int -&gt; Block -&gt; ShowS
+</span><a href="SAD.Data.Text.Block.html#showForm"><span class="hs-identifier hs-var hs-var">showForm</span></a></span></span><span> </span><span id="local-6989586621679245534"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245534"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span id="local-6989586621679245535"><span class="annot"><span class="annottext">block :: Block
+</span><a href="#local-6989586621679245535"><span class="hs-identifier hs-var">block</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">formula :: Block -&gt; Formula
+</span><a href="SAD.Data.Text.Block.html#formula"><span class="hs-identifier hs-var">formula</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679245536"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245536"><span class="hs-identifier hs-var">formula</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">name :: Block -&gt; Text
+</span><a href="SAD.Data.Text.Block.html#name"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679245537"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679245537"><span class="hs-identifier hs-var">name</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">kind :: Block -&gt; Section
+</span><a href="SAD.Data.Text.Block.html#kind"><span class="hs-identifier hs-var">kind</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679245538"><span class="annot"><span class="annottext">Section
+</span><a href="#local-6989586621679245538"><span class="hs-identifier hs-var">kind</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-180"></span><span>  </span><span class="annot"><span class="annottext">Int -&gt; ShowS
+</span><a href="SAD.Data.Text.Block.html#showIndent"><span class="hs-identifier hs-var">showIndent</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245534"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; ShowS
+</span><a href="#local-6989586621679245539"><span class="hs-identifier hs-var">sform</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; Bool
+</span><a href="SAD.Data.Text.Block.html#needsProof"><span class="hs-identifier hs-var">needsProof</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245535"><span class="hs-identifier hs-var">block</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><span class="hs-identifier hs-var">showString</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;\n&quot;</span></span><span>
+</span><span id="line-181"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-182"></span><span>    </span><span id="local-6989586621679245539"><span class="annot"><span class="annottext">sform :: Bool -&gt; ShowS
+</span><a href="#local-6989586621679245539"><span class="hs-identifier hs-var hs-var">sform</span></a></span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><span class="hs-identifier hs-var">showString</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; ShowS) -&gt; (Text -&gt; String) -&gt; Text -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><span class="hs-identifier hs-var">Text.unpack</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; ShowS) -&gt; Text -&gt; ShowS
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Role -&gt; Formula -&gt; Text
+</span><a href="SAD.Export.TPTP.html#renderLogicFormula"><span class="hs-identifier hs-var">TPTP.renderLogicFormula</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679245537"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Role
+</span><a href="SAD.Export.TPTP.html#Hypothesis"><span class="hs-identifier hs-var">TPTP.Hypothesis</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245536"><span class="hs-identifier hs-var">formula</span></a></span><span>
+</span><span id="line-183"></span><span>    </span><span class="annot"><a href="#local-6989586621679245539"><span class="hs-identifier hs-var">sform</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><span class="hs-identifier hs-var">showString</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; ShowS) -&gt; (Text -&gt; String) -&gt; Text -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><span class="hs-identifier hs-var">Text.unpack</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; ShowS) -&gt; Text -&gt; ShowS
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Role -&gt; Formula -&gt; Text
+</span><a href="SAD.Export.TPTP.html#renderLogicFormula"><span class="hs-identifier hs-var">TPTP.renderLogicFormula</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679245537"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Role
+</span><a href="SAD.Export.TPTP.html#Conjecture"><span class="hs-identifier hs-var">TPTP.Conjecture</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245536"><span class="hs-identifier hs-var">formula</span></a></span><span>
+</span><span id="line-184"></span><span>
+</span><span id="line-185"></span><span class="annot"><a href="SAD.Data.Text.Block.html#showBlockForm"><span class="hs-identifier hs-type">showBlockForm</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-186"></span><span id="showBlockForm"><span class="annot"><span class="annottext">showBlockForm :: Int -&gt; Block -&gt; ShowS
+</span><a href="SAD.Data.Text.Block.html#showBlockForm"><span class="hs-identifier hs-var hs-var">showBlockForm</span></a></span></span><span> </span><span id="local-6989586621679245543"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245543"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span id="local-6989586621679245544"><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245544"><span class="hs-identifier hs-var">block</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-187"></span><span>  </span><span class="annot"><span class="annottext">Int -&gt; ShowS
+</span><a href="SAD.Data.Text.Block.html#showIndent"><span class="hs-identifier hs-var">showIndent</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245543"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; ShowS
+</span><a href="#local-6989586621679245545"><span class="hs-identifier hs-var">sform</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; Bool
+</span><a href="SAD.Data.Text.Block.html#needsProof"><span class="hs-identifier hs-var">needsProof</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245544"><span class="hs-identifier hs-var">block</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; ShowS -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><span class="hs-identifier hs-var">showString</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;\n&quot;</span></span><span>
+</span><span id="line-188"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-189"></span><span>    </span><span id="local-6989586621679245545"><span class="annot"><span class="annottext">sform :: Bool -&gt; ShowS
+</span><a href="#local-6989586621679245545"><span class="hs-identifier hs-var hs-var">sform</span></a></span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><span class="hs-identifier hs-var">showString</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; ShowS) -&gt; (Text -&gt; String) -&gt; Text -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><span class="hs-identifier hs-var">Text.unpack</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; ShowS) -&gt; Text -&gt; ShowS
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Role -&gt; Formula -&gt; Text
+</span><a href="SAD.Export.TPTP.html#renderLogicFormula"><span class="hs-identifier hs-var">TPTP.renderLogicFormula</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;&quot;</span></span><span> </span><span class="annot"><span class="annottext">Role
+</span><a href="SAD.Export.TPTP.html#Hypothesis"><span class="hs-identifier hs-var">TPTP.Hypothesis</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; Formula
+</span><a href="SAD.Data.Text.Block.html#formulate"><span class="hs-identifier hs-var">formulate</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245544"><span class="hs-identifier hs-var">block</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-190"></span><span>    </span><span class="annot"><a href="#local-6989586621679245545"><span class="hs-identifier hs-var">sform</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><span class="hs-identifier hs-var">showString</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; ShowS) -&gt; (Text -&gt; String) -&gt; Text -&gt; ShowS
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; String
+</span><span class="hs-identifier hs-var">Text.unpack</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; ShowS) -&gt; Text -&gt; ShowS
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Role -&gt; Formula -&gt; Text
+</span><a href="SAD.Export.TPTP.html#renderLogicFormula"><span class="hs-identifier hs-var">TPTP.renderLogicFormula</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;&quot;</span></span><span> </span><span class="annot"><span class="annottext">Role
+</span><a href="SAD.Export.TPTP.html#Conjecture"><span class="hs-identifier hs-var">TPTP.Conjecture</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; Formula
+</span><a href="SAD.Data.Text.Block.html#formulate"><span class="hs-identifier hs-var">formulate</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245544"><span class="hs-identifier hs-var">block</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-191"></span><span>
+</span><span id="line-192"></span><span class="annot"><a href="SAD.Data.Text.Block.html#showIndent"><span class="hs-identifier hs-type">showIndent</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ShowS</span></span><span>
+</span><span id="line-193"></span><span id="showIndent"><span class="annot"><span class="annottext">showIndent :: Int -&gt; ShowS
+</span><a href="SAD.Data.Text.Block.html#showIndent"><span class="hs-identifier hs-var hs-var">showIndent</span></a></span></span><span> </span><span id="local-6989586621679245546"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245546"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; ShowS
+</span><span class="hs-identifier hs-var">showString</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; ShowS) -&gt; String -&gt; ShowS
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Char -&gt; String
+forall a. Int -&gt; a -&gt; [a]
+</span><span class="hs-identifier hs-var">replicate</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679245546"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">*</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">2</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">' '</span></span><span>
+</span><span id="line-194"></span><span>
+</span><span id="line-195"></span><span class="annot"><a href="SAD.Data.Text.Block.html#parseErrors"><span class="hs-identifier hs-type">parseErrors</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Parser.Error.html#ParseError"><span class="hs-identifier hs-type">ParseError</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-196"></span><span id="parseErrors"><span class="annot"><span class="annottext">parseErrors :: ProofText -&gt; [ParseError]
+</span><a href="SAD.Data.Text.Block.html#parseErrors"><span class="hs-identifier hs-var hs-var">parseErrors</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextError"><span class="hs-identifier hs-type">ProofTextError</span></a></span><span> </span><span id="local-6989586621679245549"><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679245549"><span class="hs-identifier hs-var">err</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679245549"><span class="hs-identifier hs-var">err</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-197"></span><span class="annot"><a href="SAD.Data.Text.Block.html#parseErrors"><span class="hs-identifier hs-var">parseErrors</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextBlock"><span class="hs-identifier hs-type">ProofTextBlock</span></a></span><span> </span><span id="local-6989586621679245550"><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245550"><span class="hs-identifier hs-var">bl</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(ProofText -&gt; [ParseError]) -&gt; [ProofText] -&gt; [ParseError]
+forall (t :: * -&gt; *) a b. Foldable t =&gt; (a -&gt; [b]) -&gt; t a -&gt; [b]
+</span><span class="hs-identifier hs-var">concatMap</span></span><span> </span><span class="annot"><span class="annottext">ProofText -&gt; [ParseError]
+</span><a href="SAD.Data.Text.Block.html#parseErrors"><span class="hs-identifier hs-var">parseErrors</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; [ProofText]
+</span><a href="SAD.Data.Text.Block.html#body"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679245550"><span class="hs-identifier hs-var">bl</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-198"></span><span class="annot"><a href="SAD.Data.Text.Block.html#parseErrors"><span class="hs-identifier hs-var">parseErrors</span></a></span><span> </span><span class="annot"><span class="annottext">ProofText
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-199"></span></pre></body></html>

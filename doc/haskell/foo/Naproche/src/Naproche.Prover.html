@@ -1,0 +1,781 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Authors: Makarius Wenzel (2021)</span><span>
+</span><span id="line-3"></span><span class="hs-comment">--</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- External provers.</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-8"></span><span class="hs-pragma">{-# LANGUAGE NamedFieldPuns #-}</span><span>
+</span><span id="line-9"></span><span class="hs-pragma">{-# LANGUAGE MultiWayIf #-}</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Naproche.Prover</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-12"></span><span>  </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier">Prover</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Status"><span class="hs-identifier">Status</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Prover.html#get_name"><span class="hs-identifier">get_name</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Prover.html#run"><span class="hs-identifier">run</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Prover.html#status"><span class="hs-identifier">status</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Prover.html#run_status"><span class="hs-identifier">run_status</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-13"></span><span>  </span><span class="annot"><a href="Naproche.Prover.html#verbose"><span class="hs-identifier">verbose</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Prover.html#timeout"><span class="hs-identifier">timeout</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Prover.html#memory_limit"><span class="hs-identifier">memory_limit</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Prover.html#by_contradiction"><span class="hs-identifier">by_contradiction</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>  </span><span class="annot"><a href="Naproche.Prover.html#list"><span class="hs-identifier">list</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Prover.html#find"><span class="hs-identifier">find</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Prover.html#eprover"><span class="hs-identifier">eprover</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Prover.html#eproververb"><span class="hs-identifier">eproververb</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Prover.html#spass"><span class="hs-identifier">spass</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Prover.html#vampire"><span class="hs-identifier">vampire</span></a></span><span>
+</span><span id="line-15"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">List</span></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">when</span></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html"><span class="hs-identifier">Isabelle.Bytes</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Bytes</span></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html"><span class="hs-identifier">Isabelle.Bytes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier">Bytes</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Value.html"><span class="hs-identifier">Isabelle.Value</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Value</span></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Bash.html"><span class="hs-identifier">Isabelle.Bash</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Bash</span></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Process_Result.html"><span class="hs-identifier">Isabelle.Process_Result</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Process_Result</span></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Time.html"><span class="hs-identifier">Isabelle.Time</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Time</span></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Isabelle_Thread.html"><span class="hs-identifier">Isabelle.Isabelle_Thread</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Isabelle_Thread</span></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Time.html"><span class="hs-identifier">Isabelle.Time</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Isabelle.Time.html#Time"><span class="hs-identifier">Time</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Library.html"><span class="hs-identifier">Isabelle.Library</span></a></span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Naproche.Program.html"><span class="hs-identifier">Naproche.Program</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Program</span></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Naproche.System.html"><span class="hs-identifier">Naproche.System</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">System</span></span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="hs-comment">{- type Prover -}</span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">data</span><span> </span><span id="Prover"><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-var">Prover</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Prover"><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-var">Prover</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-37"></span><span>  </span><span id="_name"><span class="annot"><span class="annottext">Prover -&gt; Bytes
+</span><a href="Naproche.Prover.html#_name"><span class="hs-identifier hs-var hs-var">_name</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-38"></span><span>  </span><span id="_variable"><span class="annot"><span class="annottext">Prover -&gt; Bytes
+</span><a href="Naproche.Prover.html#_variable"><span class="hs-identifier hs-var hs-var">_variable</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-39"></span><span>  </span><span id="_command"><span class="annot"><span class="annottext">Prover -&gt; Prover_Command
+</span><a href="Naproche.Prover.html#_command"><span class="hs-identifier hs-var hs-var">_command</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover_Command"><span class="hs-identifier hs-type">Prover_Command</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-40"></span><span>  </span><span id="_status"><span class="annot"><span class="annottext">Prover -&gt; Prover_Status
+</span><a href="Naproche.Prover.html#_status"><span class="hs-identifier hs-var hs-var">_status</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover_Status"><span class="hs-identifier hs-type">Prover_Status</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-41"></span><span>  </span><span id="_messages"><span class="annot"><span class="annottext">Prover -&gt; Messages
+</span><a href="Naproche.Prover.html#_messages"><span class="hs-identifier hs-var hs-var">_messages</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Messages"><span class="hs-identifier hs-type">Messages</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span>  </span><span id="_verbose"><span class="annot"><span class="annottext">Prover -&gt; Bool
+</span><a href="Naproche.Prover.html#_verbose"><span class="hs-identifier hs-var hs-var">_verbose</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">,</span><span>
+</span><span id="line-44"></span><span>  </span><span id="_timeout"><span class="annot"><span class="annottext">Prover -&gt; Time
+</span><a href="Naproche.Prover.html#_timeout"><span class="hs-identifier hs-var hs-var">_timeout</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Time.html#Time"><span class="hs-identifier hs-type">Time</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-45"></span><span>  </span><span id="_memory_limit"><span class="annot"><span class="annottext">Prover -&gt; Int
+</span><a href="Naproche.Prover.html#_memory_limit"><span class="hs-identifier hs-var hs-var">_memory_limit</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">,</span><span>
+</span><span id="line-46"></span><span>  </span><span id="_by_contradiction"><span class="annot"><span class="annottext">Prover -&gt; Bool
+</span><a href="Naproche.Prover.html#_by_contradiction"><span class="hs-identifier hs-var hs-var">_by_contradiction</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-47"></span><span class="hs-special">}</span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span class="hs-keyword">type</span><span> </span><span id="Prover_Command"><span class="annot"><a href="Naproche.Prover.html#Prover_Command"><span class="hs-identifier hs-var">Prover_Command</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="Isabelle.Bash.html#Params"><span class="hs-identifier hs-type">Bash.Params</span></a></span><span>
+</span><span id="line-50"></span><span class="hs-keyword">type</span><span> </span><span id="Prover_Status"><span class="annot"><a href="Naproche.Prover.html#Prover_Status"><span class="hs-identifier hs-var">Prover_Status</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Process_Result.html#T"><span class="hs-identifier hs-type">Process_Result.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Status"><span class="hs-identifier hs-type">Status</span></a></span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span class="hs-keyword">data</span><span> </span><span id="Status"><span class="annot"><a href="Naproche.Prover.html#Status"><span class="hs-identifier hs-var">Status</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Success"><span class="annot"><a href="Naproche.Prover.html#Success"><span class="hs-identifier hs-var">Success</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Failure"><span class="annot"><a href="Naproche.Prover.html#Failure"><span class="hs-identifier hs-var">Failure</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Contradictory_Axioms"><span class="annot"><a href="Naproche.Prover.html#Contradictory_Axioms"><span class="hs-identifier hs-var">Contradictory_Axioms</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Unknown"><span class="annot"><a href="Naproche.Prover.html#Unknown"><span class="hs-identifier hs-var">Unknown</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Error"><span class="annot"><a href="Naproche.Prover.html#Error"><span class="hs-identifier hs-var">Error</span></a></span></span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span>
+</span><span id="line-53"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679230905"><span id="local-6989586621679230911"><span id="local-6989586621679230915"><span class="annot"><span class="annottext">Int -&gt; Status -&gt; ShowS
+[Status] -&gt; ShowS
+Status -&gt; String
+(Int -&gt; Status -&gt; ShowS)
+-&gt; (Status -&gt; String) -&gt; ([Status] -&gt; ShowS) -&gt; Show Status
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Status -&gt; ShowS
+showsPrec :: Int -&gt; Status -&gt; ShowS
+$cshow :: Status -&gt; String
+show :: Status -&gt; String
+$cshowList :: [Status] -&gt; ShowS
+showList :: [Status] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span>
+</span><span id="line-54"></span><span>
+</span><span id="line-55"></span><span class="hs-keyword">data</span><span> </span><span id="Messages"><span class="annot"><a href="Naproche.Prover.html#Messages"><span class="hs-identifier hs-var">Messages</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Messages"><span class="annot"><a href="Naproche.Prover.html#Messages"><span class="hs-identifier hs-var">Messages</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-56"></span><span>  </span><span id="_contradiction"><span class="annot"><span class="annottext">Messages -&gt; [Bytes]
+</span><a href="Naproche.Prover.html#_contradiction"><span class="hs-identifier hs-var hs-var">_contradiction</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-57"></span><span>  </span><span id="_success"><span class="annot"><span class="annottext">Messages -&gt; [Bytes]
+</span><a href="Naproche.Prover.html#_success"><span class="hs-identifier hs-var hs-var">_success</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-58"></span><span>  </span><span id="_failure"><span class="annot"><span class="annottext">Messages -&gt; [Bytes]
+</span><a href="Naproche.Prover.html#_failure"><span class="hs-identifier hs-var hs-var">_failure</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-59"></span><span>  </span><span id="_unknown"><span class="annot"><span class="annottext">Messages -&gt; [Bytes]
+</span><a href="Naproche.Prover.html#_unknown"><span class="hs-identifier hs-var hs-var">_unknown</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-60"></span><span class="hs-special">}</span><span>
+</span><span id="line-61"></span><span>
+</span><span id="line-62"></span><span class="annot"><a href="Naproche.Prover.html#get_name"><span class="hs-identifier hs-type">get_name</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span>
+</span><span id="line-63"></span><span id="get_name"><span class="annot"><span class="annottext">get_name :: Prover -&gt; Bytes
+</span><a href="Naproche.Prover.html#get_name"><span class="hs-identifier hs-var hs-var">get_name</span></a></span></span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span class="hs-special">{</span><span id="local-6989586621679230923"><span class="annot"><span class="annottext">Bytes
+_name :: Prover -&gt; Bytes
+_name :: Bytes
+</span><a href="Naproche.Prover.html#_name"><span class="hs-identifier hs-var hs-var">_name</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230923"><span class="hs-identifier hs-var">_name</span></a></span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679230925"><span id="local-6989586621679230930"><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679230933"><span class="annot"><span class="annottext">show :: Prover -&gt; String
+</span><a href="#local-6989586621679230933"><span class="hs-identifier hs-var hs-var hs-var hs-var">show</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; String
+forall a. STRING a =&gt; a -&gt; String
+</span><a href="Isabelle.Library.html#make_string"><span class="hs-identifier hs-var">make_string</span></a></span><span> </span><span class="annot"><span class="annottext">(Bytes -&gt; String) -&gt; (Prover -&gt; Bytes) -&gt; Prover -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Prover -&gt; Bytes
+</span><a href="Naproche.Prover.html#get_name"><span class="hs-identifier hs-var">get_name</span></a></span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span class="annot"><a href="Naproche.Prover.html#make_prover"><span class="hs-identifier hs-type">make_prover</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover_Command"><span class="hs-identifier hs-type">Prover_Command</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover_Status"><span class="hs-identifier hs-type">Prover_Status</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Messages"><span class="hs-identifier hs-type">Messages</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span>
+</span><span id="line-68"></span><span id="make_prover"><span class="annot"><span class="annottext">make_prover :: Bytes
+-&gt; Bytes -&gt; Prover_Command -&gt; Prover_Status -&gt; Messages -&gt; Prover
+</span><a href="Naproche.Prover.html#make_prover"><span class="hs-identifier hs-var hs-var">make_prover</span></a></span></span><span> </span><span id="local-6989586621679230938"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230938"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679230939"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230939"><span class="hs-identifier hs-var">variable</span></a></span></span><span> </span><span id="local-6989586621679230940"><span class="annot"><span class="annottext">Prover_Command
+</span><a href="#local-6989586621679230940"><span class="hs-identifier hs-var">command</span></a></span></span><span> </span><span id="local-6989586621679230941"><span class="annot"><span class="annottext">Prover_Status
+</span><a href="#local-6989586621679230941"><span class="hs-identifier hs-var">status</span></a></span></span><span> </span><span id="local-6989586621679230942"><span class="annot"><span class="annottext">Messages
+</span><a href="#local-6989586621679230942"><span class="hs-identifier hs-var">messages</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-69"></span><span>  </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-70"></span><span>  </span><span class="annot"><span class="annottext">_name :: Bytes
+</span><a href="Naproche.Prover.html#_name"><span class="hs-identifier hs-var">_name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230938"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-71"></span><span>  </span><span class="annot"><span class="annottext">_variable :: Bytes
+</span><a href="Naproche.Prover.html#_variable"><span class="hs-identifier hs-var">_variable</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230939"><span class="hs-identifier hs-var">variable</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-72"></span><span>  </span><span class="annot"><span class="annottext">_command :: Prover_Command
+</span><a href="Naproche.Prover.html#_command"><span class="hs-identifier hs-var">_command</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Prover_Command
+</span><a href="#local-6989586621679230940"><span class="hs-identifier hs-var">command</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-73"></span><span>  </span><span class="annot"><span class="annottext">_status :: Prover_Status
+</span><a href="Naproche.Prover.html#_status"><span class="hs-identifier hs-var">_status</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Prover_Status
+</span><a href="#local-6989586621679230941"><span class="hs-identifier hs-var">status</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-74"></span><span>  </span><span class="annot"><span class="annottext">_messages :: Messages
+</span><a href="Naproche.Prover.html#_messages"><span class="hs-identifier hs-var">_messages</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Messages
+</span><a href="#local-6989586621679230942"><span class="hs-identifier hs-var">messages</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-75"></span><span>
+</span><span id="line-76"></span><span>  </span><span class="annot"><span class="annottext">_verbose :: Bool
+</span><a href="Naproche.Prover.html#_verbose"><span class="hs-identifier hs-var">_verbose</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">,</span><span>
+</span><span id="line-77"></span><span>  </span><span class="annot"><span class="annottext">_timeout :: Time
+</span><a href="Naproche.Prover.html#_timeout"><span class="hs-identifier hs-var">_timeout</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="Isabelle.Time.html#zero"><span class="hs-identifier hs-var">Time.zero</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-78"></span><span>  </span><span class="annot"><span class="annottext">_memory_limit :: Int
+</span><a href="Naproche.Prover.html#_memory_limit"><span class="hs-identifier hs-var">_memory_limit</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-special">,</span><span>
+</span><span id="line-79"></span><span>  </span><span class="annot"><span class="annottext">_by_contradiction :: Bool
+</span><a href="Naproche.Prover.html#_by_contradiction"><span class="hs-identifier hs-var">_by_contradiction</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-80"></span><span class="hs-special">}</span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span class="hs-comment">{- run prover -}</span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span class="annot"><a href="Naproche.Prover.html#run"><span class="hs-identifier hs-type">run</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Program.html#Context"><span class="hs-identifier hs-type">Program.Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="Isabelle.Process_Result.html#T"><span class="hs-identifier hs-type">Process_Result.T</span></a></span><span>
+</span><span id="line-86"></span><span id="run"><span class="annot"><span class="annottext">run :: Context -&gt; Prover -&gt; Bytes -&gt; IO T
+</span><a href="Naproche.Prover.html#run"><span class="hs-identifier hs-var hs-var">run</span></a></span></span><span> </span><span id="local-6989586621679230944"><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679230944"><span class="hs-identifier hs-var">context</span></a></span></span><span> </span><span id="local-6989586621679230945"><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230945"><span class="hs-identifier hs-var">prover</span></a></span></span><span> </span><span id="local-6989586621679230946"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230946"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-87"></span><span>  </span><span id="local-6989586621679230947"><span class="annot"><span class="annottext">Params
+</span><a href="#local-6989586621679230947"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Prover -&gt; Prover_Command
+</span><a href="Naproche.Prover.html#_command"><span class="hs-identifier hs-var">_command</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230945"><span class="hs-identifier hs-var">prover</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230945"><span class="hs-identifier hs-var">prover</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230946"><span class="hs-identifier hs-var">input</span></a></span><span>
+</span><span id="line-88"></span><span>  </span><span id="local-6989586621679230948"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679230948"><span class="hs-identifier hs-var">result</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Context -&gt; Params -&gt; IO T
+</span><a href="Naproche.System.html#bash_process"><span class="hs-identifier hs-var">System.bash_process</span></a></span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679230944"><span class="hs-identifier hs-var">context</span></a></span><span> </span><span class="annot"><span class="annottext">Params
+</span><a href="#local-6989586621679230947"><span class="hs-identifier hs-var">params</span></a></span><span>
+</span><span id="line-89"></span><span>  </span><span class="annot"><span class="annottext">IO ()
+</span><a href="Isabelle.Isabelle_Thread.html#expose_stopped"><span class="hs-identifier hs-var">Isabelle_Thread.expose_stopped</span></a></span><span>
+</span><span id="line-90"></span><span>  </span><span class="annot"><span class="annottext">T -&gt; IO T
+forall a. a -&gt; IO a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679230948"><span class="hs-identifier hs-var">result</span></a></span><span>
+</span><span id="line-91"></span><span>
+</span><span id="line-92"></span><span class="annot"><a href="Naproche.Prover.html#status"><span class="hs-identifier hs-type">status</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Process_Result.html#T"><span class="hs-identifier hs-type">Process_Result.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Status"><span class="hs-identifier hs-type">Status</span></a></span><span>
+</span><span id="line-93"></span><span id="status"><span class="annot"><span class="annottext">status :: Prover_Status
+</span><a href="Naproche.Prover.html#status"><span class="hs-identifier hs-var hs-var">status</span></a></span></span><span> </span><span id="local-6989586621679230951"><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230951"><span class="hs-identifier hs-var">prover</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Prover -&gt; Prover_Status
+</span><a href="Naproche.Prover.html#_status"><span class="hs-identifier hs-var">_status</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230951"><span class="hs-identifier hs-var">prover</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230951"><span class="hs-identifier hs-var">prover</span></a></span><span>
+</span><span id="line-94"></span><span>
+</span><span id="line-95"></span><span class="annot"><a href="Naproche.Prover.html#run_status"><span class="hs-identifier hs-type">run_status</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Program.html#Context"><span class="hs-identifier hs-type">Program.Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="Naproche.Prover.html#Status"><span class="hs-identifier hs-type">Status</span></a></span><span>
+</span><span id="line-96"></span><span id="run_status"><span class="annot"><span class="annottext">run_status :: Context -&gt; Prover -&gt; Bytes -&gt; IO Status
+</span><a href="Naproche.Prover.html#run_status"><span class="hs-identifier hs-var hs-var">run_status</span></a></span></span><span> </span><span id="local-6989586621679230952"><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679230952"><span class="hs-identifier hs-var">context</span></a></span></span><span> </span><span id="local-6989586621679230953"><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230953"><span class="hs-identifier hs-var">prover</span></a></span></span><span> </span><span id="local-6989586621679230954"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230954"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-97"></span><span>  </span><span class="annot"><span class="annottext">Prover_Status
+</span><a href="Naproche.Prover.html#status"><span class="hs-identifier hs-var">status</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230953"><span class="hs-identifier hs-var">prover</span></a></span><span> </span><span class="annot"><span class="annottext">(T -&gt; Status) -&gt; IO T -&gt; IO Status
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Context -&gt; Prover -&gt; Bytes -&gt; IO T
+</span><a href="Naproche.Prover.html#run"><span class="hs-identifier hs-var">run</span></a></span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679230952"><span class="hs-identifier hs-var">context</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230953"><span class="hs-identifier hs-var">prover</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230954"><span class="hs-identifier hs-var">input</span></a></span><span>
+</span><span id="line-98"></span><span>
+</span><span id="line-99"></span><span>
+</span><span id="line-100"></span><span class="hs-comment">{- prover parameters -}</span><span>
+</span><span id="line-101"></span><span>
+</span><span id="line-102"></span><span class="annot"><a href="Naproche.Prover.html#verbose"><span class="hs-identifier hs-type">verbose</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span>
+</span><span id="line-103"></span><span id="verbose"><span class="annot"><span class="annottext">verbose :: Prover -&gt; Prover
+</span><a href="Naproche.Prover.html#verbose"><span class="hs-identifier hs-var hs-var">verbose</span></a></span></span><span> </span><span id="local-6989586621679230956"><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230956"><span class="hs-identifier hs-var">prover</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230956"><span class="hs-identifier hs-var">prover</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><a href="Naproche.Prover.html#_verbose"><span class="hs-identifier hs-var">_verbose</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">True</span></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-104"></span><span>
+</span><span id="line-105"></span><span class="annot"><a href="Naproche.Prover.html#timeout"><span class="hs-identifier hs-type">timeout</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Time.html#Time"><span class="hs-identifier hs-type">Time</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span>
+</span><span id="line-106"></span><span id="timeout"><span class="annot"><span class="annottext">timeout :: Time -&gt; Prover -&gt; Prover
+</span><a href="Naproche.Prover.html#timeout"><span class="hs-identifier hs-var hs-var">timeout</span></a></span></span><span> </span><span id="local-6989586621679230957"><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679230957"><span class="hs-identifier hs-var">timeout</span></a></span></span><span> </span><span id="local-6989586621679230958"><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230958"><span class="hs-identifier hs-var">prover</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230958"><span class="hs-identifier hs-var">prover</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><a href="Naproche.Prover.html#_timeout"><span class="hs-identifier hs-var">_timeout</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="#local-6989586621679230957"><span class="hs-identifier hs-type">timeout</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-107"></span><span>
+</span><span id="line-108"></span><span class="annot"><a href="Naproche.Prover.html#memory_limit"><span class="hs-identifier hs-type">memory_limit</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span>
+</span><span id="line-109"></span><span id="memory_limit"><span class="annot"><span class="annottext">memory_limit :: Int -&gt; Prover -&gt; Prover
+</span><a href="Naproche.Prover.html#memory_limit"><span class="hs-identifier hs-var hs-var">memory_limit</span></a></span></span><span> </span><span id="local-6989586621679230959"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679230959"><span class="hs-identifier hs-var">memory_limit</span></a></span></span><span> </span><span id="local-6989586621679230960"><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230960"><span class="hs-identifier hs-var">prover</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230960"><span class="hs-identifier hs-var">prover</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><a href="Naproche.Prover.html#_memory_limit"><span class="hs-identifier hs-var">_memory_limit</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="#local-6989586621679230959"><span class="hs-identifier hs-type">memory_limit</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-110"></span><span>
+</span><span id="line-111"></span><span class="annot"><a href="Naproche.Prover.html#by_contradiction"><span class="hs-identifier hs-type">by_contradiction</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span>
+</span><span id="line-112"></span><span id="by_contradiction"><span class="annot"><span class="annottext">by_contradiction :: Bool -&gt; Prover -&gt; Prover
+</span><a href="Naproche.Prover.html#by_contradiction"><span class="hs-identifier hs-var hs-var">by_contradiction</span></a></span></span><span> </span><span id="local-6989586621679230961"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679230961"><span class="hs-identifier hs-var">by_contradiction</span></a></span></span><span> </span><span id="local-6989586621679230962"><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230962"><span class="hs-identifier hs-var">prover</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230962"><span class="hs-identifier hs-var">prover</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><a href="Naproche.Prover.html#_by_contradiction"><span class="hs-identifier hs-var">_by_contradiction</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="#local-6989586621679230961"><span class="hs-identifier hs-type">by_contradiction</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-113"></span><span>
+</span><span id="line-114"></span><span class="annot"><a href="Naproche.Prover.html#print_seconds"><span class="hs-identifier hs-type">print_seconds</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Time.html#Time"><span class="hs-identifier hs-type">Time</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span>
+</span><span id="line-115"></span><span id="print_seconds"><span class="annot"><span class="annottext">print_seconds :: Time -&gt; Bytes
+</span><a href="Naproche.Prover.html#print_seconds"><span class="hs-identifier hs-var hs-var">print_seconds</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bytes
+</span><a href="Isabelle.Value.html#print_int"><span class="hs-identifier hs-var">Value.print_int</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bytes) -&gt; (Time -&gt; Int) -&gt; Time -&gt; Bytes
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Double -&gt; Int
+forall b. Integral b =&gt; Double -&gt; b
+forall a b. (RealFrac a, Integral b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">round</span></span><span> </span><span class="annot"><span class="annottext">(Double -&gt; Int) -&gt; (Time -&gt; Double) -&gt; Time -&gt; Int
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Time -&gt; Double
+</span><a href="Isabelle.Time.html#get_seconds"><span class="hs-identifier hs-var">Time.get_seconds</span></a></span><span>
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span>
+</span><span id="line-118"></span><span class="hs-comment">{- prover &quot;methods&quot; -}</span><span>
+</span><span id="line-119"></span><span>
+</span><span id="line-120"></span><span class="annot"><a href="Naproche.Prover.html#prover_command"><span class="hs-identifier hs-type">prover_command</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover_Command"><span class="hs-identifier hs-type">Prover_Command</span></a></span><span>
+</span><span id="line-121"></span><span id="prover_command"><span class="annot"><span class="annottext">prover_command :: [Bytes] -&gt; Prover_Command
+</span><a href="Naproche.Prover.html#prover_command"><span class="hs-identifier hs-var hs-var">prover_command</span></a></span></span><span> </span><span id="local-6989586621679230968"><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679230968"><span class="hs-identifier hs-var">args</span></a></span></span><span> </span><span id="local-6989586621679230969"><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230969"><span class="hs-identifier hs-var">prover</span></a></span></span><span> </span><span id="local-6989586621679230970"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230970"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-122"></span><span>  </span><span id="local-6989586621679230971"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230971"><span class="hs-identifier hs-var">exe</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; IO Bytes
+</span><a href="Isabelle.Library.html#getenv"><span class="hs-identifier hs-var">getenv</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Prover -&gt; Bytes
+</span><a href="Naproche.Prover.html#_variable"><span class="hs-identifier hs-var">_variable</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230969"><span class="hs-identifier hs-var">prover</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-123"></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; IO () -&gt; IO ()
+forall (f :: * -&gt; *). Applicative f =&gt; Bool -&gt; f () -&gt; f ()
+</span><span class="hs-identifier hs-var">when</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes -&gt; Bool
+</span><a href="Isabelle.Bytes.html#null"><span class="hs-identifier hs-var">Bytes.null</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230971"><span class="hs-identifier hs-var">exe</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(IO () -&gt; IO ()) -&gt; IO () -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-124"></span><span>    </span><span class="annot"><span class="annottext">String -&gt; IO ()
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; IO ()) -&gt; String -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; String
+forall a. STRING a =&gt; a -&gt; String
+</span><a href="Isabelle.Library.html#make_string"><span class="hs-identifier hs-var">make_string</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Cannot run prover &quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes
+forall a. StringLike a =&gt; a -&gt; a
+</span><a href="Isabelle.Library.html#quote"><span class="hs-identifier hs-var">quote</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Prover -&gt; Bytes
+</span><a href="Naproche.Prover.html#_name"><span class="hs-identifier hs-var">_name</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230969"><span class="hs-identifier hs-var">prover</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span>
+</span><span id="line-125"></span><span>      </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;: undefined environment variable &quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Prover -&gt; Bytes
+</span><a href="Naproche.Prover.html#_variable"><span class="hs-identifier hs-var">_variable</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230969"><span class="hs-identifier hs-var">prover</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-126"></span><span>  </span><span class="annot"><span class="annottext">Params -&gt; IO Params
+forall a. a -&gt; IO a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Params -&gt; IO Params) -&gt; Params -&gt; IO Params
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-127"></span><span>    </span><span class="annot"><span class="annottext">Bytes -&gt; Params -&gt; Params
+</span><a href="Isabelle.Bash.html#input"><span class="hs-identifier hs-var">Bash.input</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230970"><span class="hs-identifier hs-var">input</span></a></span><span> </span><span class="annot"><span class="annottext">(Params -&gt; Params) -&gt; Params -&gt; Params
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-128"></span><span>    </span><span class="annot"><span class="annottext">Time -&gt; Params -&gt; Params
+</span><a href="Isabelle.Bash.html#timeout"><span class="hs-identifier hs-var">Bash.timeout</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Prover -&gt; Time
+</span><a href="Naproche.Prover.html#_timeout"><span class="hs-identifier hs-var">_timeout</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230969"><span class="hs-identifier hs-var">prover</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Params -&gt; Params) -&gt; Params -&gt; Params
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-129"></span><span>    </span><span class="annot"><span class="annottext">Bytes -&gt; Params
+</span><a href="Isabelle.Bash.html#script"><span class="hs-identifier hs-var">Bash.script</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Bytes] -&gt; Bytes
+</span><a href="Isabelle.Bash.html#strings"><span class="hs-identifier hs-var">Bash.strings</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230971"><span class="hs-identifier hs-var">exe</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; [Bytes] -&gt; [Bytes]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679230968"><span class="hs-identifier hs-var">args</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-130"></span><span>
+</span><span id="line-131"></span><span class="annot"><a href="Naproche.Prover.html#prover_status"><span class="hs-identifier hs-type">prover_status</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover_Status"><span class="hs-identifier hs-type">Prover_Status</span></a></span><span>
+</span><span id="line-132"></span><span id="prover_status"><span class="annot"><span class="annottext">prover_status :: Prover_Status
+</span><a href="Naproche.Prover.html#prover_status"><span class="hs-identifier hs-var hs-var">prover_status</span></a></span></span><span> </span><span id="local-6989586621679230981"><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230981"><span class="hs-identifier hs-var">prover</span></a></span></span><span> </span><span id="local-6989586621679230982"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679230982"><span class="hs-identifier hs-var">result</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-133"></span><span>  </span><span class="hs-keyword">let</span><span>
+</span><span id="line-134"></span><span>    </span><span class="annot"><a href="Naproche.Prover.html#Messages"><span class="hs-identifier hs-type">Messages</span></a></span><span class="hs-special">{</span><span id="local-6989586621679230983"><span class="annot"><span class="annottext">[Bytes]
+_success :: Messages -&gt; [Bytes]
+_success :: [Bytes]
+</span><a href="Naproche.Prover.html#_success"><span class="hs-identifier hs-var hs-var">_success</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679230984"><span class="annot"><span class="annottext">[Bytes]
+_contradiction :: Messages -&gt; [Bytes]
+_contradiction :: [Bytes]
+</span><a href="Naproche.Prover.html#_contradiction"><span class="hs-identifier hs-var hs-var">_contradiction</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679230985"><span class="annot"><span class="annottext">[Bytes]
+_failure :: Messages -&gt; [Bytes]
+_failure :: [Bytes]
+</span><a href="Naproche.Prover.html#_failure"><span class="hs-identifier hs-var hs-var">_failure</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679230986"><span class="annot"><span class="annottext">[Bytes]
+_unknown :: Messages -&gt; [Bytes]
+_unknown :: [Bytes]
+</span><a href="Naproche.Prover.html#_unknown"><span class="hs-identifier hs-var hs-var">_unknown</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Prover -&gt; Messages
+</span><a href="Naproche.Prover.html#_messages"><span class="hs-identifier hs-var">_messages</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230981"><span class="hs-identifier hs-var">prover</span></a></span><span>
+</span><span id="line-135"></span><span>    </span><span id="local-6989586621679230989"><span class="annot"><span class="annottext">timeout :: Bool
+</span><a href="#local-6989586621679230989"><span class="hs-identifier hs-var hs-var">timeout</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">T -&gt; Int
+</span><a href="Isabelle.Process_Result.html#rc"><span class="hs-identifier hs-var">Process_Result.rc</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679230982"><span class="hs-identifier hs-var">result</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="Isabelle.Process_Result.html#timeout_rc"><span class="hs-identifier hs-var">Process_Result.timeout_rc</span></a></span><span>
+</span><span id="line-136"></span><span>    </span><span id="local-6989586621679230992"><span class="annot"><span class="annottext">out :: [Bytes]
+</span><a href="#local-6989586621679230992"><span class="hs-identifier hs-var hs-var">out</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">T -&gt; [Bytes]
+</span><a href="Isabelle.Process_Result.html#out_lines"><span class="hs-identifier hs-var">Process_Result.out_lines</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679230982"><span class="hs-identifier hs-var">result</span></a></span><span>
+</span><span id="line-137"></span><span>    </span><span id="local-6989586621679230994"><span class="annot"><span class="annottext">err :: [Bytes]
+</span><a href="#local-6989586621679230994"><span class="hs-identifier hs-var hs-var">err</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">T -&gt; [Bytes]
+</span><a href="Isabelle.Process_Result.html#err_lines"><span class="hs-identifier hs-var">Process_Result.err_lines</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679230982"><span class="hs-identifier hs-var">result</span></a></span><span>
+</span><span id="line-138"></span><span>
+</span><span id="line-139"></span><span>    </span><span id="local-6989586621679230999"><span class="annot"><span class="annottext">test :: t Bytes -&gt; Bool
+</span><a href="#local-6989586621679230999"><span class="hs-identifier hs-var hs-var">test</span></a></span></span><span> </span><span id="local-6989586621679231000"><span class="annot"><span class="annottext">t Bytes
+</span><a href="#local-6989586621679231000"><span class="hs-identifier hs-var">msgs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Bytes -&gt; Bool) -&gt; [Bytes] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">any</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679231002"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679231002"><span class="hs-identifier hs-var">line</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes -&gt; Bool
+</span><a href="Isabelle.Bytes.html#null"><span class="hs-identifier hs-var">Bytes.null</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679231002"><span class="hs-identifier hs-var">line</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">(Bytes -&gt; Bool) -&gt; t Bytes -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">any</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bool
+</span><a href="Isabelle.Bytes.html#isPrefixOf"><span class="hs-operator hs-var">`Bytes.isPrefixOf`</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679231002"><span class="hs-identifier hs-var">line</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">t Bytes
+</span><a href="#local-6989586621679231000"><span class="hs-identifier hs-var">msgs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679230992"><span class="hs-identifier hs-var">out</span></a></span><span>
+</span><span id="line-140"></span><span>    </span><span id="local-6989586621679231007"><span class="annot"><span class="annottext">contradictions :: Bool
+</span><a href="#local-6989586621679231007"><span class="hs-identifier hs-var hs-var">contradictions</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; Bool
+forall {t :: * -&gt; *}. Foldable t =&gt; t Bytes -&gt; Bool
+</span><a href="#local-6989586621679230999"><span class="hs-identifier hs-var">test</span></a></span><span> </span><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679230984"><span class="hs-identifier hs-var">_contradiction</span></a></span><span>
+</span><span id="line-141"></span><span>    </span><span id="local-6989586621679231009"><span class="annot"><span class="annottext">positive :: Bool
+</span><a href="#local-6989586621679231009"><span class="hs-identifier hs-var hs-var">positive</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; Bool
+forall {t :: * -&gt; *}. Foldable t =&gt; t Bytes -&gt; Bool
+</span><a href="#local-6989586621679230999"><span class="hs-identifier hs-var">test</span></a></span><span> </span><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679230983"><span class="hs-identifier hs-var">_success</span></a></span><span>
+</span><span id="line-142"></span><span>    </span><span id="local-6989586621679231011"><span class="annot"><span class="annottext">negative :: Bool
+</span><a href="#local-6989586621679231011"><span class="hs-identifier hs-var hs-var">negative</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; Bool
+forall {t :: * -&gt; *}. Foldable t =&gt; t Bytes -&gt; Bool
+</span><a href="#local-6989586621679230999"><span class="hs-identifier hs-var">test</span></a></span><span> </span><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679230985"><span class="hs-identifier hs-var">_failure</span></a></span><span>
+</span><span id="line-143"></span><span>    </span><span id="local-6989586621679231013"><span class="annot"><span class="annottext">inconclusive :: Bool
+</span><a href="#local-6989586621679231013"><span class="hs-identifier hs-var hs-var">inconclusive</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; Bool
+forall {t :: * -&gt; *}. Foldable t =&gt; t Bytes -&gt; Bool
+</span><a href="#local-6989586621679230999"><span class="hs-identifier hs-var">test</span></a></span><span> </span><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679230986"><span class="hs-identifier hs-var">_unknown</span></a></span><span>
+</span><span id="line-144"></span><span>  </span><span class="hs-keyword">in</span><span>
+</span><span id="line-145"></span><span>    </span><span class="hs-keyword">if</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679230989"><span class="hs-identifier hs-var">timeout</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; Bool
+forall a. [a] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">null</span></span><span> </span><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679230992"><span class="hs-identifier hs-var">out</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Status
+</span><a href="Naproche.Prover.html#Error"><span class="hs-identifier hs-var">Error</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;No prover response&quot;</span></span><span>
+</span><span id="line-146"></span><span>       </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679230989"><span class="hs-identifier hs-var">timeout</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679231009"><span class="hs-identifier hs-var">positive</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679231007"><span class="hs-identifier hs-var">contradictions</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679231011"><span class="hs-identifier hs-var">negative</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679231013"><span class="hs-identifier hs-var">inconclusive</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-147"></span><span>          </span><span class="annot"><span class="annottext">Bytes -&gt; Status
+</span><a href="Naproche.Prover.html#Error"><span class="hs-identifier hs-var">Error</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Bytes] -&gt; Bytes
+forall a. StringLike a =&gt; [a] -&gt; a
+</span><a href="Isabelle.Library.html#cat_lines"><span class="hs-identifier hs-var">cat_lines</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Bad prover response:&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; [Bytes] -&gt; [Bytes]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679230992"><span class="hs-identifier hs-var">out</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-148"></span><span>       </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679231009"><span class="hs-identifier hs-var">positive</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="annot"><span class="annottext">Prover -&gt; Bool
+</span><a href="Naproche.Prover.html#_by_contradiction"><span class="hs-identifier hs-var">_by_contradiction</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230981"><span class="hs-identifier hs-var">prover</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679231007"><span class="hs-identifier hs-var">contradictions</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Status
+</span><a href="Naproche.Prover.html#Success"><span class="hs-identifier hs-var">Success</span></a></span><span>
+</span><span id="line-149"></span><span>       </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679231011"><span class="hs-identifier hs-var">negative</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Status
+</span><a href="Naproche.Prover.html#Failure"><span class="hs-identifier hs-var">Failure</span></a></span><span>
+</span><span id="line-150"></span><span>       </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Prover -&gt; Bool
+</span><a href="Naproche.Prover.html#_by_contradiction"><span class="hs-identifier hs-var">_by_contradiction</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679230981"><span class="hs-identifier hs-var">prover</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679231007"><span class="hs-identifier hs-var">contradictions</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Status
+</span><a href="Naproche.Prover.html#Contradictory_Axioms"><span class="hs-identifier hs-var">Contradictory_Axioms</span></a></span><span>
+</span><span id="line-151"></span><span>       </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679230989"><span class="hs-identifier hs-var">timeout</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679231013"><span class="hs-identifier hs-var">inconclusive</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Status
+</span><a href="Naproche.Prover.html#Unknown"><span class="hs-identifier hs-var">Unknown</span></a></span><span>
+</span><span id="line-152"></span><span>       </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; Bool
+forall a. [a] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">null</span></span><span> </span><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679230994"><span class="hs-identifier hs-var">err</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Status
+</span><a href="Naproche.Prover.html#Error"><span class="hs-identifier hs-var">Error</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Prover error&quot;</span></span><span>
+</span><span id="line-153"></span><span>       </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Status
+</span><a href="Naproche.Prover.html#Error"><span class="hs-identifier hs-var">Error</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Bytes] -&gt; Bytes
+forall a. StringLike a =&gt; [a] -&gt; a
+</span><a href="Isabelle.Library.html#cat_lines"><span class="hs-identifier hs-var">cat_lines</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Prover error:&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; [Bytes] -&gt; [Bytes]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679230994"><span class="hs-identifier hs-var">err</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-154"></span><span>
+</span><span id="line-155"></span><span>
+</span><span id="line-156"></span><span>
+</span><span id="line-157"></span><span class="hs-comment">{- list of provers -}</span><span>
+</span><span id="line-158"></span><span>
+</span><span id="line-159"></span><span class="annot"><a href="Naproche.Prover.html#list"><span class="hs-identifier hs-type">list</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-160"></span><span id="list"><span class="annot"><span class="annottext">list :: [Prover]
+</span><a href="Naproche.Prover.html#list"><span class="hs-identifier hs-var hs-var">list</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Prover
+</span><a href="Naproche.Prover.html#eprover"><span class="hs-identifier hs-var">eprover</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="Naproche.Prover.html#eproververb"><span class="hs-identifier hs-var">eproververb</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="Naproche.Prover.html#spass"><span class="hs-identifier hs-var">spass</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="Naproche.Prover.html#vampire"><span class="hs-identifier hs-var">vampire</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-161"></span><span>
+</span><span id="line-162"></span><span class="annot"><a href="Naproche.Prover.html#find"><span class="hs-identifier hs-type">find</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span>
+</span><span id="line-163"></span><span id="find"><span class="annot"><span class="annottext">find :: Bytes -&gt; Maybe Prover
+</span><a href="Naproche.Prover.html#find"><span class="hs-identifier hs-var hs-var">find</span></a></span></span><span> </span><span id="local-6989586621679231017"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679231017"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Prover -&gt; Bool) -&gt; [Prover] -&gt; Maybe Prover
+forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">List.find</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679231019"><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679231019"><span class="hs-identifier hs-var">prover</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Prover -&gt; Bytes
+</span><a href="Naproche.Prover.html#get_name"><span class="hs-identifier hs-var">get_name</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679231019"><span class="hs-identifier hs-var">prover</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679231017"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Prover]
+</span><a href="Naproche.Prover.html#list"><span class="hs-identifier hs-var">list</span></a></span><span>
+</span><span id="line-164"></span><span>
+</span><span id="line-165"></span><span>
+</span><span id="line-166"></span><span class="hs-comment">{- eprover -}</span><span>
+</span><span id="line-167"></span><span>
+</span><span id="line-168"></span><span class="annot"><a href="Naproche.Prover.html#eprover"><span class="hs-identifier hs-type">eprover</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span>
+</span><span id="line-169"></span><span id="eprover"><span class="annot"><span class="annottext">eprover :: Prover
+</span><a href="Naproche.Prover.html#eprover"><span class="hs-identifier hs-var hs-var">eprover</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-170"></span><span>  </span><span class="annot"><span class="annottext">Bytes
+-&gt; Bytes -&gt; Prover_Command -&gt; Prover_Status -&gt; Messages -&gt; Prover
+</span><a href="Naproche.Prover.html#make_prover"><span class="hs-identifier hs-var">make_prover</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;eprover&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;NAPROCHE_EPROVER&quot;</span></span><span> </span><span class="annot"><span class="annottext">Prover_Command
+</span><a href="Naproche.Prover.html#eprover_command"><span class="hs-identifier hs-var">eprover_command</span></a></span><span>
+</span><span id="line-171"></span><span>    </span><span class="annot"><span class="annottext">Prover_Status
+</span><a href="Naproche.Prover.html#prover_status"><span class="hs-identifier hs-var">prover_status</span></a></span><span> </span><span class="annot"><span class="annottext">Messages
+</span><a href="Naproche.Prover.html#eprover_messages"><span class="hs-identifier hs-var">eprover_messages</span></a></span><span>
+</span><span id="line-172"></span><span>
+</span><span id="line-173"></span><span class="annot"><a href="Naproche.Prover.html#eprover_command"><span class="hs-identifier hs-type">eprover_command</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover_Command"><span class="hs-identifier hs-type">Prover_Command</span></a></span><span>
+</span><span id="line-174"></span><span id="eprover_command"><span class="annot"><span class="annottext">eprover_command :: Prover_Command
+</span><a href="Naproche.Prover.html#eprover_command"><span class="hs-identifier hs-var hs-var">eprover_command</span></a></span></span><span> </span><span id="local-6989586621679231022"><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679231022"><span class="hs-identifier hs-var">prover</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; Prover_Command
+</span><a href="Naproche.Prover.html#prover_command"><span class="hs-identifier hs-var">prover_command</span></a></span><span> </span><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679231023"><span class="hs-identifier hs-var">args</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679231022"><span class="hs-identifier hs-var">prover</span></a></span><span>
+</span><span id="line-175"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-176"></span><span>    </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span class="hs-special">{</span><span id="local-6989586621679231024"><span class="annot"><span class="annottext">Bool
+_verbose :: Prover -&gt; Bool
+_verbose :: Bool
+</span><a href="Naproche.Prover.html#_verbose"><span class="hs-identifier hs-var hs-var">_verbose</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679231025"><span class="annot"><span class="annottext">Time
+_timeout :: Prover -&gt; Time
+_timeout :: Time
+</span><a href="Naproche.Prover.html#_timeout"><span class="hs-identifier hs-var hs-var">_timeout</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679231026"><span class="annot"><span class="annottext">Int
+_memory_limit :: Prover -&gt; Int
+_memory_limit :: Int
+</span><a href="Naproche.Prover.html#_memory_limit"><span class="hs-identifier hs-var hs-var">_memory_limit</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679231022"><span class="hs-identifier hs-var">prover</span></a></span><span>
+</span><span id="line-177"></span><span>    </span><span id="local-6989586621679231023"><span class="annot"><span class="annottext">args :: [Bytes]
+</span><a href="#local-6989586621679231023"><span class="hs-identifier hs-var hs-var">args</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-178"></span><span>      </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;--auto&quot;</span></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; [Bytes] -&gt; [Bytes]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span>
+</span><span id="line-179"></span><span>      </span><span class="hs-special">[</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679231024"><span class="hs-identifier hs-var">_verbose</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;--verbose&quot;</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;--silent&quot;</span></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; [Bytes] -&gt; [Bytes]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span>
+</span><span id="line-180"></span><span>      </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;--cpu-limit=&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Time -&gt; Bytes
+</span><a href="Naproche.Prover.html#print_seconds"><span class="hs-identifier hs-var">print_seconds</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679231025"><span class="hs-identifier hs-var">_timeout</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679231025"><span class="hs-identifier hs-var">_timeout</span></a></span><span> </span><span class="annot"><span class="annottext">Time -&gt; Time -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="Isabelle.Time.html#zero"><span class="hs-identifier hs-var">Time.zero</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; [Bytes] -&gt; [Bytes]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span>
+</span><span id="line-181"></span><span>      </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;--memory-limit=&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bytes
+</span><a href="Isabelle.Value.html#print_int"><span class="hs-identifier hs-var">Value.print_int</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679231026"><span class="hs-identifier hs-var">_memory_limit</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679231026"><span class="hs-identifier hs-var">_memory_limit</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-special">]</span><span>
+</span><span id="line-182"></span><span>
+</span><span id="line-183"></span><span class="annot"><a href="Naproche.Prover.html#eprover_messages"><span class="hs-identifier hs-type">eprover_messages</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Messages"><span class="hs-identifier hs-type">Messages</span></a></span><span>
+</span><span id="line-184"></span><span id="eprover_messages"><span class="annot"><span class="annottext">eprover_messages :: Messages
+</span><a href="Naproche.Prover.html#eprover_messages"><span class="hs-identifier hs-var hs-var">eprover_messages</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-185"></span><span>  </span><span class="annot"><a href="Naproche.Prover.html#Messages"><span class="hs-identifier hs-type">Messages</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-186"></span><span>    </span><span class="annot"><span class="annottext">_contradiction :: [Bytes]
+</span><a href="Naproche.Prover.html#_contradiction"><span class="hs-identifier hs-var">_contradiction</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;# SZS status ContradictoryAxioms&quot;</span></span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-187"></span><span>    </span><span class="annot"><span class="annottext">_success :: [Bytes]
+</span><a href="Naproche.Prover.html#_success"><span class="hs-identifier hs-var">_success</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;# SZS status Theorem&quot;</span></span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-188"></span><span>    </span><span class="annot"><span class="annottext">_failure :: [Bytes]
+</span><a href="Naproche.Prover.html#_failure"><span class="hs-identifier hs-var">_failure</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;# SZS status CounterSatisfiable&quot;</span></span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-189"></span><span>    </span><span class="annot"><span class="annottext">_unknown :: [Bytes]
+</span><a href="Naproche.Prover.html#_unknown"><span class="hs-identifier hs-var">_unknown</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;# SZS status ResourceOut&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;# SZS status GaveUp&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-190"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-191"></span><span>
+</span><span id="line-192"></span><span>
+</span><span id="line-193"></span><span class="hs-comment">{- eproververb -}</span><span>
+</span><span id="line-194"></span><span>
+</span><span id="line-195"></span><span class="annot"><a href="Naproche.Prover.html#eproververb"><span class="hs-identifier hs-type">eproververb</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span>
+</span><span id="line-196"></span><span id="eproververb"><span class="annot"><span class="annottext">eproververb :: Prover
+</span><a href="Naproche.Prover.html#eproververb"><span class="hs-identifier hs-var hs-var">eproververb</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-197"></span><span>  </span><span class="annot"><span class="annottext">Bytes
+-&gt; Bytes -&gt; Prover_Command -&gt; Prover_Status -&gt; Messages -&gt; Prover
+</span><a href="Naproche.Prover.html#make_prover"><span class="hs-identifier hs-var">make_prover</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;eproververb&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;NAPROCHE_EPROVER&quot;</span></span><span> </span><span class="annot"><span class="annottext">Prover_Command
+</span><a href="Naproche.Prover.html#eproververb_command"><span class="hs-identifier hs-var">eproververb_command</span></a></span><span>
+</span><span id="line-198"></span><span>    </span><span class="annot"><span class="annottext">Prover_Status
+</span><a href="Naproche.Prover.html#prover_status"><span class="hs-identifier hs-var">prover_status</span></a></span><span> </span><span class="annot"><span class="annottext">Messages
+</span><a href="Naproche.Prover.html#eprover_messages"><span class="hs-identifier hs-var">eprover_messages</span></a></span><span>
+</span><span id="line-199"></span><span>
+</span><span id="line-200"></span><span class="annot"><a href="Naproche.Prover.html#eproververb_command"><span class="hs-identifier hs-type">eproververb_command</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover_Command"><span class="hs-identifier hs-type">Prover_Command</span></a></span><span>
+</span><span id="line-201"></span><span id="eproververb_command"><span class="annot"><span class="annottext">eproververb_command :: Prover_Command
+</span><a href="Naproche.Prover.html#eproververb_command"><span class="hs-identifier hs-var hs-var">eproververb_command</span></a></span></span><span> </span><span id="local-6989586621679231041"><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679231041"><span class="hs-identifier hs-var">prover</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; Prover_Command
+</span><a href="Naproche.Prover.html#prover_command"><span class="hs-identifier hs-var">prover_command</span></a></span><span> </span><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679231042"><span class="hs-identifier hs-var">args</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679231041"><span class="hs-identifier hs-var">prover</span></a></span><span>
+</span><span id="line-202"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-203"></span><span>    </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span class="hs-special">{</span><span id="local-6989586621679231043"><span class="annot"><span class="annottext">Time
+_timeout :: Prover -&gt; Time
+_timeout :: Time
+</span><a href="Naproche.Prover.html#_timeout"><span class="hs-identifier hs-var hs-var">_timeout</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679231044"><span class="annot"><span class="annottext">Int
+_memory_limit :: Prover -&gt; Int
+_memory_limit :: Int
+</span><a href="Naproche.Prover.html#_memory_limit"><span class="hs-identifier hs-var hs-var">_memory_limit</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679231041"><span class="hs-identifier hs-var">prover</span></a></span><span>
+</span><span id="line-204"></span><span>    </span><span id="local-6989586621679231042"><span class="annot"><span class="annottext">args :: [Bytes]
+</span><a href="#local-6989586621679231042"><span class="hs-identifier hs-var hs-var">args</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-205"></span><span>      </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;-xAuto&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;-tAuto&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;-mAuto&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;--tstp-in&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;-l&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;2&quot;</span></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; [Bytes] -&gt; [Bytes]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span>
+</span><span id="line-206"></span><span>      </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;--cpu-limit=&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Time -&gt; Bytes
+</span><a href="Naproche.Prover.html#print_seconds"><span class="hs-identifier hs-var">print_seconds</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679231043"><span class="hs-identifier hs-var">_timeout</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679231043"><span class="hs-identifier hs-var">_timeout</span></a></span><span> </span><span class="annot"><span class="annottext">Time -&gt; Time -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="Isabelle.Time.html#zero"><span class="hs-identifier hs-var">Time.zero</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; [Bytes] -&gt; [Bytes]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span>
+</span><span id="line-207"></span><span>      </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;--memory-limit=&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bytes
+</span><a href="Isabelle.Value.html#print_int"><span class="hs-identifier hs-var">Value.print_int</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679231044"><span class="hs-identifier hs-var">_memory_limit</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679231044"><span class="hs-identifier hs-var">_memory_limit</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-special">]</span><span>
+</span><span id="line-208"></span><span>
+</span><span id="line-209"></span><span>
+</span><span id="line-210"></span><span class="hs-comment">{- spass -}</span><span>
+</span><span id="line-211"></span><span>
+</span><span id="line-212"></span><span class="annot"><a href="Naproche.Prover.html#spass"><span class="hs-identifier hs-type">spass</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span>
+</span><span id="line-213"></span><span id="spass"><span class="annot"><span class="annottext">spass :: Prover
+</span><a href="Naproche.Prover.html#spass"><span class="hs-identifier hs-var hs-var">spass</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-214"></span><span>  </span><span class="annot"><span class="annottext">Bytes
+-&gt; Bytes -&gt; Prover_Command -&gt; Prover_Status -&gt; Messages -&gt; Prover
+</span><a href="Naproche.Prover.html#make_prover"><span class="hs-identifier hs-var">make_prover</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;spass&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;NAPROCHE_SPASS&quot;</span></span><span> </span><span class="annot"><span class="annottext">Prover_Command
+</span><a href="Naproche.Prover.html#spass_command"><span class="hs-identifier hs-var">spass_command</span></a></span><span>
+</span><span id="line-215"></span><span>    </span><span class="annot"><span class="annottext">Prover_Status
+</span><a href="Naproche.Prover.html#prover_status"><span class="hs-identifier hs-var">prover_status</span></a></span><span> </span><span class="annot"><span class="annottext">Messages
+</span><a href="Naproche.Prover.html#spass_messages"><span class="hs-identifier hs-var">spass_messages</span></a></span><span>
+</span><span id="line-216"></span><span>
+</span><span id="line-217"></span><span class="annot"><a href="Naproche.Prover.html#spass_command"><span class="hs-identifier hs-type">spass_command</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover_Command"><span class="hs-identifier hs-type">Prover_Command</span></a></span><span>
+</span><span id="line-218"></span><span id="spass_command"><span class="annot"><span class="annottext">spass_command :: Prover_Command
+</span><a href="Naproche.Prover.html#spass_command"><span class="hs-identifier hs-var hs-var">spass_command</span></a></span></span><span> </span><span id="local-6989586621679231060"><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679231060"><span class="hs-identifier hs-var">prover</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; Prover_Command
+</span><a href="Naproche.Prover.html#prover_command"><span class="hs-identifier hs-var">prover_command</span></a></span><span> </span><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679231061"><span class="hs-identifier hs-var">args</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679231060"><span class="hs-identifier hs-var">prover</span></a></span><span>
+</span><span id="line-219"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-220"></span><span>    </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span class="hs-special">{</span><span id="local-6989586621679231062"><span class="annot"><span class="annottext">Time
+_timeout :: Prover -&gt; Time
+_timeout :: Time
+</span><a href="Naproche.Prover.html#_timeout"><span class="hs-identifier hs-var hs-var">_timeout</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679231063"><span class="annot"><span class="annottext">Int
+_memory_limit :: Prover -&gt; Int
+_memory_limit :: Int
+</span><a href="Naproche.Prover.html#_memory_limit"><span class="hs-identifier hs-var hs-var">_memory_limit</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679231060"><span class="hs-identifier hs-var">prover</span></a></span><span>
+</span><span id="line-221"></span><span>    </span><span id="local-6989586621679231061"><span class="annot"><span class="annottext">args :: [Bytes]
+</span><a href="#local-6989586621679231061"><span class="hs-identifier hs-var hs-var">args</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-222"></span><span>      </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;-TPTP&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;-CNFOptSkolem=0&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;-PProblem=0&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;-PGiven=0&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;-Stdin&quot;</span></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; [Bytes] -&gt; [Bytes]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span>
+</span><span id="line-223"></span><span>      </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;-TimeLimit=&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Time -&gt; Bytes
+</span><a href="Naproche.Prover.html#print_seconds"><span class="hs-identifier hs-var">print_seconds</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679231062"><span class="hs-identifier hs-var">_timeout</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679231062"><span class="hs-identifier hs-var">_timeout</span></a></span><span> </span><span class="annot"><span class="annottext">Time -&gt; Time -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="Isabelle.Time.html#zero"><span class="hs-identifier hs-var">Time.zero</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-224"></span><span>
+</span><span id="line-225"></span><span class="annot"><a href="Naproche.Prover.html#spass_messages"><span class="hs-identifier hs-type">spass_messages</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Messages"><span class="hs-identifier hs-type">Messages</span></a></span><span>
+</span><span id="line-226"></span><span id="spass_messages"><span class="annot"><span class="annottext">spass_messages :: Messages
+</span><a href="Naproche.Prover.html#spass_messages"><span class="hs-identifier hs-var hs-var">spass_messages</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-227"></span><span>    </span><span class="annot"><a href="Naproche.Prover.html#Messages"><span class="hs-identifier hs-type">Messages</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-228"></span><span>      </span><span class="annot"><span class="annottext">_contradiction :: [Bytes]
+</span><a href="Naproche.Prover.html#_contradiction"><span class="hs-identifier hs-var">_contradiction</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-229"></span><span>      </span><span class="annot"><span class="annottext">_success :: [Bytes]
+</span><a href="Naproche.Prover.html#_success"><span class="hs-identifier hs-var">_success</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;SPASS beiseite: Proof found.&quot;</span></span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-230"></span><span>      </span><span class="annot"><span class="annottext">_failure :: [Bytes]
+</span><a href="Naproche.Prover.html#_failure"><span class="hs-identifier hs-var">_failure</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;SPASS beiseite: Completion found.&quot;</span></span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-231"></span><span>      </span><span class="annot"><span class="annottext">_unknown :: [Bytes]
+</span><a href="Naproche.Prover.html#_unknown"><span class="hs-identifier hs-var">_unknown</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;SPASS beiseite: Ran out of time.&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-232"></span><span>          </span><span class="hs-comment">-- &quot;SPASS beiseite: Maximal number of loops exceeded.&quot;</span><span>
+</span><span id="line-233"></span><span>    </span><span class="hs-special">}</span><span>
+</span><span id="line-234"></span><span>
+</span><span id="line-235"></span><span>
+</span><span id="line-236"></span><span class="hs-comment">{- vampire -}</span><span>
+</span><span id="line-237"></span><span>
+</span><span id="line-238"></span><span class="annot"><a href="Naproche.Prover.html#vampire"><span class="hs-identifier hs-type">vampire</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span>
+</span><span id="line-239"></span><span id="vampire"><span class="annot"><span class="annottext">vampire :: Prover
+</span><a href="Naproche.Prover.html#vampire"><span class="hs-identifier hs-var hs-var">vampire</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-240"></span><span>  </span><span class="annot"><span class="annottext">Bytes
+-&gt; Bytes -&gt; Prover_Command -&gt; Prover_Status -&gt; Messages -&gt; Prover
+</span><a href="Naproche.Prover.html#make_prover"><span class="hs-identifier hs-var">make_prover</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;vampire&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;NAPROCHE_VAMPIRE&quot;</span></span><span> </span><span class="annot"><span class="annottext">Prover_Command
+</span><a href="Naproche.Prover.html#vampire_command"><span class="hs-identifier hs-var">vampire_command</span></a></span><span>
+</span><span id="line-241"></span><span>    </span><span class="annot"><span class="annottext">Prover_Status
+</span><a href="Naproche.Prover.html#prover_status"><span class="hs-identifier hs-var">prover_status</span></a></span><span> </span><span class="annot"><span class="annottext">Messages
+</span><a href="Naproche.Prover.html#vampire_messages"><span class="hs-identifier hs-var">vampire_messages</span></a></span><span>
+</span><span id="line-242"></span><span>
+</span><span id="line-243"></span><span class="annot"><a href="Naproche.Prover.html#vampire_command"><span class="hs-identifier hs-type">vampire_command</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Prover_Command"><span class="hs-identifier hs-type">Prover_Command</span></a></span><span>
+</span><span id="line-244"></span><span id="vampire_command"><span class="annot"><span class="annottext">vampire_command :: Prover_Command
+</span><a href="Naproche.Prover.html#vampire_command"><span class="hs-identifier hs-var hs-var">vampire_command</span></a></span></span><span> </span><span id="local-6989586621679231074"><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679231074"><span class="hs-identifier hs-var">prover</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; Prover_Command
+</span><a href="Naproche.Prover.html#prover_command"><span class="hs-identifier hs-var">prover_command</span></a></span><span> </span><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679231075"><span class="hs-identifier hs-var">args</span></a></span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679231074"><span class="hs-identifier hs-var">prover</span></a></span><span>
+</span><span id="line-245"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-246"></span><span>    </span><span class="annot"><a href="Naproche.Prover.html#Prover"><span class="hs-identifier hs-type">Prover</span></a></span><span class="hs-special">{</span><span id="local-6989586621679231076"><span class="annot"><span class="annottext">Time
+_timeout :: Prover -&gt; Time
+_timeout :: Time
+</span><a href="Naproche.Prover.html#_timeout"><span class="hs-identifier hs-var hs-var">_timeout</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679231077"><span class="annot"><span class="annottext">Int
+_memory_limit :: Prover -&gt; Int
+_memory_limit :: Int
+</span><a href="Naproche.Prover.html#_memory_limit"><span class="hs-identifier hs-var hs-var">_memory_limit</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Prover
+</span><a href="#local-6989586621679231074"><span class="hs-identifier hs-var">prover</span></a></span><span>
+</span><span id="line-247"></span><span>    </span><span id="local-6989586621679231075"><span class="annot"><span class="annottext">args :: [Bytes]
+</span><a href="#local-6989586621679231075"><span class="hs-identifier hs-var hs-var">args</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-248"></span><span>      </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;--mode&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;casc&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;--bad_option&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;hard&quot;</span></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; [Bytes] -&gt; [Bytes]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span>
+</span><span id="line-249"></span><span>      </span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679231076"><span class="hs-identifier hs-var">_timeout</span></a></span><span> </span><span class="annot"><span class="annottext">Time -&gt; Time -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="Isabelle.Time.html#zero"><span class="hs-identifier hs-var">Time.zero</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;--time_limit&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Time -&gt; Bytes
+</span><a href="Naproche.Prover.html#print_seconds"><span class="hs-identifier hs-var">print_seconds</span></a></span><span> </span><span class="annot"><span class="annottext">Time
+</span><a href="#local-6989586621679231076"><span class="hs-identifier hs-var">_timeout</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;s&quot;</span></span><span class="hs-special">]</span><span> </span><span class="hs-keyword">else</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; [Bytes] -&gt; [Bytes]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span>
+</span><span id="line-250"></span><span>      </span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679231077"><span class="hs-identifier hs-var">_memory_limit</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;--memory_limit&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bytes
+</span><a href="Isabelle.Value.html#print_int"><span class="hs-identifier hs-var">Value.print_int</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679231077"><span class="hs-identifier hs-var">_memory_limit</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-keyword">else</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-251"></span><span>
+</span><span id="line-252"></span><span class="annot"><a href="Naproche.Prover.html#vampire_messages"><span class="hs-identifier hs-type">vampire_messages</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Prover.html#Messages"><span class="hs-identifier hs-type">Messages</span></a></span><span>
+</span><span id="line-253"></span><span id="vampire_messages"><span class="annot"><span class="annottext">vampire_messages :: Messages
+</span><a href="Naproche.Prover.html#vampire_messages"><span class="hs-identifier hs-var hs-var">vampire_messages</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-254"></span><span>  </span><span class="annot"><a href="Naproche.Prover.html#Messages"><span class="hs-identifier hs-type">Messages</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-255"></span><span>    </span><span class="annot"><span class="annottext">_contradiction :: [Bytes]
+</span><a href="Naproche.Prover.html#_contradiction"><span class="hs-identifier hs-var">_contradiction</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">,</span><span>  </span><span class="hs-comment">-- guessed this one: &quot;% SZS status ContradictoryAxioms for</span><span>
+</span><span id="line-256"></span><span>    </span><span class="annot"><span class="annottext">_success :: [Bytes]
+</span><a href="Naproche.Prover.html#_success"><span class="hs-identifier hs-var">_success</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;% SZS output end Proof for&quot;</span></span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-257"></span><span>    </span><span class="annot"><span class="annottext">_failure :: [Bytes]
+</span><a href="Naproche.Prover.html#_failure"><span class="hs-identifier hs-var">_failure</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;% SZS status CounterSatisfiable for&quot;</span></span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-258"></span><span>    </span><span class="annot"><span class="annottext">_unknown :: [Bytes]
+</span><a href="Naproche.Prover.html#_unknown"><span class="hs-identifier hs-var">_unknown</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;% SZS status Timeout for&quot;</span></span><span class="hs-special">]</span><span>
+</span><span id="line-259"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-260"></span></pre></body></html>

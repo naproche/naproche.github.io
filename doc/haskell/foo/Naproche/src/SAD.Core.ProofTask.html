@@ -1,0 +1,721 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.Core.ProofTask</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2017 - 2018, Steffen Frerix</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-5"></span><span class="hs-comment">--</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Generation of proof tasks for low-level map and class definitions and choices.</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.Core.ProofTask</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Core.ProofTask.html#generateProofTask"><span class="hs-identifier">generateProofTask</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Set</span></span><span class="hs-special">)</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Text</span></span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Formula.html"><span class="hs-identifier">SAD.Data.Formula</span></a></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html"><span class="hs-identifier">SAD.Data.Text.Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Text.Block.html#Section"><span class="hs-identifier">Section</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Prove.Normalize.html"><span class="hs-identifier">SAD.Prove.Normalize</span></a></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Text.Decl.html"><span class="hs-identifier">SAD.Data.Text.Decl</span></a></span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="annot"><span class="hs-comment">-- * Proof tasks</span></span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-comment">-- Generate proof task associated with a block</span><span>
+</span><span id="line-25"></span><span class="annot"><a href="SAD.Core.ProofTask.html#generateProofTask"><span class="hs-identifier hs-type">generateProofTask</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Section"><span class="hs-identifier hs-type">Section</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><a href="SAD.Data.VarName.html#VariableName"><span class="hs-identifier hs-type">VariableName</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-26"></span><span id="generateProofTask"><span class="annot"><span class="annottext">generateProofTask :: Section -&gt; Set VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#generateProofTask"><span class="hs-identifier hs-var hs-var">generateProofTask</span></a></span></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Choice"><span class="hs-identifier hs-var">Choice</span></a></span><span> </span><span id="local-6989586621679255776"><span class="annot"><span class="annottext">Set VariableName
+</span><a href="#local-6989586621679255776"><span class="hs-identifier hs-var">vs</span></a></span></span><span> </span><span id="local-6989586621679255777"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255777"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(VariableName -&gt; Formula -&gt; Formula)
+-&gt; Formula -&gt; Set VariableName -&gt; Formula
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; Set a -&gt; b
+forall (t :: * -&gt; *) a b.
+Foldable t =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldr</span></span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mbExi"><span class="hs-identifier hs-var">mbExi</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255777"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Set VariableName
+</span><a href="#local-6989586621679255776"><span class="hs-identifier hs-var">vs</span></a></span><span>
+</span><span id="line-27"></span><span class="annot"><a href="SAD.Core.ProofTask.html#generateProofTask"><span class="hs-identifier hs-var">generateProofTask</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#LowDefinition"><span class="hs-identifier hs-var">LowDefinition</span></a></span><span> </span><span class="annot"><span class="annottext">Set VariableName
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679255781"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255781"><span class="hs-identifier hs-var">f</span></a></span></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Bool
+</span><a href="SAD.Core.ProofTask.html#mapDcl"><span class="hs-identifier hs-var">mapDcl</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255781"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#mapTask"><span class="hs-identifier hs-var">mapTask</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255781"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Bool
+</span><a href="SAD.Core.ProofTask.html#classDcl"><span class="hs-identifier hs-var">classDcl</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255781"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#classTask"><span class="hs-identifier hs-var">classTask</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255781"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-30"></span><span class="annot"><a href="SAD.Core.ProofTask.html#generateProofTask"><span class="hs-identifier hs-var">generateProofTask</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Set VariableName
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679255786"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255786"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255786"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-comment">-- Check whether a formula is a map definition</span><span>
+</span><span id="line-33"></span><span class="annot"><a href="SAD.Core.ProofTask.html#mapDcl"><span class="hs-identifier hs-type">mapDcl</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-34"></span><span id="mapDcl"><span class="annot"><span class="annottext">mapDcl :: Formula -&gt; Bool
+</span><a href="SAD.Core.ProofTask.html#mapDcl"><span class="hs-identifier hs-var hs-var">mapDcl</span></a></span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span id="local-6989586621679255787"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255787"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; TermId
+</span><a href="SAD.Data.Formula.Base.html#trmId"><span class="hs-identifier hs-var">trmId</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255787"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">TermId -&gt; TermId -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="SAD.Data.Terms.html#MapId"><span class="hs-identifier hs-var">MapId</span></a></span><span>
+</span><span id="line-35"></span><span class="annot"><a href="SAD.Core.ProofTask.html#mapDcl"><span class="hs-identifier hs-var">mapDcl</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- Check whether a formula is a class definition</span><span>
+</span><span id="line-38"></span><span class="annot"><a href="SAD.Core.ProofTask.html#classDcl"><span class="hs-identifier hs-type">classDcl</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-39"></span><span id="classDcl"><span class="annot"><span class="annottext">classDcl :: Formula -&gt; Bool
+</span><a href="SAD.Core.ProofTask.html#classDcl"><span class="hs-identifier hs-var hs-var">classDcl</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">trId :: Formula -&gt; TermId
+</span><a href="SAD.Data.Formula.Base.html#trId"><span class="hs-identifier hs-var">trId</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679255793"><span class="annot"><span class="annottext">TermId
+</span><a href="#local-6989586621679255793"><span class="hs-identifier hs-var">id</span></a></span></span><span class="hs-special">}</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="#local-6989586621679255793"><span class="hs-identifier hs-var">id</span></a></span><span> </span><span class="annot"><span class="annottext">TermId -&gt; TermId -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="SAD.Data.Terms.html#SetId"><span class="hs-identifier hs-var">SetId</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="#local-6989586621679255793"><span class="hs-identifier hs-var">id</span></a></span><span> </span><span class="annot"><span class="annottext">TermId -&gt; TermId -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="SAD.Data.Terms.html#ClassId"><span class="hs-identifier hs-var">ClassId</span></a></span><span>
+</span><span id="line-40"></span><span class="annot"><a href="SAD.Core.ProofTask.html#classDcl"><span class="hs-identifier hs-var">classDcl</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679255797"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255797"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Bool
+</span><a href="SAD.Core.ProofTask.html#classDcl"><span class="hs-identifier hs-var">classDcl</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255797"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-41"></span><span class="annot"><a href="SAD.Core.ProofTask.html#classDcl"><span class="hs-identifier hs-var">classDcl</span></a></span><span> </span><span id="local-6989586621679255798"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255798"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Bool
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Bool) -&gt; [Char] -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;SAD.Core.ProofTask.classDcl: misformed definition: &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; [Char] -&gt; [Char]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255798"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span>
+</span><span id="line-44"></span><span class="annot"><span class="hs-comment">-- ** Proof tasks for classes</span></span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span class="annot"><a href="SAD.Core.ProofTask.html#classTask"><span class="hs-identifier hs-type">classTask</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-47"></span><span class="hs-comment">-- {x_1, ..., x_n}</span><span>
+</span><span id="line-48"></span><span id="classTask"><span class="annot"><span class="annottext">classTask :: Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#classTask"><span class="hs-identifier hs-var hs-var">classTask</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#All"><span class="hs-identifier hs-type">All</span></a></span><span> </span><span id="local-6989586621679255802"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679255802"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Iff"><span class="hs-operator hs-type">`Iff`</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">trId :: Formula -&gt; TermId
+</span><a href="SAD.Data.Formula.Base.html#trId"><span class="hs-identifier hs-var">trId</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="SAD.Data.Terms.html#ObjectId"><span class="hs-identifier hs-var">ObjectId</span></a></span><span class="hs-special">}</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Data.Formula.Base.html#Top"><span class="hs-identifier hs-var">Top</span></a></span><span>
+</span><span id="line-49"></span><span class="hs-comment">-- {t(x_1, ..., x_n) | ...}</span><span>
+</span><span id="line-50"></span><span class="annot"><a href="SAD.Core.ProofTask.html#classTask"><span class="hs-identifier hs-var">classTask</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#All"><span class="hs-identifier hs-type">All</span></a></span><span> </span><span id="local-6989586621679255806"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679255806"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Iff"><span class="hs-operator hs-type">`Iff`</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#Replacement"><span class="hs-identifier hs-var">Replacement</span></a></span><span> </span><span id="local-6989586621679255809"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255809"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Data.Formula.Base.html#Top"><span class="hs-identifier hs-var">Top</span></a></span><span>
+</span><span id="line-51"></span><span class="hs-comment">-- {t(x_1,...,x_n) in X | ...}</span><span>
+</span><span id="line-52"></span><span class="annot"><a href="SAD.Core.ProofTask.html#classTask"><span class="hs-identifier hs-var">classTask</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#All"><span class="hs-identifier hs-type">All</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Iff"><span class="hs-operator hs-type">`Iff`</span></a></span><span> </span><span id="local-6989586621679255810"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255810"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Data.Formula.Base.html#Top"><span class="hs-identifier hs-var">Top</span></a></span><span>
+</span><span id="line-53"></span><span class="hs-comment">-- Anything else</span><span>
+</span><span id="line-54"></span><span class="annot"><a href="SAD.Core.ProofTask.html#classTask"><span class="hs-identifier hs-var">classTask</span></a></span><span> </span><span id="local-6989586621679255811"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255811"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Formula
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Formula) -&gt; [Char] -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;SAD.Core.ProofTask.classTask: misformed definition: &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; [Char] -&gt; [Char]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255811"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span class="annot"><span class="hs-comment">-- ** Proof tasks for maps</span></span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="hs-comment">-- Takes a statement of the form</span><span>
+</span><span id="line-60"></span><span class="hs-comment">-- @(aMap(F) and (Domain :: ...)) and ...@</span><span>
+</span><span id="line-61"></span><span class="annot"><a href="SAD.Core.ProofTask.html#mapTask"><span class="hs-identifier hs-type">mapTask</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-62"></span><span id="mapTask"><span class="annot"><span class="annottext">mapTask :: Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#mapTask"><span class="hs-identifier hs-var hs-var">mapTask</span></a></span></span><span> </span><span id="local-6989586621679255812"><span class="annot"><span class="annottext">h :: Formula
+</span><a href="#local-6989586621679255812"><span class="hs-identifier hs-var">h</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span id="local-6989586621679255813"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255813"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span id="local-6989586621679255814"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255814"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-63"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679255815"><span class="annot"><span class="annottext">c :: Formula -&gt; Formula
+</span><a href="#local-6989586621679255815"><span class="hs-identifier hs-var hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#domainCondition"><span class="hs-identifier hs-var">domainCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255813"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-keyword">in</span><span>  </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#domainTask"><span class="hs-identifier hs-var">domainTask</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255813"><span class="hs-identifier hs-var">g</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#blAnd"><span class="hs-operator hs-var">`blAnd`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255815"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#choiceTask"><span class="hs-identifier hs-var">choiceTask</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255814"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#blAnd"><span class="hs-operator hs-var">`blAnd`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#existenceTask"><span class="hs-identifier hs-var">existenceTask</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255814"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#blAnd"><span class="hs-operator hs-var">`blAnd`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#uniquenessTask"><span class="hs-identifier hs-var">uniquenessTask</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255814"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-65"></span><span class="annot"><a href="SAD.Core.ProofTask.html#mapTask"><span class="hs-identifier hs-var">mapTask</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Formula
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;SAD.Core.ProofTask.mapTask: misformed definition&quot;</span></span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span class="hs-comment">-- Takes a statement of one of the following forms:</span><span>
+</span><span id="line-68"></span><span class="hs-comment">--</span><span>
+</span><span id="line-69"></span><span class="hs-comment">--  1. @Domain :: forall v0 (aElementOf(v0,Dom(F)) iff f@</span><span>
+</span><span id="line-70"></span><span class="hs-comment">--     if the domain of @F@ is defined via a comprehension term @{x | f}@</span><span>
+</span><span id="line-71"></span><span class="hs-comment">--</span><span>
+</span><span id="line-72"></span><span class="hs-comment">--  2. @Domain :: Dom(F) = t@</span><span>
+</span><span id="line-73"></span><span class="hs-comment">--     when the domain of @F@ is defined via a term @t@</span><span>
+</span><span id="line-74"></span><span class="annot"><a href="SAD.Core.ProofTask.html#domainTask"><span class="hs-identifier hs-type">domainTask</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-75"></span><span id="domainTask"><span class="annot"><span class="annottext">domainTask :: Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#domainTask"><span class="hs-identifier hs-var hs-var">domainTask</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#Domain"><span class="hs-identifier hs-var">Domain</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#All"><span class="hs-identifier hs-type">All</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Iff"><span class="hs-operator hs-type">`Iff`</span></a></span><span> </span><span id="local-6989586621679255823"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255823"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tag -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-var">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#DomainTask"><span class="hs-identifier hs-var">DomainTask</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#separation"><span class="hs-identifier hs-var">separation</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255823"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-76"></span><span class="annot"><a href="SAD.Core.ProofTask.html#domainTask"><span class="hs-identifier hs-var">domainTask</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#Domain"><span class="hs-identifier hs-var">Domain</span></a></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">trmName :: Formula -&gt; TermName
+</span><a href="SAD.Data.Formula.Base.html#trmName"><span class="hs-identifier hs-var">trmName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermEquality"><span class="hs-identifier hs-var">TermEquality</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">trmArgs :: Formula -&gt; [Formula]
+</span><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span id="local-6989586621679255829"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255829"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">]</span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tag -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-var">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#DomainTask"><span class="hs-identifier hs-var">DomainTask</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkClass"><span class="hs-identifier hs-var">mkClass</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255829"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-77"></span><span class="annot"><a href="SAD.Core.ProofTask.html#domainTask"><span class="hs-identifier hs-var">domainTask</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Formula
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;SAD.Core.ProofTask.domainTask: misformed definition&quot;</span></span><span>
+</span><span id="line-78"></span><span>
+</span><span id="line-79"></span><span class="annot"><a href="SAD.Core.ProofTask.html#choiceTask"><span class="hs-identifier hs-type">choiceTask</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-80"></span><span id="choiceTask"><span class="annot"><span class="annottext">choiceTask :: Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#choiceTask"><span class="hs-identifier hs-var hs-var">choiceTask</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tag -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-var">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#ChoiceTask"><span class="hs-identifier hs-var">ChoiceTask</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; (Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255833"><span class="hs-identifier hs-var">dive</span></a></span><span>
+</span><span id="line-81"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-82"></span><span>    </span><span id="local-6989586621679255833"><span class="annot"><span class="annottext">dive :: Formula -&gt; Formula
+</span><a href="#local-6989586621679255833"><span class="hs-identifier hs-var hs-var">dive</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#Evaluation"><span class="hs-identifier hs-var">Evaluation</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Data.Formula.Base.html#Top"><span class="hs-identifier hs-var">Top</span></a></span><span>
+</span><span id="line-83"></span><span>    </span><span class="annot"><a href="#local-6989586621679255833"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679255839"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255839"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255833"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255839"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-84"></span><span>    </span><span class="annot"><a href="#local-6989586621679255833"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Exi"><span class="hs-identifier hs-type">Exi</span></a></span><span> </span><span id="local-6989586621679255841"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679255841"><span class="hs-identifier hs-var">dcl</span></a></span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#Defined"><span class="hs-identifier hs-var">Defined</span></a></span><span> </span><span id="local-6989586621679255843"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255843"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span id="local-6989586621679255844"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255844"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679255845"><span class="annot"><span class="annottext">x :: VariableName
+</span><a href="#local-6989586621679255845"><span class="hs-identifier hs-var hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Decl -&gt; VariableName
+</span><a href="SAD.Data.Text.Decl.html#declName"><span class="hs-identifier hs-var">declName</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679255841"><span class="hs-identifier hs-var">dcl</span></a></span><span> </span><span class="hs-keyword">in</span><span>
+</span><span id="line-85"></span><span>      </span><span class="annot"><span class="annottext">Section -&gt; Set VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#generateProofTask"><span class="hs-identifier hs-var">generateProofTask</span></a></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#LowDefinition"><span class="hs-identifier hs-var">LowDefinition</span></a></span><span> </span><span class="annot"><span class="annottext">Set VariableName
+forall a. Monoid a =&gt; a
+</span><span class="hs-identifier hs-var">mempty</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Prove.Normalize.html#dec"><span class="hs-identifier hs-var">dec</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#inst"><span class="hs-identifier hs-var">inst</span></a></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679255845"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255843"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#blAnd"><span class="hs-operator hs-var">`blAnd`</span></a></span><span>
+</span><span id="line-86"></span><span>      </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Prove.Normalize.html#dec"><span class="hs-identifier hs-var">dec</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#inst"><span class="hs-identifier hs-var">inst</span></a></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679255845"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255843"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#blImp"><span class="hs-operator hs-var">`blImp`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255833"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255844"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-87"></span><span>    </span><span class="annot"><a href="#local-6989586621679255833"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#All"><span class="hs-identifier hs-type">All</span></a></span><span> </span><span id="local-6989586621679255850"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679255850"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679255851"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255851"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#bool"><span class="hs-identifier hs-var">bool</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Decl -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#All"><span class="hs-identifier hs-var">All</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679255850"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255833"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255851"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-88"></span><span>    </span><span class="annot"><a href="#local-6989586621679255833"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679255853"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255853"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Imp"><span class="hs-operator hs-type">`Imp`</span></a></span><span> </span><span id="local-6989586621679255855"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255855"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255853"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#blImp"><span class="hs-operator hs-var">`blImp`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255833"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255855"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-89"></span><span>    </span><span class="annot"><a href="#local-6989586621679255833"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Exi"><span class="hs-identifier hs-type">Exi</span></a></span><span> </span><span id="local-6989586621679255856"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679255856"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679255857"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255857"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#bool"><span class="hs-identifier hs-var">bool</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Decl -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Exi"><span class="hs-identifier hs-var">Exi</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679255856"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255833"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255857"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-90"></span><span>    </span><span class="annot"><a href="#local-6989586621679255833"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679255858"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255858"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span id="local-6989586621679255859"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255859"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255833"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255858"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#blAnd"><span class="hs-operator hs-var">`blAnd`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255833"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255859"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-91"></span><span>    </span><span class="annot"><a href="#local-6989586621679255833"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span id="local-6989586621679255860"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255860"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255860"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span class="annot"><a href="SAD.Core.ProofTask.html#existenceTask"><span class="hs-identifier hs-type">existenceTask</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-94"></span><span id="existenceTask"><span class="annot"><span class="annottext">existenceTask :: Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#existenceTask"><span class="hs-identifier hs-var hs-var">existenceTask</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tag -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-var">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#ExistenceTask"><span class="hs-identifier hs-var">ExistenceTask</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; (Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679255862"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-95"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-96"></span><span>    </span><span class="annot"><a href="#local-6989586621679255862"><span class="hs-identifier hs-type">dive</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-97"></span><span>    </span><span id="local-6989586621679255862"><span class="annot"><span class="annottext">dive :: Int -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679255862"><span class="hs-identifier hs-var hs-var">dive</span></a></span></span><span> </span><span id="local-6989586621679255863"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679255863"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#All"><span class="hs-identifier hs-type">All</span></a></span><span> </span><span id="local-6989586621679255864"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679255864"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679255865"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255865"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679255868"><span class="annot"><span class="annottext">nn :: VariableName
+</span><a href="#local-6989586621679255868"><span class="hs-identifier hs-var hs-var">nn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; VariableName
+</span><a href="SAD.Data.VarName.html#VarTask"><span class="hs-identifier hs-var">VarTask</span></a></span><span> </span><span class="annot"><span class="annottext">(VariableName -&gt; VariableName) -&gt; VariableName -&gt; VariableName
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; VariableName
+</span><a href="SAD.Data.VarName.html#VarDefault"><span class="hs-identifier hs-var">VarDefault</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; VariableName) -&gt; Text -&gt; VariableName
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Text
+</span><span class="hs-identifier hs-var">Text.pack</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Text) -&gt; [Char] -&gt; Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679255863"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="hs-keyword">in</span><span>
+</span><span id="line-98"></span><span>      </span><span class="annot"><span class="annottext">VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkAll"><span class="hs-identifier hs-var">mkAll</span></a></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679255868"><span class="hs-identifier hs-var">nn</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679255862"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679255863"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#inst"><span class="hs-identifier hs-var">inst</span></a></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679255868"><span class="hs-identifier hs-var">nn</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255865"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-99"></span><span>    </span><span class="annot"><a href="#local-6989586621679255862"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span id="local-6989586621679255874"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679255874"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679255875"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255875"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Imp"><span class="hs-operator hs-type">`Imp`</span></a></span><span> </span><span id="local-6989586621679255876"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255876"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255875"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#blImp"><span class="hs-operator hs-var">`blImp`</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679255862"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679255874"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255876"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-100"></span><span>    </span><span class="annot"><a href="#local-6989586621679255862"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679255877"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255877"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679255879"><span class="annot"><span class="annottext">y :: Formula
+</span><a href="#local-6989586621679255879"><span class="hs-identifier hs-var hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkVar"><span class="hs-identifier hs-var">mkVar</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; VariableName
+</span><a href="SAD.Data.VarName.html#VarDefault"><span class="hs-identifier hs-var">VarDefault</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;y&quot;</span></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">in</span><span>
+</span><span id="line-101"></span><span>      </span><span class="annot"><span class="annottext">VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkExi"><span class="hs-identifier hs-var">mkExi</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; VariableName
+</span><a href="SAD.Data.VarName.html#VarDefault"><span class="hs-identifier hs-var">VarDefault</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;y&quot;</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkObject"><span class="hs-identifier hs-var">mkObject</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255879"><span class="hs-identifier hs-var">y</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-var">`And`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#devReplace"><span class="hs-identifier hs-var">devReplace</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255879"><span class="hs-identifier hs-var">y</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#describe_exi"><span class="hs-identifier hs-var">describe_exi</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255877"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span class="annot"><a href="SAD.Core.ProofTask.html#uniquenessTask"><span class="hs-identifier hs-type">uniquenessTask</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-104"></span><span id="uniquenessTask"><span class="annot"><span class="annottext">uniquenessTask :: Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#uniquenessTask"><span class="hs-identifier hs-var hs-var">uniquenessTask</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Tag -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-var">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#UniquenessTask"><span class="hs-identifier hs-var">UniquenessTask</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; (Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255886"><span class="hs-identifier hs-var">dive</span></a></span><span>
+</span><span id="line-105"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-106"></span><span>    </span><span id="local-6989586621679255886"><span class="annot"><span class="annottext">dive :: Formula -&gt; Formula
+</span><a href="#local-6989586621679255886"><span class="hs-identifier hs-var hs-var">dive</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#All"><span class="hs-identifier hs-type">All</span></a></span><span> </span><span id="local-6989586621679255889"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679255889"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679255890"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255890"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Decl -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#All"><span class="hs-identifier hs-var">All</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679255889"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255886"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255890"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-107"></span><span>    </span><span class="annot"><a href="#local-6989586621679255886"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679255891"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255891"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Imp"><span class="hs-operator hs-type">`Imp`</span></a></span><span> </span><span id="local-6989586621679255892"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255892"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255891"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#blImp"><span class="hs-operator hs-var">`blImp`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255886"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255892"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-108"></span><span>    </span><span class="annot"><a href="#local-6989586621679255886"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span id="local-6989586621679255893"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255893"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-109"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679255895"><span class="annot"><span class="annottext">y :: Formula
+</span><a href="#local-6989586621679255895"><span class="hs-identifier hs-var hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkVar"><span class="hs-identifier hs-var">mkVar</span></a></span><span> </span><span class="annot"><span class="annottext">(VariableName -&gt; Formula) -&gt; VariableName -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; VariableName
+</span><a href="SAD.Data.VarName.html#VarDefault"><span class="hs-identifier hs-var">VarDefault</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;y&quot;</span></span><span>
+</span><span id="line-110"></span><span>          </span><span id="local-6989586621679255897"><span class="annot"><span class="annottext">cy :: Formula
+</span><a href="#local-6989586621679255897"><span class="hs-identifier hs-var hs-var">cy</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkVar"><span class="hs-identifier hs-var">mkVar</span></a></span><span> </span><span class="annot"><span class="annottext">(VariableName -&gt; Formula) -&gt; VariableName -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; VariableName
+</span><a href="SAD.Data.VarName.html#VarTask"><span class="hs-identifier hs-var">VarTask</span></a></span><span> </span><span class="annot"><span class="annottext">(VariableName -&gt; VariableName) -&gt; VariableName -&gt; VariableName
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; VariableName
+</span><a href="SAD.Data.VarName.html#VarDefault"><span class="hs-identifier hs-var">VarDefault</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;y&quot;</span></span><span>
+</span><span id="line-111"></span><span>          </span><span id="local-6989586621679255898"><span class="annot"><span class="annottext">df :: Formula
+</span><a href="#local-6989586621679255898"><span class="hs-identifier hs-var hs-var">df</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#describe"><span class="hs-identifier hs-var">describe</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255893"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-112"></span><span>          </span><span id="local-6989586621679255900"><span class="annot"><span class="annottext">yf :: Formula
+</span><a href="#local-6989586621679255900"><span class="hs-identifier hs-var hs-var">yf</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#devReplace"><span class="hs-identifier hs-var">devReplace</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255895"><span class="hs-identifier hs-var">y</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255898"><span class="hs-identifier hs-var">df</span></a></span><span>
+</span><span id="line-113"></span><span>          </span><span id="local-6989586621679255901"><span class="annot"><span class="annottext">cyf :: Formula
+</span><a href="#local-6989586621679255901"><span class="hs-identifier hs-var hs-var">cyf</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#devReplace"><span class="hs-identifier hs-var">devReplace</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255897"><span class="hs-identifier hs-var">cy</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255898"><span class="hs-identifier hs-var">df</span></a></span><span>
+</span><span id="line-114"></span><span>      </span><span class="hs-keyword">in</span><span>  </span><span class="annot"><span class="annottext">VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkAll"><span class="hs-identifier hs-var">mkAll</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; VariableName
+</span><a href="SAD.Data.VarName.html#VarDefault"><span class="hs-identifier hs-var">VarDefault</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;y&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkAll"><span class="hs-identifier hs-var">mkAll</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">VariableName -&gt; VariableName
+</span><a href="SAD.Data.VarName.html#VarTask"><span class="hs-identifier hs-var">VarTask</span></a></span><span> </span><span class="annot"><span class="annottext">(VariableName -&gt; VariableName) -&gt; VariableName -&gt; VariableName
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; VariableName
+</span><a href="SAD.Data.VarName.html#VarDefault"><span class="hs-identifier hs-var">VarDefault</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;y&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-115"></span><span>        </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Prove.Normalize.html#inc"><span class="hs-identifier hs-var">inc</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Prove.Normalize.html#inc"><span class="hs-identifier hs-var">inc</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255900"><span class="hs-identifier hs-var">yf</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-var">`And`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255901"><span class="hs-identifier hs-var">cyf</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Imp"><span class="hs-operator hs-var">`Imp`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkEquality"><span class="hs-identifier hs-var">mkEquality</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255895"><span class="hs-identifier hs-var">y</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255897"><span class="hs-identifier hs-var">cy</span></a></span><span>
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span>
+</span><span id="line-118"></span><span class="annot"><span class="hs-comment">-- * Misc</span></span><span>
+</span><span id="line-119"></span><span>
+</span><span id="line-120"></span><span class="annot"><a href="SAD.Core.ProofTask.html#separation"><span class="hs-identifier hs-type">separation</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-121"></span><span id="separation"><span class="annot"><span class="annottext">separation :: Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#separation"><span class="hs-identifier hs-var hs-var">separation</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679255904"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255904"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span id="local-6989586621679255905"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255905"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#separation"><span class="hs-identifier hs-var">separation</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255904"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-122"></span><span class="annot"><a href="SAD.Core.ProofTask.html#separation"><span class="hs-identifier hs-var">separation</span></a></span><span> </span><span id="local-6989586621679255906"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255906"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Bool
+</span><a href="SAD.Data.Formula.Kit.html#isElem"><span class="hs-identifier hs-var">isElem</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255906"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Prove.Normalize.html#dec"><span class="hs-identifier hs-var">dec</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkClass"><span class="hs-identifier hs-var">mkClass</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Formula] -&gt; Formula
+forall a. HasCallStack =&gt; [a] -&gt; a
+</span><span class="hs-identifier hs-var">last</span></span><span> </span><span class="annot"><span class="annottext">([Formula] -&gt; Formula) -&gt; [Formula] -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Formula]
+</span><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255906"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-123"></span><span class="annot"><a href="SAD.Core.ProofTask.html#separation"><span class="hs-identifier hs-var">separation</span></a></span><span> </span><span id="local-6989586621679255909"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255909"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Formula
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Formula) -&gt; [Char] -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;SAD.Core.ProofTask.separation: misformed argument: &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; [Char] -&gt; [Char]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255909"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-124"></span><span>
+</span><span id="line-125"></span><span class="hs-comment">-- output a description of a map in the form</span><span>
+</span><span id="line-126"></span><span class="hs-comment">-- @(condition_1 /\ evaluation_1) \/ ... \/ (condition_n /\ evaluation_n)@</span><span>
+</span><span id="line-127"></span><span class="hs-comment">-- choices are expressed by choice operator rather than throuth an existentially</span><span>
+</span><span id="line-128"></span><span class="hs-comment">-- quantified formula</span><span>
+</span><span id="line-129"></span><span class="annot"><a href="SAD.Core.ProofTask.html#describe"><span class="hs-identifier hs-type">describe</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-130"></span><span id="describe"><span class="annot"><span class="annottext">describe :: Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#describe"><span class="hs-identifier hs-var hs-var">describe</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679255910"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255910"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span id="local-6989586621679255911"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255911"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#describe"><span class="hs-identifier hs-var">describe</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255910"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Or"><span class="hs-operator hs-var">`Or`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#describe"><span class="hs-identifier hs-var">describe</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255911"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-131"></span><span class="annot"><a href="SAD.Core.ProofTask.html#describe"><span class="hs-identifier hs-var">describe</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#Condition"><span class="hs-identifier hs-var">Condition</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679255914"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255914"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Imp"><span class="hs-operator hs-type">`Imp`</span></a></span><span> </span><span id="local-6989586621679255915"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255915"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255914"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-var">`And`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#deExi"><span class="hs-identifier hs-var">deExi</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255915"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-132"></span><span class="annot"><a href="SAD.Core.ProofTask.html#describe"><span class="hs-identifier hs-var">describe</span></a></span><span> </span><span id="local-6989586621679255917"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255917"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#deExi"><span class="hs-identifier hs-var">deExi</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255917"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-133"></span><span>
+</span><span id="line-134"></span><span class="annot"><a href="SAD.Core.ProofTask.html#deExi"><span class="hs-identifier hs-type">deExi</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-135"></span><span id="deExi"><span class="annot"><span class="annottext">deExi :: Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#deExi"><span class="hs-identifier hs-var hs-var">deExi</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Exi"><span class="hs-identifier hs-type">Exi</span></a></span><span> </span><span id="local-6989586621679255918"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679255918"><span class="hs-identifier hs-var">dcl</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679255919"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255919"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span id="local-6989586621679255920"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255920"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679255921"><span class="annot"><span class="annottext">x :: VariableName
+</span><a href="#local-6989586621679255921"><span class="hs-identifier hs-var hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Decl -&gt; VariableName
+</span><a href="SAD.Data.Text.Decl.html#declName"><span class="hs-identifier hs-var">declName</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679255918"><span class="hs-identifier hs-var">dcl</span></a></span><span> </span><span class="hs-keyword">in</span><span>
+</span><span id="line-136"></span><span>  </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Prove.Normalize.html#dec"><span class="hs-identifier hs-var">dec</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#inst"><span class="hs-identifier hs-var">inst</span></a></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679255921"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255919"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-var">`And`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#deExi"><span class="hs-identifier hs-var">deExi</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#inst"><span class="hs-identifier hs-var">inst</span></a></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679255921"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255920"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-137"></span><span class="annot"><a href="SAD.Core.ProofTask.html#deExi"><span class="hs-identifier hs-var">deExi</span></a></span><span> </span><span id="local-6989586621679255922"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255922"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255922"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-138"></span><span>
+</span><span id="line-139"></span><span class="hs-comment">-- Like 'describe' above, but choices are assumed instead of stated</span><span>
+</span><span id="line-140"></span><span class="annot"><a href="SAD.Core.ProofTask.html#describe_exi"><span class="hs-identifier hs-type">describe_exi</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-141"></span><span id="describe_exi"><span class="annot"><span class="annottext">describe_exi :: Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#describe_exi"><span class="hs-identifier hs-var hs-var">describe_exi</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679255923"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255923"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span id="local-6989586621679255924"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255924"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#describe_exi"><span class="hs-identifier hs-var">describe_exi</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255923"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Or"><span class="hs-operator hs-var">`Or`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#describe_exi"><span class="hs-identifier hs-var">describe_exi</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255924"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-142"></span><span class="annot"><a href="SAD.Core.ProofTask.html#describe_exi"><span class="hs-identifier hs-var">describe_exi</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#Condition"><span class="hs-identifier hs-var">Condition</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679255925"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255925"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Imp"><span class="hs-operator hs-type">`Imp`</span></a></span><span> </span><span id="local-6989586621679255926"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255926"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255925"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Imp"><span class="hs-operator hs-var">`Imp`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#impExi"><span class="hs-identifier hs-var">impExi</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255926"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-143"></span><span class="annot"><a href="SAD.Core.ProofTask.html#describe_exi"><span class="hs-identifier hs-var">describe_exi</span></a></span><span> </span><span id="local-6989586621679255928"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255928"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#impExi"><span class="hs-identifier hs-var">impExi</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255928"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-144"></span><span>
+</span><span id="line-145"></span><span class="annot"><a href="SAD.Core.ProofTask.html#impExi"><span class="hs-identifier hs-type">impExi</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-146"></span><span id="impExi"><span class="annot"><span class="annottext">impExi :: Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#impExi"><span class="hs-identifier hs-var hs-var">impExi</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Exi"><span class="hs-identifier hs-type">Exi</span></a></span><span> </span><span id="local-6989586621679255929"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679255929"><span class="hs-identifier hs-var">dcl</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679255930"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255930"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-operator hs-type">`And`</span></a></span><span> </span><span id="local-6989586621679255931"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255931"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679255932"><span class="annot"><span class="annottext">x :: VariableName
+</span><a href="#local-6989586621679255932"><span class="hs-identifier hs-var hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Decl -&gt; VariableName
+</span><a href="SAD.Data.Text.Decl.html#declName"><span class="hs-identifier hs-var">declName</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679255929"><span class="hs-identifier hs-var">dcl</span></a></span><span> </span><span class="hs-keyword">in</span><span>
+</span><span id="line-147"></span><span>  </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Prove.Normalize.html#dec"><span class="hs-identifier hs-var">dec</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#inst"><span class="hs-identifier hs-var">inst</span></a></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679255932"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255930"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Imp"><span class="hs-operator hs-var">`Imp`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#impExi"><span class="hs-identifier hs-var">impExi</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#inst"><span class="hs-identifier hs-var">inst</span></a></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679255932"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255931"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-148"></span><span class="annot"><a href="SAD.Core.ProofTask.html#impExi"><span class="hs-identifier hs-var">impExi</span></a></span><span> </span><span id="local-6989586621679255933"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255933"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255933"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-149"></span><span>
+</span><span id="line-150"></span><span class="hs-comment">-- A certain normalization of the term marked with Evaluation</span><span>
+</span><span id="line-151"></span><span class="annot"><a href="SAD.Core.ProofTask.html#devReplace"><span class="hs-identifier hs-type">devReplace</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-152"></span><span id="devReplace"><span class="annot"><span class="annottext">devReplace :: Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#devReplace"><span class="hs-identifier hs-var hs-var">devReplace</span></a></span></span><span> </span><span id="local-6989586621679255934"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255934"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#Evaluation"><span class="hs-identifier hs-var">Evaluation</span></a></span><span> </span><span id="local-6989586621679255935"><span class="annot"><span class="annottext">eq :: Formula
+</span><a href="#local-6989586621679255935"><span class="hs-identifier hs-var">eq</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">trmName :: Formula -&gt; TermName
+</span><a href="SAD.Data.Formula.Base.html#trmName"><span class="hs-identifier hs-var">trmName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermEquality"><span class="hs-identifier hs-var">TermEquality</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">trmArgs :: Formula -&gt; [Formula]
+</span><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679255936"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255936"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">]</span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-153"></span><span>  </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255935"><span class="hs-identifier hs-var">eq</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679255934"><span class="hs-identifier hs-type">y</span></a></span><span class="hs-special">,</span><span class="annot"><a href="#local-6989586621679255936"><span class="hs-identifier hs-type">t</span></a></span><span class="hs-special">]</span><span class="hs-special">}</span><span>
+</span><span id="line-154"></span><span class="annot"><a href="SAD.Core.ProofTask.html#devReplace"><span class="hs-identifier hs-var">devReplace</span></a></span><span> </span><span id="local-6989586621679255937"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255937"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span id="local-6989586621679255938"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255938"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#mapF"><span class="hs-identifier hs-var">mapF</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#devReplace"><span class="hs-identifier hs-var">devReplace</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255937"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255938"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-155"></span><span>
+</span><span id="line-156"></span><span class="hs-comment">-- Compute domain conditions of maps</span><span>
+</span><span id="line-157"></span><span class="annot"><a href="SAD.Core.ProofTask.html#domainCondition"><span class="hs-identifier hs-type">domainCondition</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-158"></span><span id="domainCondition"><span class="annot"><span class="annottext">domainCondition :: Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Core.ProofTask.html#domainCondition"><span class="hs-identifier hs-var hs-var">domainCondition</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#All"><span class="hs-identifier hs-type">All</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">trmArgs :: Formula -&gt; [Formula]
+</span><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span id="local-6989586621679255940"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255940"><span class="hs-identifier hs-var">dm</span></a></span></span><span class="hs-special">]</span><span class="hs-special">}</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Iff"><span class="hs-operator hs-type">`Iff`</span></a></span><span> </span><span id="local-6989586621679255941"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255941"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255942"><span class="hs-identifier hs-var">dive</span></a></span><span>
+</span><span id="line-159"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-160"></span><span>    </span><span id="local-6989586621679255942"><span class="annot"><span class="annottext">dive :: Formula -&gt; Formula
+</span><a href="#local-6989586621679255942"><span class="hs-identifier hs-var hs-var">dive</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">trId :: Formula -&gt; TermId
+</span><a href="SAD.Data.Formula.Base.html#trId"><span class="hs-identifier hs-var">trId</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679255944"><span class="annot"><span class="annottext">TermId
+</span><a href="#local-6989586621679255944"><span class="hs-identifier hs-var">tId</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">trmArgs :: Formula -&gt; [Formula]
+</span><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span id="local-6989586621679255945"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255945"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679255946"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255946"><span class="hs-identifier hs-var">d</span></a></span></span><span class="hs-special">]</span><span class="hs-special">}</span><span>
+</span><span id="line-161"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="#local-6989586621679255944"><span class="hs-identifier hs-var">tId</span></a></span><span> </span><span class="annot"><span class="annottext">TermId -&gt; TermId -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="SAD.Data.Terms.html#ElementId"><span class="hs-identifier hs-var">ElementId</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Bool
+</span><a href="SAD.Data.Formula.Base.html#twins"><span class="hs-identifier hs-var">twins</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255946"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255940"><span class="hs-identifier hs-var">dm</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#subst"><span class="hs-identifier hs-var">subst</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255945"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="SAD.Data.VarName.html#VarEmpty"><span class="hs-identifier hs-var">VarEmpty</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#inst"><span class="hs-identifier hs-var">inst</span></a></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="SAD.Data.VarName.html#VarEmpty"><span class="hs-identifier hs-var">VarEmpty</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255941"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-162"></span><span>    </span><span class="annot"><a href="#local-6989586621679255942"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span id="local-6989586621679255952"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255952"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#mapF"><span class="hs-identifier hs-var">mapF</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255942"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255952"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-163"></span><span class="annot"><a href="SAD.Core.ProofTask.html#domainCondition"><span class="hs-identifier hs-var">domainCondition</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">trmName :: Formula -&gt; TermName
+</span><a href="SAD.Data.Formula.Base.html#trmName"><span class="hs-identifier hs-var">trmName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermEquality"><span class="hs-identifier hs-var">TermEquality</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">trmArgs :: Formula -&gt; [Formula]
+</span><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span id="local-6989586621679255953"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255953"><span class="hs-identifier hs-var">dm</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679255954"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255954"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">]</span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255955"><span class="hs-identifier hs-var">dive</span></a></span><span>
+</span><span id="line-164"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-165"></span><span>    </span><span id="local-6989586621679255955"><span class="annot"><span class="annottext">dive :: Formula -&gt; Formula
+</span><a href="#local-6989586621679255955"><span class="hs-identifier hs-var hs-var">dive</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">trId :: Formula -&gt; TermId
+</span><a href="SAD.Data.Formula.Base.html#trId"><span class="hs-identifier hs-var">trId</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679255957"><span class="annot"><span class="annottext">TermId
+</span><a href="#local-6989586621679255957"><span class="hs-identifier hs-var">tId</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">trmArgs :: Formula -&gt; [Formula]
+</span><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span id="local-6989586621679255958"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255958"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679255959"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255959"><span class="hs-identifier hs-var">d</span></a></span></span><span class="hs-special">]</span><span class="hs-special">}</span><span>
+</span><span id="line-166"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="#local-6989586621679255957"><span class="hs-identifier hs-var">tId</span></a></span><span> </span><span class="annot"><span class="annottext">TermId -&gt; TermId -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="SAD.Data.Terms.html#ElementId"><span class="hs-identifier hs-var">ElementId</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Bool
+</span><a href="SAD.Data.Formula.Base.html#twins"><span class="hs-identifier hs-var">twins</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255959"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255953"><span class="hs-identifier hs-var">dm</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkElem"><span class="hs-identifier hs-var">mkElem</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255958"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255954"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-167"></span><span>    </span><span class="annot"><a href="#local-6989586621679255955"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span id="local-6989586621679255961"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255961"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#mapF"><span class="hs-identifier hs-var">mapF</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679255955"><span class="hs-identifier hs-var">dive</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679255961"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-168"></span><span class="annot"><a href="SAD.Core.ProofTask.html#domainCondition"><span class="hs-identifier hs-var">domainCondition</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-169"></span><span>  </span><span class="annot"><span class="annottext">[Char] -&gt; Formula -&gt; Formula
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;SAD.Core.ProofTask.domainCondition: misformed argument&quot;</span></span><span>
+</span><span id="line-170"></span></pre></body></html>

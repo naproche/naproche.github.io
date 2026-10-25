@@ -1,0 +1,318 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Authors: Makarius Wenzel (2022)</span><span>
+</span><span id="line-3"></span><span class="hs-comment">--</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- Typed parameters, stored via plain bytes.</span><span>
+</span><span id="line-5"></span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Naproche.Param</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-10"></span><span>  </span><span class="annot"><a href="Naproche.Param.html#print_flag"><span class="hs-identifier">print_flag</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Param.html#parse_flag"><span class="hs-identifier">parse_flag</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-11"></span><span>  </span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier">T</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Param.html#name"><span class="hs-identifier">name</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Param.html#unnamed"><span class="hs-identifier">unnamed</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Param.html#description"><span class="hs-identifier">description</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Param.html#description_default"><span class="hs-identifier">description_default</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-12"></span><span>  </span><span class="annot"><a href="Naproche.Param.html#bytes"><span class="hs-identifier">bytes</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Param.html#bool"><span class="hs-identifier">bool</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Param.html#flag"><span class="hs-identifier">flag</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Param.html#nat"><span class="hs-identifier">nat</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Param.html#int"><span class="hs-identifier">int</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Param.html#real"><span class="hs-identifier">real</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-13"></span><span>  </span><span class="annot"><a href="Naproche.Param.html#Env"><span class="hs-identifier">Env</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Param.html#empty"><span class="hs-identifier">empty</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Param.html#parse"><span class="hs-identifier">parse</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Param.html#get"><span class="hs-identifier">get</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Naproche.Param.html#put"><span class="hs-identifier">put</span></a></span><span>
+</span><span id="line-14"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Map</span></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html"><span class="hs-identifier">Isabelle.Bytes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier">Bytes</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Value.html"><span class="hs-identifier">Isabelle.Value</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Value</span></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Library.html"><span class="hs-identifier">Isabelle.Library</span></a></span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-comment">{- flags -}</span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span class="annot"><a href="Naproche.Param.html#print_flag"><span class="hs-identifier hs-type">print_flag</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span>
+</span><span id="line-27"></span><span id="print_flag"><span class="annot"><span class="annottext">print_flag :: Bool -&gt; Bytes
+</span><a href="Naproche.Param.html#print_flag"><span class="hs-identifier hs-var hs-var">print_flag</span></a></span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;on&quot;</span></span><span>
+</span><span id="line-28"></span><span class="annot"><a href="Naproche.Param.html#print_flag"><span class="hs-identifier hs-var">print_flag</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;off&quot;</span></span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="annot"><a href="Naproche.Param.html#parse_flag"><span class="hs-identifier hs-type">parse_flag</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-31"></span><span id="parse_flag"><span class="annot"><span class="annottext">parse_flag :: Bytes -&gt; Maybe Bool
+</span><a href="Naproche.Param.html#parse_flag"><span class="hs-identifier hs-var hs-var">parse_flag</span></a></span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;on&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Maybe Bool
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-32"></span><span class="annot"><a href="Naproche.Param.html#parse_flag"><span class="hs-identifier hs-var">parse_flag</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;off&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Maybe Bool
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-33"></span><span class="annot"><a href="Naproche.Param.html#parse_flag"><span class="hs-identifier hs-var">parse_flag</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;yes&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Maybe Bool
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-34"></span><span class="annot"><a href="Naproche.Param.html#parse_flag"><span class="hs-identifier hs-var">parse_flag</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;no&quot;</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Maybe Bool
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-35"></span><span class="annot"><a href="Naproche.Param.html#parse_flag"><span class="hs-identifier hs-var">parse_flag</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Bool
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="hs-comment">{- typed parameters -}</span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">data</span><span> </span><span id="T"><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-var">T</span></a></span></span><span> </span><span id="local-6989586621679230035"><span class="annot"><a href="#local-6989586621679230035"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Param"><span class="annot"><a href="Naproche.Param.html#Param"><span class="hs-identifier hs-var">Param</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-41"></span><span>  </span><span id="_print"><span class="annot"><span class="annottext">forall a. T a -&gt; a -&gt; Bytes
+</span><a href="Naproche.Param.html#_print"><span class="hs-identifier hs-var hs-var">_print</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679230035"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-42"></span><span>  </span><span id="_parse"><span class="annot"><span class="annottext">forall a. T a -&gt; Bytes -&gt; Maybe a
+</span><a href="Naproche.Param.html#_parse"><span class="hs-identifier hs-var hs-var">_parse</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679230035"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-43"></span><span>  </span><span id="_name"><span class="annot"><span class="annottext">forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#_name"><span class="hs-identifier hs-var hs-var">_name</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-44"></span><span>  </span><span id="_descr"><span class="annot"><span class="annottext">forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#_descr"><span class="hs-identifier hs-var hs-var">_descr</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-45"></span><span>  </span><span id="_default"><span class="annot"><span class="annottext">forall a. T a -&gt; a
+</span><a href="Naproche.Param.html#_default"><span class="hs-identifier hs-var hs-var">_default</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679230035"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span id="local-6989586621679230129"><span class="annot"><a href="Naproche.Param.html#name"><span class="hs-identifier hs-type">name</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679230129"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span></span><span>
+</span><span id="line-48"></span><span id="name"><span class="annot"><span class="annottext">name :: forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#name"><span class="hs-identifier hs-var hs-var">name</span></a></span></span><span> </span><span class="annot"><a href="Naproche.Param.html#Param"><span class="hs-identifier hs-type">Param</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">_name :: forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#_name"><span class="hs-identifier hs-var">_name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679230130"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230130"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230130"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span id="local-6989586621679230043"><span class="annot"><a href="Naproche.Param.html#unnamed"><span class="hs-identifier hs-type">unnamed</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679230043"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679230043"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-51"></span><span id="unnamed"><span class="annot"><span class="annottext">unnamed :: forall a. T a -&gt; T a
+</span><a href="Naproche.Param.html#unnamed"><span class="hs-identifier hs-var hs-var">unnamed</span></a></span></span><span> </span><span id="local-6989586621679230132"><span class="annot"><span class="annottext">T a
+</span><a href="#local-6989586621679230132"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">T a
+</span><a href="#local-6989586621679230132"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><a href="Naproche.Param.html#_name"><span class="hs-identifier hs-var">_name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-string">&quot;&quot;</span></span><span class="hs-special">}</span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span id="local-6989586621679230133"><span class="annot"><a href="Naproche.Param.html#description"><span class="hs-identifier hs-type">description</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679230133"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span></span><span>
+</span><span id="line-54"></span><span id="description"><span class="annot"><span class="annottext">description :: forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#description"><span class="hs-identifier hs-var hs-var">description</span></a></span></span><span> </span><span class="annot"><a href="Naproche.Param.html#Param"><span class="hs-identifier hs-type">Param</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">_descr :: forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#_descr"><span class="hs-identifier hs-var">_descr</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679230134"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230134"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230134"><span class="hs-identifier hs-var">a</span></a></span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span id="local-6989586621679230135"><span class="annot"><a href="Naproche.Param.html#description_default"><span class="hs-identifier hs-type">description_default</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679230135"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span></span><span>
+</span><span id="line-57"></span><span id="description_default"><span class="annot"><span class="annottext">description_default :: forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#description_default"><span class="hs-identifier hs-var hs-var">description_default</span></a></span></span><span> </span><span class="annot"><a href="Naproche.Param.html#Param"><span class="hs-identifier hs-type">Param</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">_descr :: forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#_descr"><span class="hs-identifier hs-var">_descr</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679230142"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230142"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_print :: forall a. T a -&gt; a -&gt; Bytes
+</span><a href="Naproche.Param.html#_print"><span class="hs-identifier hs-var">_print</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679230143"><span class="annot"><span class="annottext">a -&gt; Bytes
+</span><a href="#local-6989586621679230143"><span class="hs-identifier hs-var">print</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_default :: forall a. T a -&gt; a
+</span><a href="Naproche.Param.html#_default"><span class="hs-identifier hs-var">_default</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679230144"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679230144"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-58"></span><span>  </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230142"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot; (default: &quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; Bytes
+</span><a href="#local-6989586621679230143"><span class="hs-identifier hs-var">print</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679230144"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;)&quot;</span></span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679230050"><span id="local-6989586621679230147"><span class="annot"><span class="hs-identifier hs-type">Eq</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679230050"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span><span> </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679230152"><span class="annot"><span class="annottext">T a
+</span><a href="#local-6989586621679230152"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span id="local-6989586621679230153"><span class="annot"><span class="annottext">== :: T a -&gt; T a -&gt; Bool
+</span><span class="hs-operator hs-var hs-var hs-var hs-var">==</span></span></span><span> </span><span id="local-6989586621679230154"><span class="annot"><span class="annottext">T a
+</span><a href="#local-6989586621679230154"><span class="hs-identifier hs-var">p'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">T a -&gt; Bytes
+forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#name"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">T a
+</span><a href="#local-6989586621679230152"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">T a -&gt; Bytes
+forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#name"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">T a
+</span><a href="#local-6989586621679230154"><span class="hs-identifier hs-var">p'</span></a></span><span>
+</span><span id="line-61"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679230053"><span id="local-6989586621679230159"><span id="local-6989586621679230163"><span id="local-6989586621679230166"><span id="local-6989586621679230169"><span id="local-6989586621679230172"><span id="local-6989586621679230175"><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679230053"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span></span></span></span></span></span><span> </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679230180"><span class="annot"><span class="annottext">compare :: T a -&gt; T a -&gt; Ordering
+</span><a href="#local-6989586621679230180"><span class="hs-identifier hs-var hs-var hs-var hs-var">compare</span></a></span></span><span> </span><span id="local-6989586621679230182"><span class="annot"><span class="annottext">T a
+</span><a href="#local-6989586621679230182"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span id="local-6989586621679230183"><span class="annot"><span class="annottext">T a
+</span><a href="#local-6989586621679230183"><span class="hs-identifier hs-var">p'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Ordering
+forall a. Ord a =&gt; a -&gt; a -&gt; Ordering
+</span><span class="hs-identifier hs-var">compare</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T a -&gt; Bytes
+forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#name"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">T a
+</span><a href="#local-6989586621679230182"><span class="hs-identifier hs-var">p</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T a -&gt; Bytes
+forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#name"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">T a
+</span><a href="#local-6989586621679230183"><span class="hs-identifier hs-var">p'</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-62"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679230057"><span id="local-6989586621679230185"><span id="local-6989586621679230190"><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679230057"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span></span><span> </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679230195"><span class="annot"><span class="annottext">show :: T a -&gt; String
+</span><a href="#local-6989586621679230195"><span class="hs-identifier hs-var hs-var hs-var hs-var">show</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; String
+forall a. STRING a =&gt; a -&gt; String
+</span><a href="Isabelle.Library.html#make_string"><span class="hs-identifier hs-var">make_string</span></a></span><span> </span><span class="annot"><span class="annottext">(Bytes -&gt; String) -&gt; (T a -&gt; Bytes) -&gt; T a -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">T a -&gt; Bytes
+forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#name"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span class="annot"><a href="Naproche.Param.html#bytes"><span class="hs-identifier hs-type">bytes</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span>
+</span><span id="line-65"></span><span id="bytes"><span class="annot"><span class="annottext">bytes :: Bytes -&gt; Bytes -&gt; Bytes -&gt; T Bytes
+</span><a href="Naproche.Param.html#bytes"><span class="hs-identifier hs-var hs-var">bytes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Bytes -&gt; Bytes)
+-&gt; (Bytes -&gt; Maybe Bytes) -&gt; Bytes -&gt; Bytes -&gt; Bytes -&gt; T Bytes
+forall a.
+(a -&gt; Bytes) -&gt; (Bytes -&gt; Maybe a) -&gt; Bytes -&gt; Bytes -&gt; a -&gt; T a
+</span><a href="Naproche.Param.html#Param"><span class="hs-identifier hs-var">Param</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Maybe Bytes
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span class="annot"><a href="Naproche.Param.html#bool"><span class="hs-identifier hs-type">bool</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-68"></span><span id="bool"><span class="annot"><span class="annottext">bool :: Bytes -&gt; Bytes -&gt; Bool -&gt; T Bool
+</span><a href="Naproche.Param.html#bool"><span class="hs-identifier hs-var hs-var">bool</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bytes)
+-&gt; (Bytes -&gt; Maybe Bool) -&gt; Bytes -&gt; Bytes -&gt; Bool -&gt; T Bool
+forall a.
+(a -&gt; Bytes) -&gt; (Bytes -&gt; Maybe a) -&gt; Bytes -&gt; Bytes -&gt; a -&gt; T a
+</span><a href="Naproche.Param.html#Param"><span class="hs-identifier hs-var">Param</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bytes
+</span><a href="Isabelle.Value.html#print_bool"><span class="hs-identifier hs-var">Value.print_bool</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Maybe Bool
+</span><a href="Isabelle.Value.html#parse_bool"><span class="hs-identifier hs-var">Value.parse_bool</span></a></span><span>
+</span><span id="line-69"></span><span>
+</span><span id="line-70"></span><span class="annot"><a href="Naproche.Param.html#flag"><span class="hs-identifier hs-type">flag</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-71"></span><span id="flag"><span class="annot"><span class="annottext">flag :: Bytes -&gt; Bytes -&gt; Bool -&gt; T Bool
+</span><a href="Naproche.Param.html#flag"><span class="hs-identifier hs-var hs-var">flag</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bytes)
+-&gt; (Bytes -&gt; Maybe Bool) -&gt; Bytes -&gt; Bytes -&gt; Bool -&gt; T Bool
+forall a.
+(a -&gt; Bytes) -&gt; (Bytes -&gt; Maybe a) -&gt; Bytes -&gt; Bytes -&gt; a -&gt; T a
+</span><a href="Naproche.Param.html#Param"><span class="hs-identifier hs-var">Param</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bytes
+</span><a href="Naproche.Param.html#print_flag"><span class="hs-identifier hs-var">print_flag</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Maybe Bool
+</span><a href="Naproche.Param.html#parse_flag"><span class="hs-identifier hs-var">parse_flag</span></a></span><span>
+</span><span id="line-72"></span><span>
+</span><span id="line-73"></span><span class="annot"><a href="Naproche.Param.html#nat"><span class="hs-identifier hs-type">nat</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-74"></span><span id="nat"><span class="annot"><span class="annottext">nat :: Bytes -&gt; Bytes -&gt; Int -&gt; T Int
+</span><a href="Naproche.Param.html#nat"><span class="hs-identifier hs-var hs-var">nat</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bytes)
+-&gt; (Bytes -&gt; Maybe Int) -&gt; Bytes -&gt; Bytes -&gt; Int -&gt; T Int
+forall a.
+(a -&gt; Bytes) -&gt; (Bytes -&gt; Maybe a) -&gt; Bytes -&gt; Bytes -&gt; a -&gt; T a
+</span><a href="Naproche.Param.html#Param"><span class="hs-identifier hs-var">Param</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bytes
+</span><a href="Isabelle.Value.html#print_int"><span class="hs-identifier hs-var">Value.print_int</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Maybe Int
+</span><a href="Isabelle.Value.html#parse_nat"><span class="hs-identifier hs-var">Value.parse_nat</span></a></span><span>
+</span><span id="line-75"></span><span>
+</span><span id="line-76"></span><span class="annot"><a href="Naproche.Param.html#int"><span class="hs-identifier hs-type">int</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-77"></span><span id="int"><span class="annot"><span class="annottext">int :: Bytes -&gt; Bytes -&gt; Int -&gt; T Int
+</span><a href="Naproche.Param.html#int"><span class="hs-identifier hs-var hs-var">int</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bytes)
+-&gt; (Bytes -&gt; Maybe Int) -&gt; Bytes -&gt; Bytes -&gt; Int -&gt; T Int
+forall a.
+(a -&gt; Bytes) -&gt; (Bytes -&gt; Maybe a) -&gt; Bytes -&gt; Bytes -&gt; a -&gt; T a
+</span><a href="Naproche.Param.html#Param"><span class="hs-identifier hs-var">Param</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bytes
+</span><a href="Isabelle.Value.html#print_int"><span class="hs-identifier hs-var">Value.print_int</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Maybe Int
+</span><a href="Isabelle.Value.html#parse_int"><span class="hs-identifier hs-var">Value.parse_int</span></a></span><span>
+</span><span id="line-78"></span><span>
+</span><span id="line-79"></span><span class="annot"><a href="Naproche.Param.html#real"><span class="hs-identifier hs-type">real</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Double</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Double</span></span><span>
+</span><span id="line-80"></span><span id="real"><span class="annot"><span class="annottext">real :: Bytes -&gt; Bytes -&gt; Double -&gt; T Double
+</span><a href="Naproche.Param.html#real"><span class="hs-identifier hs-var hs-var">real</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Double -&gt; Bytes)
+-&gt; (Bytes -&gt; Maybe Double) -&gt; Bytes -&gt; Bytes -&gt; Double -&gt; T Double
+forall a.
+(a -&gt; Bytes) -&gt; (Bytes -&gt; Maybe a) -&gt; Bytes -&gt; Bytes -&gt; a -&gt; T a
+</span><a href="Naproche.Param.html#Param"><span class="hs-identifier hs-var">Param</span></a></span><span> </span><span class="annot"><span class="annottext">Double -&gt; Bytes
+</span><a href="Isabelle.Value.html#print_real"><span class="hs-identifier hs-var">Value.print_real</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Maybe Double
+</span><a href="Isabelle.Value.html#parse_real"><span class="hs-identifier hs-var">Value.parse_real</span></a></span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span class="hs-comment">{- untyped environment -}</span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span class="hs-keyword">newtype</span><span> </span><span id="Env"><span class="annot"><a href="Naproche.Param.html#Env"><span class="hs-identifier hs-var">Env</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Env"><span class="annot"><a href="Naproche.Param.html#Env"><span class="hs-identifier hs-var">Env</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-86"></span><span>
+</span><span id="line-87"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679230209"><span id="local-6989586621679230214"><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="Naproche.Param.html#Env"><span class="hs-identifier hs-type">Env</span></a></span></span></span><span>
+</span><span id="line-88"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679230220"><span class="annot"><span class="annottext">show :: Env -&gt; String
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">show</span></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Naproche.Param.html#Env"><span class="hs-identifier hs-type">Env</span></a></span><span> </span><span id="local-6989586621679230221"><span class="annot"><span class="annottext">Map Bytes Bytes
+</span><a href="#local-6989586621679230221"><span class="hs-identifier hs-var">ps</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">([Bytes] -&gt; String) -&gt; [Bytes] -&gt; String
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">((Bytes, Bytes) -&gt; Bytes) -&gt; [(Bytes, Bytes)] -&gt; [Bytes]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">(Bytes, Bytes) -&gt; Bytes
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">([(Bytes, Bytes)] -&gt; [Bytes]) -&gt; [(Bytes, Bytes)] -&gt; [Bytes]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Map Bytes Bytes -&gt; [(Bytes, Bytes)]
+forall k a. Map k a -&gt; [(k, a)]
+</span><span class="hs-identifier hs-var">Map.toList</span></span><span> </span><span class="annot"><span class="annottext">Map Bytes Bytes
+</span><a href="#local-6989586621679230221"><span class="hs-identifier hs-var">ps</span></a></span><span>
+</span><span id="line-89"></span><span>
+</span><span id="line-90"></span><span class="annot"><a href="Naproche.Param.html#empty"><span class="hs-identifier hs-type">empty</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Param.html#Env"><span class="hs-identifier hs-type">Env</span></a></span><span>
+</span><span id="line-91"></span><span id="empty"><span class="annot"><span class="annottext">empty :: Env
+</span><a href="Naproche.Param.html#empty"><span class="hs-identifier hs-var hs-var">empty</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Bytes Bytes -&gt; Env
+</span><a href="Naproche.Param.html#Env"><span class="hs-identifier hs-var">Env</span></a></span><span> </span><span class="annot"><span class="annottext">Map Bytes Bytes
+forall k a. Map k a
+</span><span class="hs-identifier hs-var">Map.empty</span></span><span>
+</span><span id="line-92"></span><span>
+</span><span id="line-93"></span><span id="local-6989586621679230078"><span class="annot"><a href="Naproche.Param.html#parse"><span class="hs-identifier hs-type">parse</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679230078"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679230078"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-94"></span><span id="parse"><span class="annot"><span class="annottext">parse :: forall a. T a -&gt; Bytes -&gt; a
+</span><a href="Naproche.Param.html#parse"><span class="hs-identifier hs-var hs-var">parse</span></a></span></span><span> </span><span class="annot"><a href="Naproche.Param.html#Param"><span class="hs-identifier hs-type">Param</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">_name :: forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#_name"><span class="hs-identifier hs-var">_name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679230236"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230236"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_parse :: forall a. T a -&gt; Bytes -&gt; Maybe a
+</span><a href="Naproche.Param.html#_parse"><span class="hs-identifier hs-var">_parse</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679230237"><span class="annot"><span class="annottext">Bytes -&gt; Maybe a
+</span><a href="#local-6989586621679230237"><span class="hs-identifier hs-var">parse</span></a></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679230238"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230238"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-95"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Maybe a
+</span><a href="#local-6989586621679230237"><span class="hs-identifier hs-var">parse</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230238"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-96"></span><span>    </span><span class="annot"><span class="annottext">Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-97"></span><span>      </span><span class="annot"><span class="annottext">String -&gt; a
+forall a. HasCallStack =&gt; String -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes -&gt; String
+forall a. STRING a =&gt; a -&gt; String
+</span><a href="Isabelle.Library.html#make_string"><span class="hs-identifier hs-var">make_string</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Malformed value for parameter &quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes
+forall a. StringLike a =&gt; a -&gt; a
+</span><a href="Isabelle.Library.html#quote"><span class="hs-identifier hs-var">quote</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230236"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot; =\n  &quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes
+forall a. StringLike a =&gt; a -&gt; a
+</span><a href="Isabelle.Library.html#quote"><span class="hs-identifier hs-var">quote</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230238"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-98"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679230241"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679230241"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679230241"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-99"></span><span>
+</span><span id="line-100"></span><span id="local-6989586621679230085"><span class="annot"><a href="Naproche.Param.html#get"><span class="hs-identifier hs-type">get</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679230085"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Param.html#Env"><span class="hs-identifier hs-type">Env</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679230085"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-101"></span><span id="get"><span class="annot"><span class="annottext">get :: forall a. T a -&gt; Env -&gt; a
+</span><a href="Naproche.Param.html#get"><span class="hs-identifier hs-var hs-var">get</span></a></span></span><span> </span><span id="local-6989586621679230243"><span class="annot"><span class="annottext">p :: T a
+</span><a href="#local-6989586621679230243"><span class="hs-identifier hs-var">p</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="Naproche.Param.html#Param"><span class="hs-identifier hs-type">Param</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">_name :: forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#_name"><span class="hs-identifier hs-var">_name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679230244"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230244"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_default :: forall a. T a -&gt; a
+</span><a href="Naproche.Param.html#_default"><span class="hs-identifier hs-var">_default</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679230245"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679230245"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Naproche.Param.html#Env"><span class="hs-identifier hs-type">Env</span></a></span><span> </span><span id="local-6989586621679230246"><span class="annot"><span class="annottext">Map Bytes Bytes
+</span><a href="#local-6989586621679230246"><span class="hs-identifier hs-var">ps</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-102"></span><span>  </span><span class="annot"><span class="annottext">a -&gt; (Bytes -&gt; a) -&gt; Maybe Bytes -&gt; a
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679230245"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T a -&gt; Bytes -&gt; a
+forall a. T a -&gt; Bytes -&gt; a
+</span><a href="Naproche.Param.html#parse"><span class="hs-identifier hs-var">parse</span></a></span><span> </span><span class="annot"><span class="annottext">T a
+</span><a href="#local-6989586621679230243"><span class="hs-identifier hs-var">p</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes -&gt; Map Bytes Bytes -&gt; Maybe Bytes
+forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230244"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">Map Bytes Bytes
+</span><a href="#local-6989586621679230246"><span class="hs-identifier hs-var">ps</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-103"></span><span>
+</span><span id="line-104"></span><span id="local-6989586621679230091"><span class="annot"><a href="Naproche.Param.html#put"><span class="hs-identifier hs-type">put</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Param.html#T"><span class="hs-identifier hs-type">T</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679230091"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679230091"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Param.html#Env"><span class="hs-identifier hs-type">Env</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Naproche.Param.html#Env"><span class="hs-identifier hs-type">Env</span></a></span></span><span>
+</span><span id="line-105"></span><span id="put"><span class="annot"><span class="annottext">put :: forall a. T a -&gt; a -&gt; Env -&gt; Env
+</span><a href="Naproche.Param.html#put"><span class="hs-identifier hs-var hs-var">put</span></a></span></span><span> </span><span class="annot"><a href="Naproche.Param.html#Param"><span class="hs-identifier hs-type">Param</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">_name :: forall a. T a -&gt; Bytes
+</span><a href="Naproche.Param.html#_name"><span class="hs-identifier hs-var">_name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679230250"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230250"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">_print :: forall a. T a -&gt; a -&gt; Bytes
+</span><a href="Naproche.Param.html#_print"><span class="hs-identifier hs-var">_print</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679230251"><span class="annot"><span class="annottext">a -&gt; Bytes
+</span><a href="#local-6989586621679230251"><span class="hs-identifier hs-var">print</span></a></span></span><span class="hs-special">}</span><span> </span><span id="local-6989586621679230252"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679230252"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Naproche.Param.html#Env"><span class="hs-identifier hs-type">Env</span></a></span><span> </span><span id="local-6989586621679230253"><span class="annot"><span class="annottext">Map Bytes Bytes
+</span><a href="#local-6989586621679230253"><span class="hs-identifier hs-var">ps</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-106"></span><span>  </span><span class="annot"><span class="annottext">Map Bytes Bytes -&gt; Env
+</span><a href="Naproche.Param.html#Env"><span class="hs-identifier hs-var">Env</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Map Bytes Bytes -&gt; Map Bytes Bytes
+forall k a. Ord k =&gt; k -&gt; a -&gt; Map k a -&gt; Map k a
+</span><span class="hs-identifier hs-var">Map.insert</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679230250"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; Bytes
+</span><a href="#local-6989586621679230251"><span class="hs-identifier hs-var">print</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679230252"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Map Bytes Bytes
+</span><a href="#local-6989586621679230253"><span class="hs-identifier hs-var">ps</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-107"></span></pre></body></html>

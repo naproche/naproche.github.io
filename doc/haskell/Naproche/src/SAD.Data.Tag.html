@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.Data.Tag</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2001 - 2008, Andrei Paskevich,</span><span>
+</span><span id="line-4"></span><span class="hs-comment">--               (c) 2017 - 2018, Steffen Frerix</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-6"></span><span class="hs-comment">--</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- TODO: Add description.</span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.Data.Tag</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">data</span><span> </span><span id="Tag"><span class="annot"><a href="SAD.Data.Tag.html#Tag"><span class="hs-identifier hs-var">Tag</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-13"></span><span>  </span><span id="Dig"><span class="annot"><a href="SAD.Data.Tag.html#Dig"><span class="hs-identifier hs-var">Dig</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="DigMultiSubject"><span class="annot"><a href="SAD.Data.Tag.html#DigMultiSubject"><span class="hs-identifier hs-var">DigMultiSubject</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="DigMultiPairwise"><span class="annot"><a href="SAD.Data.Tag.html#DigMultiPairwise"><span class="hs-identifier hs-var">DigMultiPairwise</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="HeadTerm"><span class="annot"><a href="SAD.Data.Tag.html#HeadTerm"><span class="hs-identifier hs-var">HeadTerm</span></a></span></span><span> </span><span class="hs-glyph">|</span><span>
+</span><span id="line-14"></span><span>  </span><span id="InductionHypothesis"><span class="annot"><a href="SAD.Data.Tag.html#InductionHypothesis"><span class="hs-identifier hs-var">InductionHypothesis</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="CaseHypothesis"><span class="annot"><a href="SAD.Data.Tag.html#CaseHypothesis"><span class="hs-identifier hs-var">CaseHypothesis</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="EqualityChain"><span class="annot"><a href="SAD.Data.Tag.html#EqualityChain"><span class="hs-identifier hs-var">EqualityChain</span></a></span></span><span> </span><span class="hs-glyph">|</span><span>
+</span><span id="line-15"></span><span>  </span><span class="hs-comment">-- Tags to mark certain parts of map definitions</span><span>
+</span><span id="line-16"></span><span>  </span><span id="GenericMark"><span class="annot"><a href="SAD.Data.Tag.html#GenericMark"><span class="hs-identifier hs-var">GenericMark</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Evaluation"><span class="annot"><a href="SAD.Data.Tag.html#Evaluation"><span class="hs-identifier hs-var">Evaluation</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Condition"><span class="annot"><a href="SAD.Data.Tag.html#Condition"><span class="hs-identifier hs-var">Condition</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Defined"><span class="annot"><a href="SAD.Data.Tag.html#Defined"><span class="hs-identifier hs-var">Defined</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Domain"><span class="annot"><a href="SAD.Data.Tag.html#Domain"><span class="hs-identifier hs-var">Domain</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Replacement"><span class="annot"><a href="SAD.Data.Tag.html#Replacement"><span class="hs-identifier hs-var">Replacement</span></a></span></span><span> </span><span class="hs-glyph">|</span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-comment">-- Tags to mark parts in map proof tasks</span><span>
+</span><span id="line-18"></span><span>  </span><span id="DomainTask"><span class="annot"><a href="SAD.Data.Tag.html#DomainTask"><span class="hs-identifier hs-var">DomainTask</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="ExistenceTask"><span class="annot"><a href="SAD.Data.Tag.html#ExistenceTask"><span class="hs-identifier hs-var">ExistenceTask</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="UniquenessTask"><span class="annot"><a href="SAD.Data.Tag.html#UniquenessTask"><span class="hs-identifier hs-var">UniquenessTask</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="ChoiceTask"><span class="annot"><a href="SAD.Data.Tag.html#ChoiceTask"><span class="hs-identifier hs-var">ChoiceTask</span></a></span></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679233041"><span id="local-6989586621679233043"><span class="annot"><span class="annottext">Tag -&gt; Tag -&gt; Bool
+(Tag -&gt; Tag -&gt; Bool) -&gt; (Tag -&gt; Tag -&gt; Bool) -&gt; Eq Tag
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Tag -&gt; Tag -&gt; Bool
+== :: Tag -&gt; Tag -&gt; Bool
+$c/= :: Tag -&gt; Tag -&gt; Bool
+/= :: Tag -&gt; Tag -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679233050"><span id="local-6989586621679233052"><span id="local-6989586621679233054"><span id="local-6989586621679233058"><span id="local-6989586621679233061"><span id="local-6989586621679233064"><span id="local-6989586621679233067"><span class="annot"><span class="annottext">Eq Tag
+Eq Tag =&gt;
+(Tag -&gt; Tag -&gt; Ordering)
+-&gt; (Tag -&gt; Tag -&gt; Bool)
+-&gt; (Tag -&gt; Tag -&gt; Bool)
+-&gt; (Tag -&gt; Tag -&gt; Bool)
+-&gt; (Tag -&gt; Tag -&gt; Bool)
+-&gt; (Tag -&gt; Tag -&gt; Tag)
+-&gt; (Tag -&gt; Tag -&gt; Tag)
+-&gt; Ord Tag
+Tag -&gt; Tag -&gt; Bool
+Tag -&gt; Tag -&gt; Ordering
+Tag -&gt; Tag -&gt; Tag
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: Tag -&gt; Tag -&gt; Ordering
+compare :: Tag -&gt; Tag -&gt; Ordering
+$c&lt; :: Tag -&gt; Tag -&gt; Bool
+&lt; :: Tag -&gt; Tag -&gt; Bool
+$c&lt;= :: Tag -&gt; Tag -&gt; Bool
+&lt;= :: Tag -&gt; Tag -&gt; Bool
+$c&gt; :: Tag -&gt; Tag -&gt; Bool
+&gt; :: Tag -&gt; Tag -&gt; Bool
+$c&gt;= :: Tag -&gt; Tag -&gt; Bool
+&gt;= :: Tag -&gt; Tag -&gt; Bool
+$cmax :: Tag -&gt; Tag -&gt; Tag
+max :: Tag -&gt; Tag -&gt; Tag
+$cmin :: Tag -&gt; Tag -&gt; Tag
+min :: Tag -&gt; Tag -&gt; Tag
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679233071"><span id="local-6989586621679233073"><span id="local-6989586621679233077"><span class="annot"><span class="annottext">Int -&gt; Tag -&gt; ShowS
+[Tag] -&gt; ShowS
+Tag -&gt; String
+(Int -&gt; Tag -&gt; ShowS)
+-&gt; (Tag -&gt; String) -&gt; ([Tag] -&gt; ShowS) -&gt; Show Tag
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Tag -&gt; ShowS
+showsPrec :: Int -&gt; Tag -&gt; ShowS
+$cshow :: Tag -&gt; String
+show :: Tag -&gt; String
+$cshowList :: [Tag] -&gt; ShowS
+showList :: [Tag] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="annot"><span class="hs-comment">-- | whether a Tag marks a part in a map proof task</span></span><span>
+</span><span id="line-22"></span><span class="annot"><a href="SAD.Data.Tag.html#fnTag"><span class="hs-identifier hs-type">fnTag</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Tag.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-23"></span><span id="fnTag"><span class="annot"><span class="annottext">fnTag :: Tag -&gt; Bool
+</span><a href="SAD.Data.Tag.html#fnTag"><span class="hs-identifier hs-var hs-var">fnTag</span></a></span></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#DomainTask"><span class="hs-identifier hs-var">DomainTask</span></a></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span class="hs-special">;</span><span> </span><span class="annot"><a href="SAD.Data.Tag.html#fnTag"><span class="hs-identifier hs-var">fnTag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#ChoiceTask"><span class="hs-identifier hs-var">ChoiceTask</span></a></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-24"></span><span class="annot"><a href="SAD.Data.Tag.html#fnTag"><span class="hs-identifier hs-var">fnTag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#ExistenceTask"><span class="hs-identifier hs-var">ExistenceTask</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span class="hs-special">;</span><span> </span><span class="annot"><a href="SAD.Data.Tag.html#fnTag"><span class="hs-identifier hs-var">fnTag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#UniquenessTask"><span class="hs-identifier hs-var">UniquenessTask</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-25"></span><span class="annot"><a href="SAD.Data.Tag.html#fnTag"><span class="hs-identifier hs-var">fnTag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><span class="hs-identifier">_</span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-26"></span></pre></body></html>

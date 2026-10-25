@@ -1,0 +1,903 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.Import.Reader</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2001 - 2008, Andrei Paskevich,</span><span>
+</span><span id="line-4"></span><span class="hs-comment">--               (c) 2017 - 2018, Steffen Frerix</span><span>
+</span><span id="line-5"></span><span class="hs-comment">--               (c) 2024, Marcel Sch&#252;tz</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-7"></span><span class="hs-comment">--</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Main text reading functions.</span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.Import.Reader</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-11"></span><span>  </span><span class="annot"><a href="SAD.Import.Reader.html#readProofText"><span class="hs-identifier">readProofText</span></a></span><span>
+</span><span id="line-12"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad</span></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">System.IO.Error</span></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">System.FilePath.Posix</span></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Exception</span></span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html"><span class="hs-identifier">SAD.Data.Text.Block</span></a></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Instr.html"><span class="hs-identifier">SAD.Data.Instr</span></a></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html"><span class="hs-identifier">SAD.ForTheL.Base</span></a></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.FTL.Base.html"><span class="hs-identifier">SAD.ForTheL.FTL.Base</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">FTL</span></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.FTL.Structure.html"><span class="hs-identifier">SAD.ForTheL.FTL.Structure</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">FTL</span></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.TEX.Base.html"><span class="hs-identifier">SAD.ForTheL.TEX.Base</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">TEX</span></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.TEX.Structure.html"><span class="hs-identifier">SAD.ForTheL.TEX.Structure</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">TEX</span></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.STEX.Base.html"><span class="hs-identifier">SAD.ForTheL.STEX.Base</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">STEX</span></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.STEX.Structure.html"><span class="hs-identifier">SAD.ForTheL.STEX.Structure</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">STEX</span></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html"><span class="hs-identifier">SAD.Parser.Base</span></a></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.FTL.Lexer.html"><span class="hs-identifier">SAD.Parser.FTL.Lexer</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">FTL</span></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.TEX.Lexer.html"><span class="hs-identifier">SAD.Parser.TEX.Lexer</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">TEX</span></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.STEX.Lexer.html"><span class="hs-identifier">SAD.Parser.STEX.Lexer</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">STEX</span></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.FTL.Token.html"><span class="hs-identifier">SAD.Parser.FTL.Token</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">FTL</span></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.TEX.Token.html"><span class="hs-identifier">SAD.Parser.TEX.Token</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">TEX</span></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.STEX.Token.html"><span class="hs-identifier">SAD.Parser.STEX.Token</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">STEX</span></span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.Token.html"><span class="hs-identifier">SAD.Parser.Token</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Parser.Token.html#Token"><span class="hs-identifier">Token</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Parser.Token.html#noTokens"><span class="hs-identifier">noTokens</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Core.Message.html"><span class="hs-identifier">SAD.Core.Message</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Message</span></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Helpers.html"><span class="hs-identifier">SAD.Helpers</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Helpers.html#failWithMessage"><span class="hs-identifier">failWithMessage</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Helpers.html#getNaprocheFormalizations"><span class="hs-identifier">getNaprocheFormalizations</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.File.html"><span class="hs-identifier">Isabelle.File</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">File</span></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Library.html"><span class="hs-identifier">Isabelle.Library</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Isabelle.Library.html#make_bytes"><span class="hs-identifier">make_bytes</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Position.html"><span class="hs-identifier">Isabelle.Position</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Position</span></span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html"><span class="hs-identifier">Isabelle.Bytes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier">Bytes</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span>
+</span><span id="line-44"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Naproche.Program.html"><span class="hs-identifier">Naproche.Program</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Program</span></span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="annot"><span class="hs-comment">-- * Reader loop</span></span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span class="annot"><span class="hs-comment">-- | Parse one or more ForTheL texts</span></span><span>
+</span><span id="line-50"></span><span class="annot"><a href="SAD.Import.Reader.html#readProofText"><span class="hs-identifier hs-type">readProofText</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Instr.html#ParserKind"><span class="hs-identifier hs-type">ParserKind</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-51"></span><span id="readProofText"><span class="annot"><span class="annottext">readProofText :: ParserKind -&gt; [ProofText] -&gt; IO [ProofText]
+</span><a href="SAD.Import.Reader.html#readProofText"><span class="hs-identifier hs-var hs-var">readProofText</span></a></span></span><span> </span><span id="local-6989586621679254369"><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254369"><span class="hs-identifier hs-var">dialect</span></a></span></span><span> </span><span id="local-6989586621679254370"><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254370"><span class="hs-identifier hs-var">text0</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-52"></span><span>  </span><span id="local-6989586621679254371"><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679254371"><span class="hs-identifier hs-var">context</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO Context
+</span><a href="Naproche.Program.html#thread_context"><span class="hs-identifier hs-var">Program.thread_context</span></a></span><span>
+</span><span id="line-53"></span><span>  </span><span id="local-6989586621679254373"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254373"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO String
+</span><a href="SAD.Helpers.html#getNaprocheFormalizations"><span class="hs-identifier hs-var">getNaprocheFormalizations</span></a></span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-special">(</span><span id="local-6989586621679254374"><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254374"><span class="hs-identifier hs-var">text</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679254375"><span class="annot"><span class="annottext">[Report]
+</span><a href="#local-6989586621679254375"><span class="hs-identifier hs-var">reports</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Int
+-&gt; ParserKind
+-&gt; String
+-&gt; [String]
+-&gt; [State FState]
+-&gt; [ProofText]
+-&gt; IO ([ProofText], [Report])
+</span><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var">reader</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254369"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254373"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Context -&gt; [Token] -&gt; State FState
+</span><a href="SAD.Import.Reader.html#initState"><span class="hs-identifier hs-var">initState</span></a></span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679254371"><span class="hs-identifier hs-var">context</span></a></span><span> </span><span class="annot"><span class="annottext">[Token]
+</span><a href="SAD.Parser.Token.html#noTokens"><span class="hs-identifier hs-var">noTokens</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254370"><span class="hs-identifier hs-var">text0</span></a></span><span>
+</span><span id="line-55"></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; IO () -&gt; IO ()
+forall (f :: * -&gt; *). Applicative f =&gt; Bool -&gt; f () -&gt; f ()
+</span><span class="hs-identifier hs-var">when</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Context -&gt; Bool
+</span><a href="Naproche.Program.html#is_pide"><span class="hs-identifier hs-var">Program.is_pide</span></a></span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679254371"><span class="hs-identifier hs-var">context</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(IO () -&gt; IO ()) -&gt; IO () -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Report] -&gt; IO ()
+</span><a href="SAD.Core.Message.html#reports"><span class="hs-identifier hs-var">Message.reports</span></a></span><span> </span><span class="annot"><span class="annottext">[Report]
+</span><a href="#local-6989586621679254375"><span class="hs-identifier hs-var">reports</span></a></span><span>
+</span><span id="line-56"></span><span>  </span><span class="annot"><span class="annottext">[ProofText] -&gt; IO [ProofText]
+forall a. a -&gt; IO a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254374"><span class="hs-identifier hs-var">text</span></a></span><span>
+</span><span id="line-57"></span><span>
+</span><span id="line-58"></span><span class="annot"><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-type">reader</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Instr.html#ParserKind"><span class="hs-identifier hs-type">ParserKind</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FState"><span class="hs-identifier hs-type">FState</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Isabelle.Position.html#Report"><span class="hs-identifier hs-type">Position.Report</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-59"></span><span class="hs-comment">-- Take an archive path, a module path and a module name, turn it into an</span><span>
+</span><span id="line-60"></span><span class="hs-comment">-- absolute file path and continue the reader loop with a read instruction for</span><span>
+</span><span id="line-61"></span><span class="hs-comment">-- this file path.</span><span>
+</span><span id="line-62"></span><span class="hs-comment">-- Moreover, we track the depth of the imported modules (where depth 0 means</span><span>
+</span><span id="line-63"></span><span class="hs-comment">-- that we are currently not in an imported module), where we disable the</span><span>
+</span><span id="line-64"></span><span class="hs-comment">-- logical and ontological checking at depth &gt; 0.</span><span>
+</span><span id="line-65"></span><span id="reader"><span class="annot"><span class="annottext">reader :: Int
+-&gt; ParserKind
+-&gt; String
+-&gt; [String]
+-&gt; [State FState]
+-&gt; [ProofText]
+-&gt; IO ([ProofText], [Report])
+</span><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var hs-var">reader</span></a></span></span><span> </span><span id="local-6989586621679254382"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254382"><span class="hs-identifier hs-var">depth</span></a></span></span><span> </span><span id="local-6989586621679254383"><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254383"><span class="hs-identifier hs-var">dialect</span></a></span></span><span> </span><span id="local-6989586621679254384"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254384"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span></span><span> </span><span id="local-6989586621679254385"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254385"><span class="hs-identifier hs-var">doneFiles</span></a></span></span><span> </span><span id="local-6989586621679254386"><span class="annot"><span class="annottext">[State FState]
+</span><a href="#local-6989586621679254386"><span class="hs-identifier hs-var">stateList</span></a></span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-type">ProofTextInstr</span></a></span><span> </span><span id="local-6989586621679254388"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679254388"><span class="hs-identifier hs-var">pos</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Instr.html#GetModule"><span class="hs-identifier hs-type">GetModule</span></a></span><span> </span><span id="local-6989586621679254390"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254390"><span class="hs-identifier hs-var">archivePath</span></a></span></span><span> </span><span id="local-6989586621679254391"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254391"><span class="hs-identifier hs-var">modulePath</span></a></span></span><span> </span><span id="local-6989586621679254392"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254392"><span class="hs-identifier hs-var">moduleName</span></a></span></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-66"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679254393"><span class="annot"><span class="annottext">relativeFilePath :: String
+</span><a href="#local-6989586621679254393"><span class="hs-identifier hs-var hs-var">relativeFilePath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254390"><span class="hs-identifier hs-var">archivePath</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+</span><span class="hs-operator hs-var">&lt;/&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;source&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+</span><span class="hs-operator hs-var">&lt;/&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254391"><span class="hs-identifier hs-var">modulePath</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+</span><span class="hs-operator hs-var">&lt;/&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254392"><span class="hs-identifier hs-var">moduleName</span></a></span><span>
+</span><span id="line-67"></span><span>      </span><span id="local-6989586621679254395"><span class="annot"><span class="annottext">relativeFilePath' :: String
+</span><a href="#local-6989586621679254395"><span class="hs-identifier hs-var hs-var">relativeFilePath'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254393"><span class="hs-identifier hs-var">relativeFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+</span><span class="hs-operator hs-var">&lt;.&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;en&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+</span><span class="hs-operator hs-var">&lt;.&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;tex&quot;</span></span><span>
+</span><span id="line-68"></span><span>      </span><span id="local-6989586621679254397"><span class="annot"><span class="annottext">absoluteFilePath :: String
+</span><a href="#local-6989586621679254397"><span class="hs-identifier hs-var hs-var">absoluteFilePath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254384"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+</span><span class="hs-operator hs-var">&lt;/&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;archive&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+</span><span class="hs-operator hs-var">&lt;/&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254395"><span class="hs-identifier hs-var">relativeFilePath'</span></a></span><span>
+</span><span id="line-69"></span><span>      </span><span id="local-6989586621679254398"><span class="annot"><span class="annottext">instr :: Instr
+</span><a href="#local-6989586621679254398"><span class="hs-identifier hs-var hs-var">instr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Instr
+</span><a href="SAD.Data.Instr.html#GetAbsoluteFilePath"><span class="hs-identifier hs-var">GetAbsoluteFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254397"><span class="hs-identifier hs-var">absoluteFilePath</span></a></span><span>
+</span><span id="line-70"></span><span>  </span><span class="hs-keyword">in</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-71"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679254400"><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254400"><span class="hs-identifier hs-var">proofTexts</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679254401"><span class="annot"><span class="annottext">[Report]
+</span><a href="#local-6989586621679254401"><span class="hs-identifier hs-var">reports</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Int
+-&gt; ParserKind
+-&gt; String
+-&gt; [String]
+-&gt; [State FState]
+-&gt; [ProofText]
+-&gt; IO ([ProofText], [Report])
+</span><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var">reader</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254382"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254383"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254384"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254385"><span class="hs-identifier hs-var">doneFiles</span></a></span><span> </span><span class="annot"><span class="annottext">[State FState]
+</span><a href="#local-6989586621679254386"><span class="hs-identifier hs-var">stateList</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">T -&gt; Instr -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-var">ProofTextInstr</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679254388"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="annot"><span class="annottext">Instr
+</span><a href="#local-6989586621679254398"><span class="hs-identifier hs-var">instr</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-72"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679254405"><span class="annot"><span class="annottext">proofTexts' :: [ProofText]
+</span><a href="#local-6989586621679254405"><span class="hs-identifier hs-var hs-var">proofTexts'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254382"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-73"></span><span>          </span><span class="hs-keyword">then</span><span> </span><span class="hs-special">[</span><span>
+</span><span id="line-74"></span><span>              </span><span class="annot"><span class="annottext">T -&gt; Instr -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-var">ProofTextInstr</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T Bool -&gt; Bool -&gt; Instr
+</span><a href="SAD.Data.Instr.html#SetBool"><span class="hs-identifier hs-var">SetBool</span></a></span><span> </span><span class="annot"><span class="annottext">T Bool
+</span><a href="SAD.Data.Instr.html#proveParam"><span class="hs-identifier hs-var">proveParam</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-75"></span><span>              </span><span class="annot"><span class="annottext">T -&gt; Instr -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-var">ProofTextInstr</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T Bool -&gt; Bool -&gt; Instr
+</span><a href="SAD.Data.Instr.html#SetBool"><span class="hs-identifier hs-var">SetBool</span></a></span><span> </span><span class="annot"><span class="annottext">T Bool
+</span><a href="SAD.Data.Instr.html#checkParam"><span class="hs-identifier hs-var">checkParam</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span>
+</span><span id="line-76"></span><span>            </span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[ProofText] -&gt; [ProofText] -&gt; [ProofText]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254400"><span class="hs-identifier hs-var">proofTexts</span></a></span><span> </span><span class="annot"><span class="annottext">[ProofText] -&gt; [ProofText] -&gt; [ProofText]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="hs-special">[</span><span>
+</span><span id="line-77"></span><span>              </span><span class="annot"><span class="annottext">T -&gt; Instr -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-var">ProofTextInstr</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T Bool -&gt; Bool -&gt; Instr
+</span><a href="SAD.Data.Instr.html#SetBool"><span class="hs-identifier hs-var">SetBool</span></a></span><span> </span><span class="annot"><span class="annottext">T Bool
+</span><a href="SAD.Data.Instr.html#proveParam"><span class="hs-identifier hs-var">proveParam</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-78"></span><span>              </span><span class="annot"><span class="annottext">T -&gt; Instr -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-var">ProofTextInstr</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T Bool -&gt; Bool -&gt; Instr
+</span><a href="SAD.Data.Instr.html#SetBool"><span class="hs-identifier hs-var">SetBool</span></a></span><span> </span><span class="annot"><span class="annottext">T Bool
+</span><a href="SAD.Data.Instr.html#checkParam"><span class="hs-identifier hs-var">checkParam</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span class="hs-special">)</span><span>
+</span><span id="line-79"></span><span>            </span><span class="hs-special">]</span><span>
+</span><span id="line-80"></span><span>          </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254400"><span class="hs-identifier hs-var">proofTexts</span></a></span><span>
+</span><span id="line-81"></span><span>    </span><span class="annot"><span class="annottext">([ProofText], [Report]) -&gt; IO ([ProofText], [Report])
+forall a. a -&gt; IO a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254405"><span class="hs-identifier hs-var">proofTexts'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[Report]
+</span><a href="#local-6989586621679254401"><span class="hs-identifier hs-var">reports</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-82"></span><span class="hs-comment">-- Take a relative file path (i.e. relative to the library directory) and turn</span><span>
+</span><span id="line-83"></span><span class="hs-comment">-- it into an absolute path.</span><span>
+</span><span id="line-84"></span><span class="annot"><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var">reader</span></a></span><span> </span><span id="local-6989586621679254410"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254410"><span class="hs-identifier hs-var">depth</span></a></span></span><span> </span><span id="local-6989586621679254411"><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254411"><span class="hs-identifier hs-var">dialect</span></a></span></span><span> </span><span id="local-6989586621679254412"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254412"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span></span><span> </span><span id="local-6989586621679254413"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254413"><span class="hs-identifier hs-var">doneFiles</span></a></span></span><span> </span><span id="local-6989586621679254414"><span class="annot"><span class="annottext">[State FState]
+</span><a href="#local-6989586621679254414"><span class="hs-identifier hs-var">stateList</span></a></span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-type">ProofTextInstr</span></a></span><span> </span><span id="local-6989586621679254415"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679254415"><span class="hs-identifier hs-var">pos</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Instr.html#GetRelativeFilePath"><span class="hs-identifier hs-type">GetRelativeFilePath</span></a></span><span> </span><span id="local-6989586621679254417"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254417"><span class="hs-identifier hs-var">relativeFilePath</span></a></span></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-85"></span><span>  </span><span class="hs-comment">-- Catch &quot;.&quot; as directory name in file path:</span><span>
+</span><span id="line-86"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;.&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; Bool
+forall a. Eq a =&gt; a -&gt; [a] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-operator hs-var">`elem`</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">splitDirectories</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254417"><span class="hs-identifier hs-var">relativeFilePath</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-87"></span><span>      </span><span class="annot"><span class="annottext">T -&gt; String -&gt; IO ([ProofText], [Report])
+forall a b. BYTES a =&gt; T -&gt; a -&gt; IO b
+</span><a href="SAD.Core.Message.html#errorReader"><span class="hs-identifier hs-var">Message.errorReader</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679254415"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; IO ([ProofText], [Report]))
+-&gt; String -&gt; IO ([ProofText], [Report])
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-88"></span><span>        </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;\&quot;.\&quot; is not allowed as a directory name in a file path: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span>
+</span><span id="line-89"></span><span>        </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254417"><span class="hs-identifier hs-var">relativeFilePath</span></a></span><span>
+</span><span id="line-90"></span><span>  </span><span class="hs-comment">-- Catch &quot;..&quot; as directory name in file path:</span><span>
+</span><span id="line-91"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;..&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; Bool
+forall a. Eq a =&gt; a -&gt; [a] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-operator hs-var">`elem`</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String]
+</span><span class="hs-identifier hs-var">splitDirectories</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254417"><span class="hs-identifier hs-var">relativeFilePath</span></a></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-92"></span><span>      </span><span class="annot"><span class="annottext">T -&gt; String -&gt; IO ([ProofText], [Report])
+forall a b. BYTES a =&gt; T -&gt; a -&gt; IO b
+</span><a href="SAD.Core.Message.html#errorReader"><span class="hs-identifier hs-var">Message.errorReader</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679254415"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; IO ([ProofText], [Report]))
+-&gt; String -&gt; IO ([ProofText], [Report])
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-93"></span><span>        </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;\&quot;..\&quot; is not allowed as a directory name in a file path: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span>
+</span><span id="line-94"></span><span>        </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254417"><span class="hs-identifier hs-var">relativeFilePath</span></a></span><span>
+</span><span id="line-95"></span><span>  </span><span class="hs-comment">-- Catch invalid file name extension:</span><span>
+</span><span id="line-96"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; String
+</span><span class="hs-identifier hs-var">takeExtensions</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254417"><span class="hs-identifier hs-var">relativeFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-operator hs-var">`notElem`</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;.ftl&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;.ftl.tex&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;.ftl.en.tex&quot;</span></span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-97"></span><span>      </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; String
+</span><span class="hs-identifier hs-var">takeExtensions</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254417"><span class="hs-identifier hs-var">relativeFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;.ftl&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254411"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="annot"><span class="annottext">ParserKind -&gt; ParserKind -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="SAD.Data.Instr.html#Ftl"><span class="hs-identifier hs-var">Ftl</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-98"></span><span>      </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; String
+</span><span class="hs-identifier hs-var">takeExtensions</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254417"><span class="hs-identifier hs-var">relativeFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;.ftl.tex&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254411"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="annot"><span class="annottext">ParserKind -&gt; ParserKind -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="SAD.Data.Instr.html#Tex"><span class="hs-identifier hs-var">Tex</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-99"></span><span>      </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">||</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; String
+</span><span class="hs-identifier hs-var">takeExtensions</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254417"><span class="hs-identifier hs-var">relativeFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;.ftl.en.tex&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254411"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="annot"><span class="annottext">ParserKind -&gt; ParserKind -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="SAD.Data.Instr.html#Stex"><span class="hs-identifier hs-var">Stex</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-100"></span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">T -&gt; String -&gt; IO ([ProofText], [Report])
+forall a b. BYTES a =&gt; T -&gt; a -&gt; IO b
+</span><a href="SAD.Core.Message.html#errorReader"><span class="hs-identifier hs-var">Message.errorReader</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679254415"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; IO ([ProofText], [Report]))
+-&gt; String -&gt; IO ([ProofText], [Report])
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-101"></span><span>        </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Invalid file name extension \&quot;&quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><span class="hs-identifier hs-var">takeExtensions</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254417"><span class="hs-identifier hs-var">relativeFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span>
+</span><span id="line-102"></span><span>        </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;\&quot;: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254417"><span class="hs-identifier hs-var">relativeFilePath</span></a></span><span>
+</span><span id="line-103"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-104"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679254429"><span class="annot"><span class="annottext">absoluteFilePath :: String
+</span><a href="#local-6989586621679254429"><span class="hs-identifier hs-var hs-var">absoluteFilePath</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254412"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+</span><span class="hs-operator hs-var">&lt;/&gt;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254417"><span class="hs-identifier hs-var">relativeFilePath</span></a></span><span>
+</span><span id="line-105"></span><span>          </span><span id="local-6989586621679254430"><span class="annot"><span class="annottext">instr :: Instr
+</span><a href="#local-6989586621679254430"><span class="hs-identifier hs-var hs-var">instr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Instr
+</span><a href="SAD.Data.Instr.html#GetAbsoluteFilePath"><span class="hs-identifier hs-var">GetAbsoluteFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254429"><span class="hs-identifier hs-var">absoluteFilePath</span></a></span><span>
+</span><span id="line-106"></span><span>      </span><span class="hs-keyword">in</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-107"></span><span>        </span><span class="hs-special">(</span><span id="local-6989586621679254431"><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254431"><span class="hs-identifier hs-var">proofTexts</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679254432"><span class="annot"><span class="annottext">[Report]
+</span><a href="#local-6989586621679254432"><span class="hs-identifier hs-var">reports</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Int
+-&gt; ParserKind
+-&gt; String
+-&gt; [String]
+-&gt; [State FState]
+-&gt; [ProofText]
+-&gt; IO ([ProofText], [Report])
+</span><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var">reader</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254410"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254411"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254412"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254413"><span class="hs-identifier hs-var">doneFiles</span></a></span><span> </span><span class="annot"><span class="annottext">[State FState]
+</span><a href="#local-6989586621679254414"><span class="hs-identifier hs-var">stateList</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">T -&gt; Instr -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-var">ProofTextInstr</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679254415"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="annot"><span class="annottext">Instr
+</span><a href="#local-6989586621679254430"><span class="hs-identifier hs-var">instr</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-108"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679254435"><span class="annot"><span class="annottext">proofTexts' :: [ProofText]
+</span><a href="#local-6989586621679254435"><span class="hs-identifier hs-var hs-var">proofTexts'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254410"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-109"></span><span>            </span><span class="hs-keyword">then</span><span> </span><span class="hs-special">[</span><span>
+</span><span id="line-110"></span><span>                </span><span class="annot"><span class="annottext">T -&gt; Instr -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-var">ProofTextInstr</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T Bool -&gt; Bool -&gt; Instr
+</span><a href="SAD.Data.Instr.html#SetBool"><span class="hs-identifier hs-var">SetBool</span></a></span><span> </span><span class="annot"><span class="annottext">T Bool
+</span><a href="SAD.Data.Instr.html#proveParam"><span class="hs-identifier hs-var">proveParam</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-111"></span><span>                </span><span class="annot"><span class="annottext">T -&gt; Instr -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-var">ProofTextInstr</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T Bool -&gt; Bool -&gt; Instr
+</span><a href="SAD.Data.Instr.html#SetBool"><span class="hs-identifier hs-var">SetBool</span></a></span><span> </span><span class="annot"><span class="annottext">T Bool
+</span><a href="SAD.Data.Instr.html#checkParam"><span class="hs-identifier hs-var">checkParam</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span>
+</span><span id="line-112"></span><span>              </span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[ProofText] -&gt; [ProofText] -&gt; [ProofText]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254431"><span class="hs-identifier hs-var">proofTexts</span></a></span><span> </span><span class="annot"><span class="annottext">[ProofText] -&gt; [ProofText] -&gt; [ProofText]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="hs-special">[</span><span>
+</span><span id="line-113"></span><span>                </span><span class="annot"><span class="annottext">T -&gt; Instr -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-var">ProofTextInstr</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T Bool -&gt; Bool -&gt; Instr
+</span><a href="SAD.Data.Instr.html#SetBool"><span class="hs-identifier hs-var">SetBool</span></a></span><span> </span><span class="annot"><span class="annottext">T Bool
+</span><a href="SAD.Data.Instr.html#proveParam"><span class="hs-identifier hs-var">proveParam</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-114"></span><span>                </span><span class="annot"><span class="annottext">T -&gt; Instr -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-var">ProofTextInstr</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T Bool -&gt; Bool -&gt; Instr
+</span><a href="SAD.Data.Instr.html#SetBool"><span class="hs-identifier hs-var">SetBool</span></a></span><span> </span><span class="annot"><span class="annottext">T Bool
+</span><a href="SAD.Data.Instr.html#checkParam"><span class="hs-identifier hs-var">checkParam</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span class="hs-special">)</span><span>
+</span><span id="line-115"></span><span>              </span><span class="hs-special">]</span><span>
+</span><span id="line-116"></span><span>            </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254431"><span class="hs-identifier hs-var">proofTexts</span></a></span><span>
+</span><span id="line-117"></span><span>        </span><span class="annot"><span class="annottext">([ProofText], [Report]) -&gt; IO ([ProofText], [Report])
+forall a. a -&gt; IO a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254435"><span class="hs-identifier hs-var">proofTexts'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[Report]
+</span><a href="#local-6989586621679254432"><span class="hs-identifier hs-var">reports</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-118"></span><span>
+</span><span id="line-119"></span><span class="annot"><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var">reader</span></a></span><span> </span><span id="local-6989586621679254436"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254436"><span class="hs-identifier hs-var">depth</span></a></span></span><span> </span><span id="local-6989586621679254437"><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254437"><span class="hs-identifier hs-var">dialect</span></a></span></span><span> </span><span id="local-6989586621679254438"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254438"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span></span><span> </span><span id="local-6989586621679254439"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254439"><span class="hs-identifier hs-var">doneFiles</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679254440"><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254440"><span class="hs-identifier hs-var">pState</span></a></span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span id="local-6989586621679254441"><span class="annot"><span class="annottext">[State FState]
+</span><a href="#local-6989586621679254441"><span class="hs-identifier hs-var">states</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-type">ProofTextInstr</span></a></span><span> </span><span id="local-6989586621679254442"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679254442"><span class="hs-identifier hs-var">pos</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Instr.html#GetAbsoluteFilePath"><span class="hs-identifier hs-type">GetAbsoluteFilePath</span></a></span><span> </span><span id="local-6989586621679254443"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254443"><span class="hs-identifier hs-var">absoluteFilePath</span></a></span></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-120"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254443"><span class="hs-identifier hs-var">absoluteFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; Bool
+forall a. Eq a =&gt; a -&gt; [a] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-operator hs-var">`elem`</span></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254439"><span class="hs-identifier hs-var">doneFiles</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-121"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679254444"><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254444"><span class="hs-identifier hs-var">newProofText</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679254445"><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254445"><span class="hs-identifier hs-var">newState</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State FState -&gt; IO ([ProofText], State FState)
+</span><a href="SAD.Import.Reader.html#parseState"><span class="hs-identifier hs-var">parseState</span></a></span><span> </span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254440"><span class="hs-identifier hs-var">pState</span></a></span><span>
+</span><span id="line-122"></span><span>      </span><span class="annot"><span class="annottext">Int
+-&gt; ParserKind
+-&gt; String
+-&gt; [String]
+-&gt; [State FState]
+-&gt; [ProofText]
+-&gt; IO ([ProofText], [Report])
+</span><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var">reader</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254436"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254437"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254438"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254439"><span class="hs-identifier hs-var">doneFiles</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254445"><span class="hs-identifier hs-var">newState</span></a></span><span class="annot"><span class="annottext">State FState -&gt; [State FState] -&gt; [State FState]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[State FState]
+</span><a href="#local-6989586621679254441"><span class="hs-identifier hs-var">states</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254444"><span class="hs-identifier hs-var">newProofText</span></a></span><span>
+</span><span id="line-123"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-124"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679254447"><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254447"><span class="hs-identifier hs-var">newProofText</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679254448"><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254448"><span class="hs-identifier hs-var">newState</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ParserKind
+-&gt; String -&gt; State FState -&gt; IO ([ProofText], State FState)
+</span><a href="SAD.Import.Reader.html#parseFile"><span class="hs-identifier hs-var">parseFile</span></a></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254437"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254443"><span class="hs-identifier hs-var">absoluteFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254440"><span class="hs-identifier hs-var">pState</span></a></span><span>
+</span><span id="line-125"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679254453"><span class="annot"><span class="annottext">newProofText' :: [ProofText]
+</span><a href="#local-6989586621679254453"><span class="hs-identifier hs-var hs-var">newProofText'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254436"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-126"></span><span>          </span><span class="hs-keyword">then</span><span> </span><span class="hs-special">[</span><span>
+</span><span id="line-127"></span><span>              </span><span class="annot"><span class="annottext">T -&gt; Instr -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-var">ProofTextInstr</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T Bool -&gt; Bool -&gt; Instr
+</span><a href="SAD.Data.Instr.html#SetBool"><span class="hs-identifier hs-var">SetBool</span></a></span><span> </span><span class="annot"><span class="annottext">T Bool
+</span><a href="SAD.Data.Instr.html#proveParam"><span class="hs-identifier hs-var">proveParam</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-128"></span><span>              </span><span class="annot"><span class="annottext">T -&gt; Instr -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-var">ProofTextInstr</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T Bool -&gt; Bool -&gt; Instr
+</span><a href="SAD.Data.Instr.html#SetBool"><span class="hs-identifier hs-var">SetBool</span></a></span><span> </span><span class="annot"><span class="annottext">T Bool
+</span><a href="SAD.Data.Instr.html#checkParam"><span class="hs-identifier hs-var">checkParam</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span>
+</span><span id="line-129"></span><span>            </span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[ProofText] -&gt; [ProofText] -&gt; [ProofText]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254447"><span class="hs-identifier hs-var">newProofText</span></a></span><span>
+</span><span id="line-130"></span><span>          </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254447"><span class="hs-identifier hs-var">newProofText</span></a></span><span>
+</span><span id="line-131"></span><span>      </span><span class="hs-comment">-- state from before reading is still here</span><span>
+</span><span id="line-132"></span><span>      </span><span class="annot"><span class="annottext">Int
+-&gt; ParserKind
+-&gt; String
+-&gt; [String]
+-&gt; [State FState]
+-&gt; [ProofText]
+-&gt; IO ([ProofText], [Report])
+</span><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var">reader</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254436"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254437"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254438"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254443"><span class="hs-identifier hs-var">absoluteFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; [String]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254439"><span class="hs-identifier hs-var">doneFiles</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254448"><span class="hs-identifier hs-var">newState</span></a></span><span class="annot"><span class="annottext">State FState -&gt; [State FState] -&gt; [State FState]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254440"><span class="hs-identifier hs-var">pState</span></a></span><span class="annot"><span class="annottext">State FState -&gt; [State FState] -&gt; [State FState]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[State FState]
+</span><a href="#local-6989586621679254441"><span class="hs-identifier hs-var">states</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254453"><span class="hs-identifier hs-var">newProofText'</span></a></span><span>
+</span><span id="line-133"></span><span>
+</span><span id="line-134"></span><span class="annot"><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var">reader</span></a></span><span> </span><span id="local-6989586621679254455"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254455"><span class="hs-identifier hs-var">depth</span></a></span></span><span> </span><span id="local-6989586621679254456"><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254456"><span class="hs-identifier hs-var">dialect</span></a></span></span><span> </span><span id="local-6989586621679254457"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254457"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span></span><span> </span><span id="local-6989586621679254458"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254458"><span class="hs-identifier hs-var">doneFiles</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679254459"><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254459"><span class="hs-identifier hs-var">pState</span></a></span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span id="local-6989586621679254460"><span class="annot"><span class="annottext">[State FState]
+</span><a href="#local-6989586621679254460"><span class="hs-identifier hs-var">states</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-type">ProofTextInstr</span></a></span><span> </span><span id="local-6989586621679254461"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679254461"><span class="hs-identifier hs-var">pos</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Instr.html#GetText"><span class="hs-identifier hs-type">GetText</span></a></span><span> </span><span id="local-6989586621679254463"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679254463"><span class="hs-identifier hs-var">text</span></a></span></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-135"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679254464"><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254464"><span class="hs-identifier hs-var">newProofText</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679254465"><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254465"><span class="hs-identifier hs-var">newState</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ParserKind
+-&gt; Bytes -&gt; State FState -&gt; IO ([ProofText], State FState)
+</span><a href="SAD.Import.Reader.html#parseBytes"><span class="hs-identifier hs-var">parseBytes</span></a></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254456"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679254463"><span class="hs-identifier hs-var">text</span></a></span><span> </span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254459"><span class="hs-identifier hs-var">pState</span></a></span><span>
+</span><span id="line-136"></span><span>    </span><span class="annot"><span class="annottext">Int
+-&gt; ParserKind
+-&gt; String
+-&gt; [String]
+-&gt; [State FState]
+-&gt; [ProofText]
+-&gt; IO ([ProofText], [Report])
+</span><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var">reader</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254455"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254456"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254457"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254458"><span class="hs-identifier hs-var">doneFiles</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254465"><span class="hs-identifier hs-var">newState</span></a></span><span> </span><span class="annot"><span class="annottext">State FState -&gt; [State FState] -&gt; [State FState]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254459"><span class="hs-identifier hs-var">pState</span></a></span><span> </span><span class="annot"><span class="annottext">State FState -&gt; [State FState] -&gt; [State FState]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">[State FState]
+</span><a href="#local-6989586621679254460"><span class="hs-identifier hs-var">states</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254464"><span class="hs-identifier hs-var">newProofText</span></a></span><span> </span><span class="hs-comment">-- state from before reading is still here</span><span>
+</span><span id="line-137"></span><span>
+</span><span id="line-138"></span><span class="hs-comment">-- This says that we are only really processing the last instruction in a [ProofText].</span><span>
+</span><span id="line-139"></span><span class="annot"><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var">reader</span></a></span><span> </span><span id="local-6989586621679254467"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254467"><span class="hs-identifier hs-var">depth</span></a></span></span><span> </span><span id="local-6989586621679254468"><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254468"><span class="hs-identifier hs-var">dialect</span></a></span></span><span> </span><span id="local-6989586621679254469"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254469"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span></span><span> </span><span id="local-6989586621679254470"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254470"><span class="hs-identifier hs-var">doneFiles</span></a></span></span><span> </span><span id="local-6989586621679254471"><span class="annot"><span class="annottext">[State FState]
+</span><a href="#local-6989586621679254471"><span class="hs-identifier hs-var">stateList</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679254472"><span class="annot"><span class="annottext">ProofText
+</span><a href="#local-6989586621679254472"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span id="local-6989586621679254473"><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254473"><span class="hs-identifier hs-var">restProofText</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-140"></span><span>  </span><span class="hs-special">(</span><span id="local-6989586621679254474"><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254474"><span class="hs-identifier hs-var">ts</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679254475"><span class="annot"><span class="annottext">[Report]
+</span><a href="#local-6989586621679254475"><span class="hs-identifier hs-var">ls</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Int
+-&gt; ParserKind
+-&gt; String
+-&gt; [String]
+-&gt; [State FState]
+-&gt; [ProofText]
+-&gt; IO ([ProofText], [Report])
+</span><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var">reader</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254467"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254468"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254469"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254470"><span class="hs-identifier hs-var">doneFiles</span></a></span><span> </span><span class="annot"><span class="annottext">[State FState]
+</span><a href="#local-6989586621679254471"><span class="hs-identifier hs-var">stateList</span></a></span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254473"><span class="hs-identifier hs-var">restProofText</span></a></span><span>
+</span><span id="line-141"></span><span>  </span><span class="annot"><span class="annottext">([ProofText], [Report]) -&gt; IO ([ProofText], [Report])
+forall a. a -&gt; IO a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ProofText
+</span><a href="#local-6989586621679254472"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">ProofText -&gt; [ProofText] -&gt; [ProofText]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254474"><span class="hs-identifier hs-var">ts</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[Report]
+</span><a href="#local-6989586621679254475"><span class="hs-identifier hs-var">ls</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-142"></span><span>
+</span><span id="line-143"></span><span class="annot"><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var">reader</span></a></span><span> </span><span id="local-6989586621679254476"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254476"><span class="hs-identifier hs-var">depth</span></a></span></span><span> </span><span id="local-6989586621679254477"><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254477"><span class="hs-identifier hs-var">dialect</span></a></span></span><span> </span><span id="local-6989586621679254478"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254478"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span></span><span> </span><span id="local-6989586621679254479"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254479"><span class="hs-identifier hs-var">doneFiles</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679254480"><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254480"><span class="hs-identifier hs-var">pState</span></a></span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span id="local-6989586621679254481"><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254481"><span class="hs-identifier hs-var">oldState</span></a></span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span id="local-6989586621679254482"><span class="annot"><span class="annottext">[State FState]
+</span><a href="#local-6989586621679254482"><span class="hs-identifier hs-var">rest</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-144"></span><span>  </span><span class="annot"><span class="annottext">Kind -&gt; T -&gt; String -&gt; IO ()
+forall a. BYTES a =&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#outputParser"><span class="hs-identifier hs-var">Message.outputParser</span></a></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><a href="SAD.Core.Message.html#TRACING"><span class="hs-identifier hs-var">Message.TRACING</span></a></span><span>
+</span><span id="line-145"></span><span>    </span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; Bool
+forall a. [a] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">null</span></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254479"><span class="hs-identifier hs-var">doneFiles</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; T
+</span><a href="Isabelle.Position.html#file_only"><span class="hs-identifier hs-var">Position.file_only</span></a></span><span> </span><span class="annot"><span class="annottext">(Bytes -&gt; T) -&gt; Bytes -&gt; T
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Bytes
+forall a. BYTES a =&gt; a -&gt; Bytes
+</span><a href="Isabelle.Library.html#make_bytes"><span class="hs-identifier hs-var">make_bytes</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Bytes) -&gt; String -&gt; Bytes
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+forall a. HasCallStack =&gt; [a] -&gt; a
+</span><span class="hs-identifier hs-var">head</span></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254479"><span class="hs-identifier hs-var">doneFiles</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;parsing successful&quot;</span></span><span>
+</span><span id="line-146"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679254488"><span class="annot"><span class="annottext">resetState :: State FState
+</span><a href="#local-6989586621679254488"><span class="hs-identifier hs-var hs-var">resetState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254481"><span class="hs-identifier hs-var">oldState</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-147"></span><span>        </span><span class="annot"><a href="SAD.Parser.Base.html#stUser"><span class="hs-identifier hs-var">stUser</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Parser.Base.html#stUser"><span class="hs-identifier hs-var">stUser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679254480"><span class="hs-identifier hs-type">pState</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">{</span><span class="annot"><a href="SAD.ForTheL.Base.html#tvrExpr"><span class="hs-identifier hs-var">tvrExpr</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#tvrExpr"><span class="hs-identifier hs-var">tvrExpr</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">$</span></span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#stUser"><span class="hs-identifier hs-var">stUser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679254481"><span class="hs-identifier hs-type">oldState</span></a></span><span class="hs-special">}</span><span class="hs-special">}</span><span>
+</span><span id="line-148"></span><span>  </span><span class="hs-comment">-- Continue running a parser after eg. a read instruction was evaluated.</span><span>
+</span><span id="line-149"></span><span>  </span><span class="hs-special">(</span><span id="local-6989586621679254491"><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254491"><span class="hs-identifier hs-var">newProofText</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679254492"><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254492"><span class="hs-identifier hs-var">newState</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">State FState -&gt; IO ([ProofText], State FState)
+</span><a href="SAD.Import.Reader.html#parseState"><span class="hs-identifier hs-var">parseState</span></a></span><span> </span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254488"><span class="hs-identifier hs-var">resetState</span></a></span><span>
+</span><span id="line-150"></span><span>  </span><span class="hs-special">(</span><span id="local-6989586621679254493"><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254493"><span class="hs-identifier hs-var">newProofText'</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679254494"><span class="annot"><span class="annottext">[Report]
+</span><a href="#local-6989586621679254494"><span class="hs-identifier hs-var">reports</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Int
+-&gt; ParserKind
+-&gt; String
+-&gt; [String]
+-&gt; [State FState]
+-&gt; [ProofText]
+-&gt; IO ([ProofText], [Report])
+</span><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var">reader</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254476"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254476"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+forall a. Num a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-glyph hs-var">-</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254477"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254478"><span class="hs-identifier hs-var">naprocheFormalizationsPath</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679254479"><span class="hs-identifier hs-var">doneFiles</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254492"><span class="hs-identifier hs-var">newState</span></a></span><span> </span><span class="annot"><span class="annottext">State FState -&gt; [State FState] -&gt; [State FState]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">[State FState]
+</span><a href="#local-6989586621679254482"><span class="hs-identifier hs-var">rest</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254491"><span class="hs-identifier hs-var">newProofText</span></a></span><span>
+</span><span id="line-151"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679254497"><span class="annot"><span class="annottext">newProofText'' :: [ProofText]
+</span><a href="#local-6989586621679254497"><span class="hs-identifier hs-var hs-var">newProofText''</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679254476"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">1</span></span><span>
+</span><span id="line-152"></span><span>        </span><span class="hs-keyword">then</span><span> </span><span class="hs-special">[</span><span>
+</span><span id="line-153"></span><span>            </span><span class="annot"><span class="annottext">T -&gt; Instr -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-var">ProofTextInstr</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T Bool -&gt; Bool -&gt; Instr
+</span><a href="SAD.Data.Instr.html#SetBool"><span class="hs-identifier hs-var">SetBool</span></a></span><span> </span><span class="annot"><span class="annottext">T Bool
+</span><a href="SAD.Data.Instr.html#proveParam"><span class="hs-identifier hs-var">proveParam</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-154"></span><span>            </span><span class="annot"><span class="annottext">T -&gt; Instr -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextInstr"><span class="hs-identifier hs-var">ProofTextInstr</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T Bool -&gt; Bool -&gt; Instr
+</span><a href="SAD.Data.Instr.html#SetBool"><span class="hs-identifier hs-var">SetBool</span></a></span><span> </span><span class="annot"><span class="annottext">T Bool
+</span><a href="SAD.Data.Instr.html#checkParam"><span class="hs-identifier hs-var">checkParam</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span class="hs-special">)</span><span>
+</span><span id="line-155"></span><span>          </span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[ProofText] -&gt; [ProofText] -&gt; [ProofText]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254493"><span class="hs-identifier hs-var">newProofText'</span></a></span><span>
+</span><span id="line-156"></span><span>        </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254493"><span class="hs-identifier hs-var">newProofText'</span></a></span><span>
+</span><span id="line-157"></span><span>  </span><span class="annot"><span class="annottext">([ProofText], [Report]) -&gt; IO ([ProofText], [Report])
+forall a. a -&gt; IO a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[ProofText]
+</span><a href="#local-6989586621679254497"><span class="hs-identifier hs-var">newProofText''</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[Report]
+</span><a href="#local-6989586621679254494"><span class="hs-identifier hs-var">reports</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-158"></span><span>
+</span><span id="line-159"></span><span>
+</span><span id="line-160"></span><span class="annot"><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var">reader</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679254498"><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254498"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span class="annot"><span class="annottext">[State FState]
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([ProofText], [Report]) -&gt; IO ([ProofText], [Report])
+forall a. a -&gt; IO a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">FState -&gt; [Report]
+</span><a href="SAD.ForTheL.Base.html#reports"><span class="hs-identifier hs-var">reports</span></a></span><span> </span><span class="annot"><span class="annottext">(FState -&gt; [Report]) -&gt; FState -&gt; [Report]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">State FState -&gt; FState
+forall st. State st -&gt; st
+</span><a href="SAD.Parser.Base.html#stUser"><span class="hs-identifier hs-var">stUser</span></a></span><span> </span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254498"><span class="hs-identifier hs-var">state</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-161"></span><span>
+</span><span id="line-162"></span><span class="annot"><a href="SAD.Import.Reader.html#reader"><span class="hs-identifier hs-var">reader</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">[State FState]
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">[ProofText]
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; IO ([ProofText], [Report])
+forall a. String -&gt; String -&gt; a
+</span><a href="SAD.Helpers.html#failWithMessage"><span class="hs-identifier hs-var">failWithMessage</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;SAD.Parser.Base.reader&quot;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Invalid arguments.&quot;</span></span><span>
+</span><span id="line-163"></span><span>
+</span><span id="line-164"></span><span class="annot"><span class="hs-comment">-- | Consequtively lex, tokenize and parse a byte string.</span></span><span>
+</span><span id="line-165"></span><span class="annot"><a href="SAD.Import.Reader.html#parse"><span class="hs-identifier hs-type">parse</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Instr.html#ParserKind"><span class="hs-identifier hs-type">ParserKind</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FState"><span class="hs-identifier hs-type">FState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FState"><span class="hs-identifier hs-type">FState</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-166"></span><span id="parse"><span class="annot"><span class="annottext">parse :: ParserKind
+-&gt; T -&gt; Bytes -&gt; State FState -&gt; IO ([ProofText], State FState)
+</span><a href="SAD.Import.Reader.html#parse"><span class="hs-identifier hs-var hs-var">parse</span></a></span></span><span> </span><span id="local-6989586621679254501"><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254501"><span class="hs-identifier hs-var">dialect</span></a></span></span><span> </span><span id="local-6989586621679254502"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679254502"><span class="hs-identifier hs-var">pos</span></a></span></span><span> </span><span id="local-6989586621679254503"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679254503"><span class="hs-identifier hs-var">bytes</span></a></span></span><span> </span><span id="local-6989586621679254504"><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254504"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-167"></span><span>  </span><span id="local-6989586621679254505"><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679254505"><span class="hs-identifier hs-var">tokens</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254501"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-168"></span><span>    </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="SAD.Data.Instr.html#Ftl"><span class="hs-identifier hs-var">Ftl</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">T -&gt; Bytes -&gt; IO [Lexeme]
+</span><a href="SAD.Parser.FTL.Lexer.html#lex"><span class="hs-identifier hs-var">FTL.lex</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679254502"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679254503"><span class="hs-identifier hs-var">bytes</span></a></span><span> </span><span class="annot"><span class="annottext">IO [Lexeme] -&gt; ([Lexeme] -&gt; IO [Token]) -&gt; IO [Token]
+forall a b. IO a -&gt; (a -&gt; IO b) -&gt; IO b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">[Lexeme] -&gt; IO [Token]
+</span><a href="SAD.Parser.FTL.Token.html#tokenize"><span class="hs-identifier hs-var">FTL.tokenize</span></a></span><span>
+</span><span id="line-169"></span><span>    </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="SAD.Data.Instr.html#Tex"><span class="hs-identifier hs-var">Tex</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">T -&gt; Bytes -&gt; IO [Lexeme]
+</span><a href="SAD.Parser.TEX.Lexer.html#lex"><span class="hs-identifier hs-var">TEX.lex</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679254502"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679254503"><span class="hs-identifier hs-var">bytes</span></a></span><span> </span><span class="annot"><span class="annottext">IO [Lexeme] -&gt; ([Lexeme] -&gt; IO [Token]) -&gt; IO [Token]
+forall a b. IO a -&gt; (a -&gt; IO b) -&gt; IO b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">[Lexeme] -&gt; IO [Token]
+</span><a href="SAD.Parser.TEX.Token.html#tokenize"><span class="hs-identifier hs-var">TEX.tokenize</span></a></span><span>
+</span><span id="line-170"></span><span>    </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="SAD.Data.Instr.html#Stex"><span class="hs-identifier hs-var">Stex</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">T -&gt; Bytes -&gt; IO [Lexeme]
+</span><a href="SAD.Parser.TEX.Lexer.html#lex"><span class="hs-identifier hs-var">STEX.lex</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679254502"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679254503"><span class="hs-identifier hs-var">bytes</span></a></span><span> </span><span class="annot"><span class="annottext">IO [Lexeme] -&gt; ([Lexeme] -&gt; IO [Token]) -&gt; IO [Token]
+forall a b. IO a -&gt; (a -&gt; IO b) -&gt; IO b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">[Lexeme] -&gt; IO [Token]
+</span><a href="SAD.Parser.TEX.Token.html#tokenize"><span class="hs-identifier hs-var">STEX.tokenize</span></a></span><span>
+</span><span id="line-171"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span>
+</span><span id="line-172"></span><span>      </span><span id="local-6989586621679254510"><span class="annot"><span class="annottext">addInits :: FState -&gt; FState
+</span><a href="#local-6989586621679254510"><span class="hs-identifier hs-var hs-var">addInits</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254501"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-173"></span><span>        </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="SAD.Data.Instr.html#Ftl"><span class="hs-identifier hs-var">Ftl</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">FState -&gt; FState
+</span><a href="SAD.ForTheL.FTL.Base.html#addInits"><span class="hs-identifier hs-var">FTL.addInits</span></a></span><span>
+</span><span id="line-174"></span><span>        </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="SAD.Data.Instr.html#Tex"><span class="hs-identifier hs-var">Tex</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">FState -&gt; FState
+</span><a href="SAD.ForTheL.TEX.Base.html#addInits"><span class="hs-identifier hs-var">TEX.addInits</span></a></span><span>
+</span><span id="line-175"></span><span>        </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="SAD.Data.Instr.html#Stex"><span class="hs-identifier hs-var">Stex</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">FState -&gt; FState
+</span><a href="SAD.ForTheL.STEX.Base.html#addInits"><span class="hs-identifier hs-var">STEX.addInits</span></a></span><span>
+</span><span id="line-176"></span><span>      </span><span id="local-6989586621679254514"><span class="annot"><span class="annottext">newState :: State FState
+</span><a href="#local-6989586621679254514"><span class="hs-identifier hs-var hs-var">newState</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-177"></span><span>        </span><span class="annot"><span class="annottext">stUser :: FState
+</span><a href="SAD.Parser.Base.html#stUser"><span class="hs-identifier hs-var">stUser</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FState -&gt; FState
+</span><a href="#local-6989586621679254510"><span class="hs-identifier hs-var">addInits</span></a></span><span> </span><span class="annot"><span class="annottext">(FState -&gt; FState) -&gt; FState -&gt; FState
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">State FState -&gt; FState
+forall st. State st -&gt; st
+</span><a href="SAD.Parser.Base.html#stUser"><span class="hs-identifier hs-var">stUser</span></a></span><span> </span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254504"><span class="hs-identifier hs-var">state</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">{</span><span class="annot"><a href="SAD.ForTheL.Base.html#tvrExpr"><span class="hs-identifier hs-var">tvrExpr</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">}</span><span class="hs-special">,</span><span>
+</span><span id="line-178"></span><span>        </span><span class="annot"><span class="annottext">stInput :: [Token]
+</span><a href="SAD.Parser.Base.html#stInput"><span class="hs-identifier hs-var">stInput</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679254505"><span class="hs-identifier hs-var">tokens</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-179"></span><span>        </span><span class="annot"><span class="annottext">parserKind :: ParserKind
+</span><a href="SAD.Parser.Base.html#parserKind"><span class="hs-identifier hs-var">parserKind</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254501"><span class="hs-identifier hs-var">dialect</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-180"></span><span>        </span><span class="annot"><span class="annottext">lastPosition :: T
+</span><a href="SAD.Parser.Base.html#lastPosition"><span class="hs-identifier hs-var">lastPosition</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span>
+</span><span id="line-181"></span><span>      </span><span class="hs-special">}</span><span>
+</span><span id="line-182"></span><span>  </span><span class="annot"><span class="annottext">State FState -&gt; IO ([ProofText], State FState)
+</span><a href="SAD.Import.Reader.html#parseState"><span class="hs-identifier hs-var">parseState</span></a></span><span> </span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254514"><span class="hs-identifier hs-var">newState</span></a></span><span>
+</span><span id="line-183"></span><span>
+</span><span id="line-184"></span><span class="annot"><span class="hs-comment">-- | Parse a byte string.</span></span><span>
+</span><span id="line-185"></span><span class="annot"><a href="SAD.Import.Reader.html#parseBytes"><span class="hs-identifier hs-type">parseBytes</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Instr.html#ParserKind"><span class="hs-identifier hs-type">ParserKind</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FState"><span class="hs-identifier hs-type">FState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FState"><span class="hs-identifier hs-type">FState</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-186"></span><span id="parseBytes"><span class="annot"><span class="annottext">parseBytes :: ParserKind
+-&gt; Bytes -&gt; State FState -&gt; IO ([ProofText], State FState)
+</span><a href="SAD.Import.Reader.html#parseBytes"><span class="hs-identifier hs-var hs-var">parseBytes</span></a></span></span><span> </span><span id="local-6989586621679254519"><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254519"><span class="hs-identifier hs-var">dialect</span></a></span></span><span> </span><span id="local-6989586621679254520"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679254520"><span class="hs-identifier hs-var">bytes</span></a></span></span><span> </span><span id="local-6989586621679254521"><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254521"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-187"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679254522"><span class="annot"><span class="annottext">pos :: T
+</span><a href="#local-6989586621679254522"><span class="hs-identifier hs-var hs-var">pos</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#start"><span class="hs-identifier hs-var">Position.start</span></a></span><span>
+</span><span id="line-188"></span><span>  </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">ParserKind
+-&gt; T -&gt; Bytes -&gt; State FState -&gt; IO ([ProofText], State FState)
+</span><a href="SAD.Import.Reader.html#parse"><span class="hs-identifier hs-var">parse</span></a></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254519"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679254522"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679254520"><span class="hs-identifier hs-var">bytes</span></a></span><span> </span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254521"><span class="hs-identifier hs-var">state</span></a></span><span class="hs-special">{</span><span class="annot"><a href="SAD.Parser.Base.html#parserKind"><span class="hs-identifier hs-var">parserKind</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="#local-6989586621679254519"><span class="hs-identifier hs-type">dialect</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-189"></span><span>
+</span><span id="line-190"></span><span class="annot"><span class="hs-comment">-- | Parse a file (or the content of stdin if an empty file path is given).</span></span><span>
+</span><span id="line-191"></span><span class="annot"><a href="SAD.Import.Reader.html#parseFile"><span class="hs-identifier hs-type">parseFile</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Instr.html#ParserKind"><span class="hs-identifier hs-type">ParserKind</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FState"><span class="hs-identifier hs-type">FState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FState"><span class="hs-identifier hs-type">FState</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-192"></span><span id="parseFile"><span class="annot"><span class="annottext">parseFile :: ParserKind
+-&gt; String -&gt; State FState -&gt; IO ([ProofText], State FState)
+</span><a href="SAD.Import.Reader.html#parseFile"><span class="hs-identifier hs-var hs-var">parseFile</span></a></span></span><span> </span><span id="local-6989586621679254524"><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254524"><span class="hs-identifier hs-var">dialect</span></a></span></span><span> </span><span id="local-6989586621679254525"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254525"><span class="hs-identifier hs-var">filePath</span></a></span></span><span> </span><span id="local-6989586621679254526"><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254526"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-193"></span><span>  </span><span id="local-6989586621679254527"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679254527"><span class="hs-identifier hs-var">bytes</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO Bytes -&gt; (IOError -&gt; IO Bytes) -&gt; IO Bytes
+forall e a. Exception e =&gt; IO a -&gt; (e -&gt; IO a) -&gt; IO a
+</span><span class="hs-identifier hs-var">catch</span></span><span>
+</span><span id="line-194"></span><span>    </span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">String -&gt; Bool
+forall a. [a] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">null</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254525"><span class="hs-identifier hs-var">filePath</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">String -&gt; Bytes
+forall a. BYTES a =&gt; a -&gt; Bytes
+</span><a href="Isabelle.Library.html#make_bytes"><span class="hs-identifier hs-var">make_bytes</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Bytes) -&gt; IO String -&gt; IO Bytes
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">IO String
+</span><span class="hs-identifier hs-var">getContents</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">String -&gt; IO Bytes
+</span><a href="Isabelle.File.html#read"><span class="hs-identifier hs-var">File.read</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254525"><span class="hs-identifier hs-var">filePath</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-195"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T -&gt; Bytes -&gt; IO Bytes
+forall a b. BYTES a =&gt; T -&gt; a -&gt; IO b
+</span><a href="SAD.Core.Message.html#errorReader"><span class="hs-identifier hs-var">Message.errorReader</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes -&gt; T
+</span><a href="Isabelle.Position.html#file_only"><span class="hs-identifier hs-var">Position.file_only</span></a></span><span> </span><span class="annot"><span class="annottext">(Bytes -&gt; T) -&gt; Bytes -&gt; T
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Bytes
+forall a. BYTES a =&gt; a -&gt; Bytes
+</span><a href="Isabelle.Library.html#make_bytes"><span class="hs-identifier hs-var">make_bytes</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254525"><span class="hs-identifier hs-var">filePath</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Bytes -&gt; IO Bytes) -&gt; (IOError -&gt; Bytes) -&gt; IOError -&gt; IO Bytes
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Bytes
+forall a. BYTES a =&gt; a -&gt; Bytes
+</span><a href="Isabelle.Library.html#make_bytes"><span class="hs-identifier hs-var">make_bytes</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Bytes) -&gt; (IOError -&gt; String) -&gt; IOError -&gt; Bytes
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">IOError -&gt; String
+</span><span class="hs-identifier hs-var">ioeGetErrorString</span></span><span class="hs-special">)</span><span>
+</span><span id="line-196"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679254535"><span class="annot"><span class="annottext">pos :: T
+</span><a href="#local-6989586621679254535"><span class="hs-identifier hs-var hs-var">pos</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; T
+</span><a href="Isabelle.Position.html#file"><span class="hs-identifier hs-var">Position.file</span></a></span><span> </span><span class="annot"><span class="annottext">(Bytes -&gt; T) -&gt; Bytes -&gt; T
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Bytes
+forall a. BYTES a =&gt; a -&gt; Bytes
+</span><a href="Isabelle.Library.html#make_bytes"><span class="hs-identifier hs-var">make_bytes</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679254525"><span class="hs-identifier hs-var">filePath</span></a></span><span>
+</span><span id="line-197"></span><span>  </span><span class="annot"><span class="annottext">ParserKind
+-&gt; T -&gt; Bytes -&gt; State FState -&gt; IO ([ProofText], State FState)
+</span><a href="SAD.Import.Reader.html#parse"><span class="hs-identifier hs-var">parse</span></a></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254524"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679254535"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679254527"><span class="hs-identifier hs-var">bytes</span></a></span><span> </span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254526"><span class="hs-identifier hs-var">state</span></a></span><span class="hs-special">{</span><span class="annot"><a href="SAD.Parser.Base.html#parserKind"><span class="hs-identifier hs-var">parserKind</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="#local-6989586621679254524"><span class="hs-identifier hs-type">dialect</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-198"></span><span>
+</span><span id="line-199"></span><span class="annot"><span class="hs-comment">-- | Parse (the tokens contained in) a state.</span></span><span>
+</span><span id="line-200"></span><span class="annot"><a href="SAD.Import.Reader.html#parseState"><span class="hs-identifier hs-type">parseState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FState"><span class="hs-identifier hs-type">FState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FState"><span class="hs-identifier hs-type">FState</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-201"></span><span id="parseState"><span class="annot"><span class="annottext">parseState :: State FState -&gt; IO ([ProofText], State FState)
+</span><a href="SAD.Import.Reader.html#parseState"><span class="hs-identifier hs-var hs-var">parseState</span></a></span></span><span> </span><span id="local-6989586621679254537"><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254537"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-202"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679254538"><span class="annot"><span class="annottext">dialect :: ParserKind
+</span><a href="#local-6989586621679254538"><span class="hs-identifier hs-var hs-var">dialect</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">State FState -&gt; ParserKind
+forall st. State st -&gt; ParserKind
+</span><a href="SAD.Parser.Base.html#parserKind"><span class="hs-identifier hs-var">parserKind</span></a></span><span> </span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254537"><span class="hs-identifier hs-var">state</span></a></span><span>
+</span><span id="line-203"></span><span>      </span><span id="local-6989586621679254539"><span class="annot"><span class="annottext">parser :: FTL [ProofText]
+</span><a href="#local-6989586621679254539"><span class="hs-identifier hs-var hs-var">parser</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679254538"><span class="hs-identifier hs-var">dialect</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-204"></span><span>        </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="SAD.Data.Instr.html#Ftl"><span class="hs-identifier hs-var">Ftl</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">FTL [ProofText]
+</span><a href="SAD.ForTheL.FTL.Structure.html#forthelText"><span class="hs-identifier hs-var">FTL.forthelText</span></a></span><span>
+</span><span id="line-205"></span><span>        </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="SAD.Data.Instr.html#Tex"><span class="hs-identifier hs-var">Tex</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">FTL [ProofText]
+</span><a href="SAD.ForTheL.TEX.Structure.html#forthelText"><span class="hs-identifier hs-var">TEX.forthelText</span></a></span><span>
+</span><span id="line-206"></span><span>        </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="SAD.Data.Instr.html#Stex"><span class="hs-identifier hs-var">Stex</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">FTL [ProofText]
+</span><a href="SAD.ForTheL.STEX.Structure.html#forthelText"><span class="hs-identifier hs-var">STEX.forthelText</span></a></span><span>
+</span><span id="line-207"></span><span>  </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">FTL [ProofText] -&gt; State FState -&gt; IO ([ProofText], State FState)
+forall st a. Parser st a -&gt; State st -&gt; IO (a, State st)
+</span><a href="SAD.Parser.Base.html#launchParser"><span class="hs-identifier hs-var">launchParser</span></a></span><span> </span><span class="annot"><span class="annottext">FTL [ProofText]
+</span><a href="#local-6989586621679254539"><span class="hs-identifier hs-var">parser</span></a></span><span> </span><span class="annot"><span class="annottext">State FState
+</span><a href="#local-6989586621679254537"><span class="hs-identifier hs-var">state</span></a></span><span>
+</span><span id="line-208"></span><span>
+</span><span id="line-209"></span><span class="annot"><a href="SAD.Import.Reader.html#initState"><span class="hs-identifier hs-type">initState</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Program.html#Context"><span class="hs-identifier hs-type">Program.Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Parser.Token.html#Token"><span class="hs-identifier hs-type">Token</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FState"><span class="hs-identifier hs-type">FState</span></a></span><span>
+</span><span id="line-210"></span><span id="initState"><span class="annot"><span class="annottext">initState :: Context -&gt; [Token] -&gt; State FState
+</span><a href="SAD.Import.Reader.html#initState"><span class="hs-identifier hs-var hs-var">initState</span></a></span></span><span> </span><span id="local-6989586621679254544"><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679254544"><span class="hs-identifier hs-var">context</span></a></span></span><span> </span><span id="local-6989586621679254545"><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679254545"><span class="hs-identifier hs-var">tokens</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FState -&gt; [Token] -&gt; ParserKind -&gt; T -&gt; State FState
+forall st. st -&gt; [Token] -&gt; ParserKind -&gt; T -&gt; State st
+</span><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-var">State</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Context -&gt; FState
+</span><a href="SAD.ForTheL.Base.html#initFState"><span class="hs-identifier hs-var">initFState</span></a></span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679254544"><span class="hs-identifier hs-var">context</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679254545"><span class="hs-identifier hs-var">tokens</span></a></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="SAD.Data.Instr.html#Ftl"><span class="hs-identifier hs-var">Ftl</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span>
+</span><span id="line-211"></span><span>
+</span><span id="line-212"></span><span>
+</span><span id="line-213"></span></pre></body></html>

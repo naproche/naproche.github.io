@@ -1,0 +1,303 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.Data.Text.Context</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2001 - 2008, Andrei Paskevich,</span><span>
+</span><span id="line-4"></span><span class="hs-comment">--               (c) 2017 - 2018, Steffen Frerix</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-6"></span><span class="hs-comment">--</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- TODO: Add description.</span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.Data.Text.Context</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-14"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier">Context</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Context.html#MRule"><span class="hs-identifier">MRule</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Context.html#name"><span class="hs-identifier">name</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Context.html#setFormula"><span class="hs-identifier">setFormula</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Context.html#isLowLevel"><span class="hs-identifier">isLowLevel</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Context.html#link"><span class="hs-identifier">link</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Context.html#head"><span class="hs-identifier">head</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Context.html#isAssumption"><span class="hs-identifier">isAssumption</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Context.html#declaredNames"><span class="hs-identifier">declaredNames</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-23"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Context.html#isTopLevel"><span class="hs-identifier">isTopLevel</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-24"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Context.html#output"><span class="hs-identifier">output</span></a></span><span>
+</span><span id="line-25"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Prelude</span></span><span> </span><span class="hs-keyword">hiding</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">head</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">tail</span></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Prelude</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">head</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">tail</span></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Text</span></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Set</span></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html"><span class="hs-identifier">SAD.Data.Text.Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Text.Block.html#Section"><span class="hs-identifier">Section</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html"><span class="hs-identifier">SAD.Data.Text.Block</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Block</span></span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Formula.html"><span class="hs-identifier">SAD.Data.Formula</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier">Formula</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Data.VarName.html#VariableName"><span class="hs-identifier">VariableName</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Export.TPTP.html"><span class="hs-identifier">SAD.Export.TPTP</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">TPTP</span></span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="hs-keyword">data</span><span> </span><span id="Context"><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-var">Context</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Context"><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-var">Context</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-40"></span><span>  </span><span id="formula"><span class="annot"><span class="annottext">Context -&gt; Formula
+</span><a href="SAD.Data.Text.Context.html#formula"><span class="hs-identifier hs-var hs-var">formula</span></a></span></span><span>        </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">,</span><span>  </span><span class="hs-comment">-- formula of the context</span><span>
+</span><span id="line-41"></span><span>  </span><span id="branch"><span class="annot"><span class="annottext">Context -&gt; [Block]
+</span><a href="SAD.Data.Text.Context.html#branch"><span class="hs-identifier hs-var hs-var">branch</span></a></span></span><span>         </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block.Block</span></a></span><span class="hs-special">]</span><span class="hs-special">,</span><span>  </span><span class="hs-comment">-- branch of the context</span><span>
+</span><span id="line-42"></span><span>  </span><span id="mesonRules"><span class="annot"><span class="annottext">Context -&gt; [MRule]
+</span><a href="SAD.Data.Text.Context.html#mesonRules"><span class="hs-identifier hs-var hs-var">mesonRules</span></a></span></span><span>     </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Context.html#MRule"><span class="hs-identifier hs-type">MRule</span></a></span><span class="hs-special">]</span><span class="hs-special">}</span><span>  </span><span class="hs-comment">-- MESON rules extracted from the formula</span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679254608"><span id="local-6989586621679254617"><span class="annot"><span class="annottext">Context -&gt; Context -&gt; Bool
+(Context -&gt; Context -&gt; Bool)
+-&gt; (Context -&gt; Context -&gt; Bool) -&gt; Eq Context
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Context -&gt; Context -&gt; Bool
+== :: Context -&gt; Context -&gt; Bool
+$c/= :: Context -&gt; Context -&gt; Bool
+/= :: Context -&gt; Context -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679254626"><span id="local-6989586621679254635"><span id="local-6989586621679254642"><span id="local-6989586621679254646"><span id="local-6989586621679254649"><span id="local-6989586621679254652"><span id="local-6989586621679254655"><span class="annot"><span class="annottext">Eq Context
+Eq Context =&gt;
+(Context -&gt; Context -&gt; Ordering)
+-&gt; (Context -&gt; Context -&gt; Bool)
+-&gt; (Context -&gt; Context -&gt; Bool)
+-&gt; (Context -&gt; Context -&gt; Bool)
+-&gt; (Context -&gt; Context -&gt; Bool)
+-&gt; (Context -&gt; Context -&gt; Context)
+-&gt; (Context -&gt; Context -&gt; Context)
+-&gt; Ord Context
+Context -&gt; Context -&gt; Bool
+Context -&gt; Context -&gt; Ordering
+Context -&gt; Context -&gt; Context
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: Context -&gt; Context -&gt; Ordering
+compare :: Context -&gt; Context -&gt; Ordering
+$c&lt; :: Context -&gt; Context -&gt; Bool
+&lt; :: Context -&gt; Context -&gt; Bool
+$c&lt;= :: Context -&gt; Context -&gt; Bool
+&lt;= :: Context -&gt; Context -&gt; Bool
+$c&gt; :: Context -&gt; Context -&gt; Bool
+&gt; :: Context -&gt; Context -&gt; Bool
+$c&gt;= :: Context -&gt; Context -&gt; Bool
+&gt;= :: Context -&gt; Context -&gt; Bool
+$cmax :: Context -&gt; Context -&gt; Context
+max :: Context -&gt; Context -&gt; Context
+$cmin :: Context -&gt; Context -&gt; Context
+min :: Context -&gt; Context -&gt; Context
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679254661"><span id="local-6989586621679254672"><span id="local-6989586621679254676"><span class="annot"><span class="annottext">Int -&gt; Context -&gt; ShowS
+[Context] -&gt; ShowS
+Context -&gt; String
+(Int -&gt; Context -&gt; ShowS)
+-&gt; (Context -&gt; String) -&gt; ([Context] -&gt; ShowS) -&gt; Show Context
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Context -&gt; ShowS
+showsPrec :: Int -&gt; Context -&gt; ShowS
+$cshow :: Context -&gt; String
+show :: Context -&gt; String
+$cshowList :: [Context] -&gt; ShowS
+showList :: [Context] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="hs-keyword">data</span><span> </span><span id="MRule"><span class="annot"><a href="SAD.Data.Text.Context.html#MRule"><span class="hs-identifier hs-var">MRule</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="MR"><span class="annot"><a href="SAD.Data.Text.Context.html#MR"><span class="hs-identifier hs-var">MR</span></a></span></span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="assumption"><span class="annot"><span class="annottext">MRule -&gt; [Formula]
+</span><a href="SAD.Data.Text.Context.html#assumption"><span class="hs-identifier hs-var hs-var">assumption</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-comment">-- assumptions of the rule</span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="conclusion"><span class="annot"><span class="annottext">MRule -&gt; Formula
+</span><a href="SAD.Data.Text.Context.html#conclusion"><span class="hs-identifier hs-var hs-var">conclusion</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>   </span><span class="hs-comment">-- conclusion of the rule</span><span>
+</span><span id="line-48"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679254685"><span id="local-6989586621679254690"><span class="annot"><span class="annottext">MRule -&gt; MRule -&gt; Bool
+(MRule -&gt; MRule -&gt; Bool) -&gt; (MRule -&gt; MRule -&gt; Bool) -&gt; Eq MRule
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: MRule -&gt; MRule -&gt; Bool
+== :: MRule -&gt; MRule -&gt; Bool
+$c/= :: MRule -&gt; MRule -&gt; Bool
+/= :: MRule -&gt; MRule -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679254695"><span id="local-6989586621679254700"><span id="local-6989586621679254705"><span id="local-6989586621679254708"><span id="local-6989586621679254711"><span id="local-6989586621679254714"><span id="local-6989586621679254717"><span class="annot"><span class="annottext">Eq MRule
+Eq MRule =&gt;
+(MRule -&gt; MRule -&gt; Ordering)
+-&gt; (MRule -&gt; MRule -&gt; Bool)
+-&gt; (MRule -&gt; MRule -&gt; Bool)
+-&gt; (MRule -&gt; MRule -&gt; Bool)
+-&gt; (MRule -&gt; MRule -&gt; Bool)
+-&gt; (MRule -&gt; MRule -&gt; MRule)
+-&gt; (MRule -&gt; MRule -&gt; MRule)
+-&gt; Ord MRule
+MRule -&gt; MRule -&gt; Bool
+MRule -&gt; MRule -&gt; Ordering
+MRule -&gt; MRule -&gt; MRule
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: MRule -&gt; MRule -&gt; Ordering
+compare :: MRule -&gt; MRule -&gt; Ordering
+$c&lt; :: MRule -&gt; MRule -&gt; Bool
+&lt; :: MRule -&gt; MRule -&gt; Bool
+$c&lt;= :: MRule -&gt; MRule -&gt; Bool
+&lt;= :: MRule -&gt; MRule -&gt; Bool
+$c&gt; :: MRule -&gt; MRule -&gt; Bool
+&gt; :: MRule -&gt; MRule -&gt; Bool
+$c&gt;= :: MRule -&gt; MRule -&gt; Bool
+&gt;= :: MRule -&gt; MRule -&gt; Bool
+$cmax :: MRule -&gt; MRule -&gt; MRule
+max :: MRule -&gt; MRule -&gt; MRule
+$cmin :: MRule -&gt; MRule -&gt; MRule
+min :: MRule -&gt; MRule -&gt; MRule
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679254720"><span id="local-6989586621679254726"><span id="local-6989586621679254729"><span class="annot"><span class="annottext">Int -&gt; MRule -&gt; ShowS
+[MRule] -&gt; ShowS
+MRule -&gt; String
+(Int -&gt; MRule -&gt; ShowS)
+-&gt; (MRule -&gt; String) -&gt; ([MRule] -&gt; ShowS) -&gt; Show MRule
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; MRule -&gt; ShowS
+showsPrec :: Int -&gt; MRule -&gt; ShowS
+$cshow :: MRule -&gt; String
+show :: MRule -&gt; String
+$cshowList :: [MRule] -&gt; ShowS
+showList :: [MRule] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span>
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span class="hs-comment">-- Context utilities</span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="annot"><a href="SAD.Data.Text.Context.html#head"><span class="hs-identifier hs-type">head</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-type">Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block.Block</span></a></span><span>
+</span><span id="line-55"></span><span id="head"><span class="annot"><span class="annottext">head :: Context -&gt; Block
+</span><a href="SAD.Data.Text.Context.html#head"><span class="hs-identifier hs-var hs-var">head</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Block] -&gt; Block
+forall a. HasCallStack =&gt; [a] -&gt; a
+</span><span class="hs-identifier hs-var">Prelude.head</span></span><span> </span><span class="annot"><span class="annottext">([Block] -&gt; Block) -&gt; (Context -&gt; [Block]) -&gt; Context -&gt; Block
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Context -&gt; [Block]
+</span><a href="SAD.Data.Text.Context.html#branch"><span class="hs-identifier hs-var">branch</span></a></span><span>
+</span><span id="line-56"></span><span>
+</span><span id="line-57"></span><span class="annot"><a href="SAD.Data.Text.Context.html#tail"><span class="hs-identifier hs-type">tail</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-type">Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block.Block</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-58"></span><span id="tail"><span class="annot"><span class="annottext">tail :: Context -&gt; [Block]
+</span><a href="SAD.Data.Text.Context.html#tail"><span class="hs-identifier hs-var hs-var">tail</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Block] -&gt; [Block]
+forall a. HasCallStack =&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">Prelude.tail</span></span><span> </span><span class="annot"><span class="annottext">([Block] -&gt; [Block]) -&gt; (Context -&gt; [Block]) -&gt; Context -&gt; [Block]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Context -&gt; [Block]
+</span><a href="SAD.Data.Text.Context.html#branch"><span class="hs-identifier hs-var">branch</span></a></span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span class="annot"><a href="SAD.Data.Text.Context.html#isTopLevel"><span class="hs-identifier hs-type">isTopLevel</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-type">Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-61"></span><span id="isTopLevel"><span class="annot"><span class="annottext">isTopLevel :: Context -&gt; Bool
+</span><a href="SAD.Data.Text.Context.html#isTopLevel"><span class="hs-identifier hs-var hs-var">isTopLevel</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Block] -&gt; Bool
+forall a. [a] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">null</span></span><span> </span><span class="annot"><span class="annottext">([Block] -&gt; Bool) -&gt; (Context -&gt; [Block]) -&gt; Context -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Context -&gt; [Block]
+</span><a href="SAD.Data.Text.Context.html#tail"><span class="hs-identifier hs-var">tail</span></a></span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span class="annot"><a href="SAD.Data.Text.Context.html#isLowLevel"><span class="hs-identifier hs-type">isLowLevel</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-type">Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-64"></span><span id="isLowLevel"><span class="annot"><span class="annottext">isLowLevel :: Context -&gt; Bool
+</span><a href="SAD.Data.Text.Context.html#isLowLevel"><span class="hs-identifier hs-var hs-var">isLowLevel</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span>  </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; (Context -&gt; Bool) -&gt; Context -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Context -&gt; Bool
+</span><a href="SAD.Data.Text.Context.html#isTopLevel"><span class="hs-identifier hs-var">isTopLevel</span></a></span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span class="annot"><a href="SAD.Data.Text.Context.html#declaredNames"><span class="hs-identifier hs-type">declaredNames</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-type">Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><a href="SAD.Data.VarName.html#VariableName"><span class="hs-identifier hs-type">VariableName</span></a></span><span>
+</span><span id="line-67"></span><span id="declaredNames"><span class="annot"><span class="annottext">declaredNames :: Context -&gt; Set VariableName
+</span><a href="SAD.Data.Text.Context.html#declaredNames"><span class="hs-identifier hs-var hs-var">declaredNames</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block -&gt; Set VariableName
+</span><a href="SAD.Data.Text.Block.html#declaredNames"><span class="hs-identifier hs-var">Block.declaredNames</span></a></span><span> </span><span class="annot"><span class="annottext">(Block -&gt; Set VariableName)
+-&gt; (Context -&gt; Block) -&gt; Context -&gt; Set VariableName
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Context -&gt; Block
+</span><a href="SAD.Data.Text.Context.html#head"><span class="hs-identifier hs-var">head</span></a></span><span>
+</span><span id="line-68"></span><span>
+</span><span id="line-69"></span><span class="annot"><a href="SAD.Data.Text.Context.html#name"><span class="hs-identifier hs-type">name</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-type">Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-70"></span><span id="name"><span class="annot"><span class="annottext">name :: Context -&gt; Text
+</span><a href="SAD.Data.Text.Context.html#name"><span class="hs-identifier hs-var hs-var">name</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block -&gt; Text
+</span><a href="SAD.Data.Text.Block.html#name"><span class="hs-identifier hs-var">Block.name</span></a></span><span> </span><span class="annot"><span class="annottext">(Block -&gt; Text) -&gt; (Context -&gt; Block) -&gt; Context -&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Context -&gt; Block
+</span><a href="SAD.Data.Text.Context.html#head"><span class="hs-identifier hs-var">head</span></a></span><span>
+</span><span id="line-71"></span><span>
+</span><span id="line-72"></span><span class="annot"><a href="SAD.Data.Text.Context.html#link"><span class="hs-identifier hs-type">link</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-type">Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">]</span><span>
+</span><span id="line-73"></span><span id="link"><span class="annot"><span class="annottext">link :: Context -&gt; [Text]
+</span><a href="SAD.Data.Text.Context.html#link"><span class="hs-identifier hs-var hs-var">link</span></a></span></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Block -&gt; [Text]
+</span><a href="SAD.Data.Text.Block.html#link"><span class="hs-identifier hs-var">Block.link</span></a></span><span> </span><span class="annot"><span class="annottext">(Block -&gt; [Text]) -&gt; (Context -&gt; Block) -&gt; Context -&gt; [Text]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Context -&gt; Block
+</span><a href="SAD.Data.Text.Context.html#head"><span class="hs-identifier hs-var">head</span></a></span><span>
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span class="annot"><a href="SAD.Data.Text.Context.html#isAssumption"><span class="hs-identifier hs-type">isAssumption</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-type">Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-76"></span><span id="isAssumption"><span class="annot"><span class="annottext">isAssumption :: Context -&gt; Bool
+</span><a href="SAD.Data.Text.Context.html#isAssumption"><span class="hs-identifier hs-var hs-var">isAssumption</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Section -&gt; Section -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="annot"><span class="annottext">Section
+</span><a href="SAD.Data.Text.Block.html#Assumption"><span class="hs-identifier hs-var">Assumption</span></a></span><span> </span><span class="annot"><span class="annottext">(Section -&gt; Bool) -&gt; (Context -&gt; Section) -&gt; Context -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Block -&gt; Section
+</span><a href="SAD.Data.Text.Block.html#kind"><span class="hs-identifier hs-var">Block.kind</span></a></span><span> </span><span class="annot"><span class="annottext">(Block -&gt; Section) -&gt; (Context -&gt; Block) -&gt; Context -&gt; Section
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Context -&gt; Block
+</span><a href="SAD.Data.Text.Context.html#head"><span class="hs-identifier hs-var">head</span></a></span><span>
+</span><span id="line-77"></span><span>
+</span><span id="line-78"></span><span class="annot"><a href="SAD.Data.Text.Context.html#setFormula"><span class="hs-identifier hs-type">setFormula</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-type">Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-type">Context</span></a></span><span>
+</span><span id="line-79"></span><span id="setFormula"><span class="annot"><span class="annottext">setFormula :: Context -&gt; Formula -&gt; Context
+</span><a href="SAD.Data.Text.Context.html#setFormula"><span class="hs-identifier hs-var hs-var">setFormula</span></a></span></span><span> </span><span id="local-6989586621679254740"><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679254740"><span class="hs-identifier hs-var">context</span></a></span></span><span> </span><span id="local-6989586621679254741"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679254741"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679254740"><span class="hs-identifier hs-var">context</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><a href="SAD.Data.Text.Context.html#formula"><span class="hs-identifier hs-var">formula</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="#local-6989586621679254741"><span class="hs-identifier hs-type">f</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span class="hs-comment">-- TPTP rendering</span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="annot"><a href="SAD.Data.Text.Context.html#output"><span class="hs-identifier hs-type">output</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-type">Context</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-type">Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-85"></span><span id="output"><span class="annot"><span class="annottext">output :: [Context] -&gt; Context -&gt; Text
+</span><a href="SAD.Data.Text.Context.html#output"><span class="hs-identifier hs-var hs-var">output</span></a></span></span><span> </span><span id="local-6989586621679254742"><span class="annot"><span class="annottext">[Context]
+</span><a href="#local-6989586621679254742"><span class="hs-identifier hs-var">contexts</span></a></span></span><span> </span><span id="local-6989586621679254743"><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679254743"><span class="hs-identifier hs-var">goal</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-86"></span><span>  </span><span class="annot"><span class="annottext">[Text] -&gt; Text
+</span><span class="hs-identifier hs-var">Text.unlines</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Context -&gt; Text) -&gt; [Context] -&gt; [Text]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Role -&gt; Context -&gt; Text
+</span><a href="SAD.Data.Text.Context.html#tptpForm"><span class="hs-identifier hs-var">tptpForm</span></a></span><span> </span><span class="annot"><span class="annottext">Role
+</span><a href="SAD.Export.TPTP.html#Hypothesis"><span class="hs-identifier hs-var">TPTP.Hypothesis</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Context] -&gt; [Text]) -&gt; [Context] -&gt; [Text]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Context] -&gt; [Context]
+forall a. [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">reverse</span></span><span> </span><span class="annot"><span class="annottext">[Context]
+</span><a href="#local-6989586621679254742"><span class="hs-identifier hs-var">contexts</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-87"></span><span>  </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;\n&quot;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Role -&gt; Context -&gt; Text
+</span><a href="SAD.Data.Text.Context.html#tptpForm"><span class="hs-identifier hs-var">tptpForm</span></a></span><span> </span><span class="annot"><span class="annottext">Role
+</span><a href="SAD.Export.TPTP.html#Conjecture"><span class="hs-identifier hs-var">TPTP.Conjecture</span></a></span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679254743"><span class="hs-identifier hs-var">goal</span></a></span><span>
+</span><span id="line-88"></span><span>
+</span><span id="line-89"></span><span class="hs-comment">-- Formula print</span><span>
+</span><span id="line-90"></span><span class="annot"><a href="SAD.Data.Text.Context.html#tptpForm"><span class="hs-identifier hs-type">tptpForm</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Export.TPTP.html#Role"><span class="hs-identifier hs-type">TPTP.Role</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-type">Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-91"></span><span id="tptpForm"><span class="annot"><span class="annottext">tptpForm :: Role -&gt; Context -&gt; Text
+</span><a href="SAD.Data.Text.Context.html#tptpForm"><span class="hs-identifier hs-var hs-var">tptpForm</span></a></span></span><span> </span><span id="local-6989586621679254749"><span class="annot"><span class="annottext">Role
+</span><a href="#local-6989586621679254749"><span class="hs-keyword hs-var">role</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Text.Context.html#Context"><span class="hs-identifier hs-type">Context</span></a></span><span> </span><span id="local-6989586621679254750"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679254750"><span class="hs-identifier hs-var">formula</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Text.Block.html#Block"><span class="hs-identifier hs-type">Block.Block</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">name :: Block -&gt; Text
+</span><a href="SAD.Data.Text.Block.html#name"><span class="hs-identifier hs-var">Block.name</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679254752"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679254752"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span class="hs-special">}</span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span class="annot"><span class="annottext">[Block]
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[MRule]
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-92"></span><span>  </span><span class="annot"><span class="annottext">Text -&gt; Role -&gt; Formula -&gt; Text
+</span><a href="SAD.Export.TPTP.html#renderLogicFormula"><span class="hs-identifier hs-var">TPTP.renderLogicFormula</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679254752"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Role
+</span><a href="#local-6989586621679254749"><span class="hs-keyword hs-var">role</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679254750"><span class="hs-identifier hs-var">formula</span></a></span><span>
+</span><span id="line-93"></span><span class="annot"><a href="SAD.Data.Text.Context.html#tptpForm"><span class="hs-identifier hs-var">tptpForm</span></a></span><span> </span><span class="annot"><span class="annottext">Role
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Context
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;&quot;</span></span><span>
+</span><span id="line-94"></span></pre></body></html>

@@ -1,0 +1,828 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.Structures.StructureTree</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2020, Anton Lorenzen</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-5"></span><span class="hs-comment">--</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- TODO: Add description.</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-pragma">{-# LANGUAGE RecordWildCards #-}</span><span>
+</span><span id="line-10"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-11"></span><span class="hs-pragma">{-# LANGUAGE PatternSynonyms #-}</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.Structures.StructureTree</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">T</span></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Tree</span></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Text</span></span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Formula.html"><span class="hs-identifier">SAD.Data.Formula</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Formula</span></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html"><span class="hs-identifier">SAD.Structures.Formula</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">F</span></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Structures.Export.html"><span class="hs-identifier">SAD.Structures.Export</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">E</span></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Structures.Translate.html"><span class="hs-identifier">SAD.Structures.Translate</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">T</span></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html"><span class="hs-identifier">SAD.Data.Text.Block</span></a></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Text.Decl.html"><span class="hs-identifier">SAD.Data.Text.Decl</span></a></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Core.Message.html"><span class="hs-identifier">SAD.Core.Message</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Core.Message.html#show_position"><span class="hs-identifier">show_position</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">foldl'</span></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">data</span><span> </span><span id="ForthelExpr"><span class="annot"><a href="SAD.Structures.StructureTree.html#ForthelExpr"><span class="hs-identifier hs-var">ForthelExpr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ForthelExpr"><span class="annot"><a href="SAD.Structures.StructureTree.html#ForthelExpr"><span class="hs-identifier hs-var">ForthelExpr</span></a></span></span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="forthelName"><span class="annot"><span class="annottext">ForthelExpr -&gt; Text
+</span><a href="SAD.Structures.StructureTree.html#forthelName"><span class="hs-identifier hs-var hs-var">forthelName</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="forthelAssumptions"><span class="annot"><span class="annottext">ForthelExpr -&gt; [Formula]
+</span><a href="SAD.Structures.StructureTree.html#forthelAssumptions"><span class="hs-identifier hs-var hs-var">forthelAssumptions</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="forthelTopLevel"><span class="annot"><span class="annottext">ForthelExpr -&gt; Bool
+</span><a href="SAD.Structures.StructureTree.html#forthelTopLevel"><span class="hs-identifier hs-var hs-var">forthelTopLevel</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="forthelNeedsProof"><span class="annot"><span class="annottext">ForthelExpr -&gt; Bool
+</span><a href="SAD.Structures.StructureTree.html#forthelNeedsProof"><span class="hs-identifier hs-var hs-var">forthelNeedsProof</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="forthelCanDeclare"><span class="annot"><span class="annottext">ForthelExpr -&gt; Bool
+</span><a href="SAD.Structures.StructureTree.html#forthelCanDeclare"><span class="hs-identifier hs-var hs-var">forthelCanDeclare</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="forthelFormula"><span class="annot"><span class="annottext">ForthelExpr -&gt; Formula
+</span><a href="SAD.Structures.StructureTree.html#forthelFormula"><span class="hs-identifier hs-var hs-var">forthelFormula</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-37"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679263502"><span id="local-6989586621679263514"><span class="annot"><span class="annottext">ForthelExpr -&gt; ForthelExpr -&gt; Bool
+(ForthelExpr -&gt; ForthelExpr -&gt; Bool)
+-&gt; (ForthelExpr -&gt; ForthelExpr -&gt; Bool) -&gt; Eq ForthelExpr
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: ForthelExpr -&gt; ForthelExpr -&gt; Bool
+== :: ForthelExpr -&gt; ForthelExpr -&gt; Bool
+$c/= :: ForthelExpr -&gt; ForthelExpr -&gt; Bool
+/= :: ForthelExpr -&gt; ForthelExpr -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679263520"><span id="local-6989586621679263533"><span id="local-6989586621679263537"><span class="annot"><span class="annottext">Int -&gt; ForthelExpr -&gt; ShowS
+[ForthelExpr] -&gt; ShowS
+ForthelExpr -&gt; [Char]
+(Int -&gt; ForthelExpr -&gt; ShowS)
+-&gt; (ForthelExpr -&gt; [Char])
+-&gt; ([ForthelExpr] -&gt; ShowS)
+-&gt; Show ForthelExpr
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; [Char]) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; ForthelExpr -&gt; ShowS
+showsPrec :: Int -&gt; ForthelExpr -&gt; ShowS
+$cshow :: ForthelExpr -&gt; [Char]
+show :: ForthelExpr -&gt; [Char]
+$cshowList :: [ForthelExpr] -&gt; ShowS
+showList :: [ForthelExpr] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#extractBlocks"><span class="hs-identifier hs-type">extractBlocks</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Forest</span></span><span> </span><span class="annot"><a href="SAD.Structures.StructureTree.html#ForthelExpr"><span class="hs-identifier hs-type">ForthelExpr</span></a></span><span>
+</span><span id="line-40"></span><span id="extractBlocks"><span class="annot"><span class="annottext">extractBlocks :: ProofText -&gt; Forest ForthelExpr
+</span><a href="SAD.Structures.StructureTree.html#extractBlocks"><span class="hs-identifier hs-var hs-var">extractBlocks</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofTextBlock"><span class="hs-identifier hs-type">ProofTextBlock</span></a></span><span> </span><span id="local-6989586621679263542"><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679263542"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">ForthelExpr -&gt; Forest ForthelExpr -&gt; Tree ForthelExpr
+forall a. a -&gt; [Tree a] -&gt; Tree a
+</span><span class="hs-identifier hs-var">Node</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; [Formula] -&gt; Bool -&gt; Bool -&gt; Bool -&gt; Formula -&gt; ForthelExpr
+</span><a href="SAD.Structures.StructureTree.html#ForthelExpr"><span class="hs-identifier hs-var">ForthelExpr</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; Text
+</span><a href="SAD.Data.Text.Block.html#name"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679263542"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; Bool
+</span><a href="SAD.Data.Text.Block.html#isTopLevel"><span class="hs-identifier hs-var">isTopLevel</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679263542"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; Bool
+</span><a href="SAD.Data.Text.Block.html#needsProof"><span class="hs-identifier hs-var">needsProof</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679263542"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Section -&gt; Bool
+</span><a href="SAD.Data.Text.Block.html#canDeclare"><span class="hs-identifier hs-var">canDeclare</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; Section
+</span><a href="SAD.Data.Text.Block.html#kind"><span class="hs-identifier hs-var">kind</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679263542"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; Formula
+</span><a href="SAD.Data.Text.Block.html#formula"><span class="hs-identifier hs-var">formula</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679263542"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(ProofText -&gt; Forest ForthelExpr)
+-&gt; [ProofText] -&gt; Forest ForthelExpr
+forall (t :: * -&gt; *) a b. Foldable t =&gt; (a -&gt; [b]) -&gt; t a -&gt; [b]
+</span><span class="hs-identifier hs-var">concatMap</span></span><span> </span><span class="annot"><span class="annottext">ProofText -&gt; Forest ForthelExpr
+</span><a href="SAD.Structures.StructureTree.html#extractBlocks"><span class="hs-identifier hs-var">extractBlocks</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Block -&gt; [ProofText]
+</span><a href="SAD.Data.Text.Block.html#body"><span class="hs-identifier hs-var">body</span></a></span><span> </span><span class="annot"><span class="annottext">Block
+</span><a href="#local-6989586621679263542"><span class="hs-identifier hs-var">b</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-43"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#extractBlocks"><span class="hs-identifier hs-var">extractBlocks</span></a></span><span> </span><span class="annot"><span class="annottext">ProofText
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-44"></span><span>
+</span><span id="line-45"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#toStatement"><span class="hs-identifier hs-type">toStatement</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tree</span></span><span> </span><span class="annot"><a href="SAD.Structures.StructureTree.html#ForthelExpr"><span class="hs-identifier hs-type">ForthelExpr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="annot"><a href="SAD.Structures.StructureTree.html#ForthelExpr"><span class="hs-identifier hs-type">ForthelExpr</span></a></span><span>
+</span><span id="line-46"></span><span id="toStatement"><span class="annot"><span class="annottext">toStatement :: Tree ForthelExpr -&gt; Either Text ForthelExpr
+</span><a href="SAD.Structures.StructureTree.html#toStatement"><span class="hs-identifier hs-var hs-var">toStatement</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Node</span></span><span> </span><span id="local-6989586621679263553"><span class="annot"><span class="annottext">ForthelExpr
+</span><a href="#local-6989586621679263553"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span id="local-6989586621679263554"><span class="annot"><span class="annottext">Forest ForthelExpr
+</span><a href="#local-6989586621679263554"><span class="hs-identifier hs-var">xs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679263555"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679263555"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679263556"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263556"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679263557"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263557"><span class="hs-identifier hs-var">xs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ForthelExpr
+</span><a href="#local-6989586621679263553"><span class="hs-identifier hs-var">e</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><a href="SAD.Structures.StructureTree.html#forthelNeedsProof"><span class="hs-identifier hs-var">forthelNeedsProof</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="#local-6989586621679263555"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Structures.StructureTree.html#forthelFormula"><span class="hs-identifier hs-var">forthelFormula</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="#local-6989586621679263556"><span class="hs-identifier hs-type">x</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Structures.StructureTree.html#forthelAssumptions"><span class="hs-identifier hs-var">forthelAssumptions</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="#local-6989586621679263557"><span class="hs-identifier hs-type">xs</span></a></span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((Bool, Formula, [Formula]) -&gt; ForthelExpr)
+-&gt; Either Text (Bool, Formula, [Formula])
+-&gt; Either Text ForthelExpr
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Forest ForthelExpr -&gt; Either Text (Bool, Formula, [Formula])
+</span><a href="#local-6989586621679263559"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Forest ForthelExpr
+</span><a href="#local-6989586621679263554"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-48"></span><span>    </span><span class="annot"><a href="#local-6989586621679263559"><span class="hs-identifier hs-type">go</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Forest</span></span><span> </span><span class="annot"><a href="SAD.Structures.StructureTree.html#ForthelExpr"><span class="hs-identifier hs-type">ForthelExpr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-49"></span><span>    </span><span id="local-6989586621679263559"><span class="annot"><span class="annottext">go :: Forest ForthelExpr -&gt; Either Text (Bool, Formula, [Formula])
+</span><a href="#local-6989586621679263559"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Either Text (Bool, Formula, [Formula])
+forall a b. a -&gt; Either a b
+</span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;Empty theorem.&quot;</span></span><span>
+</span><span id="line-50"></span><span>    </span><span class="annot"><a href="#local-6989586621679263559"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263560"><span class="annot"><span class="annottext">Forest ForthelExpr
+</span><a href="#local-6989586621679263560"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679263561"><span class="annot"><span class="annottext">Forest ForthelExpr
+</span><a href="#local-6989586621679263561"><span class="hs-identifier hs-var">ys</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679263562"><span class="annot"><span class="annottext">Tree ForthelExpr
+</span><a href="#local-6989586621679263562"><span class="hs-identifier hs-var">y</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Forest ForthelExpr -&gt; (Forest ForthelExpr, Tree ForthelExpr)
+forall {b}. [b] -&gt; ([b], b)
+</span><a href="#local-6989586621679263563"><span class="hs-identifier hs-var">unsnoc</span></a></span><span> </span><span class="annot"><span class="annottext">Forest ForthelExpr
+</span><a href="#local-6989586621679263560"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-51"></span><span>      </span><span class="hs-keyword">in</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">(Tree ForthelExpr -&gt; Bool) -&gt; Forest ForthelExpr -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; (a -&gt; Bool) -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">any</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ForthelExpr -&gt; Bool
+</span><a href="SAD.Structures.StructureTree.html#forthelNeedsProof"><span class="hs-identifier hs-var">forthelNeedsProof</span></a></span><span> </span><span class="annot"><span class="annottext">(ForthelExpr -&gt; Bool)
+-&gt; (Tree ForthelExpr -&gt; ForthelExpr) -&gt; Tree ForthelExpr -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Tree ForthelExpr -&gt; ForthelExpr
+forall a. Tree a -&gt; a
+</span><span class="hs-identifier hs-var">rootLabel</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Forest ForthelExpr
+</span><a href="#local-6989586621679263561"><span class="hs-identifier hs-var">ys</span></a></span><span>
+</span><span id="line-52"></span><span>        </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Either Text (Bool, Formula, [Formula])
+forall a b. a -&gt; Either a b
+</span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;Multiple statements in a theorem are not supported!&quot;</span></span><span>
+</span><span id="line-53"></span><span>        </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">(Bool, Formula, [Formula])
+-&gt; Either Text (Bool, Formula, [Formula])
+forall a b. b -&gt; Either a b
+</span><span class="hs-identifier hs-var">Right</span></span><span> </span><span class="annot"><span class="annottext">((Bool, Formula, [Formula])
+ -&gt; Either Text (Bool, Formula, [Formula]))
+-&gt; (Bool, Formula, [Formula])
+-&gt; Either Text (Bool, Formula, [Formula])
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-54"></span><span>          </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">ForthelExpr -&gt; Bool
+</span><a href="SAD.Structures.StructureTree.html#forthelNeedsProof"><span class="hs-identifier hs-var">forthelNeedsProof</span></a></span><span> </span><span class="annot"><span class="annottext">(ForthelExpr -&gt; Bool) -&gt; ForthelExpr -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Tree ForthelExpr -&gt; ForthelExpr
+forall a. Tree a -&gt; a
+</span><span class="hs-identifier hs-var">rootLabel</span></span><span> </span><span class="annot"><span class="annottext">Tree ForthelExpr
+</span><a href="#local-6989586621679263562"><span class="hs-identifier hs-var">y</span></a></span><span>
+</span><span id="line-55"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ForthelExpr -&gt; Formula
+</span><a href="SAD.Structures.StructureTree.html#forthelFormula"><span class="hs-identifier hs-var">forthelFormula</span></a></span><span> </span><span class="annot"><span class="annottext">(ForthelExpr -&gt; Formula) -&gt; ForthelExpr -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Tree ForthelExpr -&gt; ForthelExpr
+forall a. Tree a -&gt; a
+</span><span class="hs-identifier hs-var">rootLabel</span></span><span> </span><span class="annot"><span class="annottext">Tree ForthelExpr
+</span><a href="#local-6989586621679263562"><span class="hs-identifier hs-var">y</span></a></span><span>
+</span><span id="line-56"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">(Tree ForthelExpr -&gt; Formula) -&gt; Forest ForthelExpr -&gt; [Formula]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ForthelExpr -&gt; Formula
+</span><a href="SAD.Structures.StructureTree.html#forthelFormula"><span class="hs-identifier hs-var">forthelFormula</span></a></span><span> </span><span class="annot"><span class="annottext">(ForthelExpr -&gt; Formula)
+-&gt; (Tree ForthelExpr -&gt; ForthelExpr) -&gt; Tree ForthelExpr -&gt; Formula
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Tree ForthelExpr -&gt; ForthelExpr
+forall a. Tree a -&gt; a
+</span><span class="hs-identifier hs-var">rootLabel</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Forest ForthelExpr
+</span><a href="#local-6989586621679263561"><span class="hs-identifier hs-var">ys</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-57"></span><span>    </span><span id="local-6989586621679263563"><span class="annot"><span class="annottext">unsnoc :: [b] -&gt; ([b], b)
+</span><a href="#local-6989586621679263563"><span class="hs-identifier hs-var hs-var">unsnoc</span></a></span></span><span> </span><span id="local-6989586621679263571"><span class="annot"><span class="annottext">[b]
+</span><a href="#local-6989586621679263571"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[b] -&gt; [b]
+forall a. HasCallStack =&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">init</span></span><span> </span><span class="annot"><span class="annottext">[b]
+</span><a href="#local-6989586621679263571"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[b] -&gt; b
+forall a. HasCallStack =&gt; [a] -&gt; a
+</span><span class="hs-identifier hs-var">last</span></span><span> </span><span class="annot"><span class="annottext">[b]
+</span><a href="#local-6989586621679263571"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="SAD.Structures.StructureTree.html#%3A%5C%2F"><span class="hs-operator hs-type">(:\/)</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Structures.StructureTree.html#%3A%2F%5C"><span class="hs-operator hs-type">(:/\)</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Structures.StructureTree.html#%3A-%3E"><span class="hs-operator hs-type">(:-&gt;)</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Structures.StructureTree.html#%3A%3C-%3E"><span class="hs-operator hs-type">(:&lt;-&gt;)</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Structures.StructureTree.html#%3A%3D%3D"><span class="hs-operator hs-type">(:==)</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-60"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="#local-6989586621679263579"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span id="%3A%5C%2F"><span id="%24b%3A%5C%2F"><span id="%24m%3A%5C%2F"><span class="annot"><span class="annottext">$b:\/ :: Formula -&gt; Formula -&gt; Formula
+$m:\/ :: forall {r}.
+Formula -&gt; (Formula -&gt; Formula -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+</span><a href="SAD.Structures.StructureTree.html#%3A%5C%2F"><span class="hs-operator hs-var hs-var hs-var">:\/</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679263582"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Or"><span class="hs-identifier hs-type">Or</span></a></span><span> </span><span id="local-6989586621679263579"><span class="annot"><a href="#local-6989586621679263579"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679263582"><span class="annot"><a href="#local-6989586621679263582"><span class="hs-identifier hs-var">b</span></a></span></span><span>
+</span><span id="line-61"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="#local-6989586621679263584"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span id="%3A%2F%5C"><span id="%24b%3A%2F%5C"><span id="%24m%3A%2F%5C"><span class="annot"><span class="annottext">$b:/\ :: Formula -&gt; Formula -&gt; Formula
+$m:/\ :: forall {r}.
+Formula -&gt; (Formula -&gt; Formula -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+</span><a href="SAD.Structures.StructureTree.html#%3A%2F%5C"><span class="hs-operator hs-var hs-var hs-var">:/\</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679263587"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-identifier hs-type">And</span></a></span><span> </span><span id="local-6989586621679263584"><span class="annot"><a href="#local-6989586621679263584"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679263587"><span class="annot"><a href="#local-6989586621679263587"><span class="hs-identifier hs-var">b</span></a></span></span><span>
+</span><span id="line-62"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="#local-6989586621679263589"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span id="%3A-%3E"><span id="%24b%3A-%3E"><span id="%24m%3A-%3E"><span class="annot"><span class="annottext">$b:-&gt; :: Formula -&gt; Formula -&gt; Formula
+$m:-&gt; :: forall {r}.
+Formula -&gt; (Formula -&gt; Formula -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+</span><a href="SAD.Structures.StructureTree.html#%3A-%3E"><span class="hs-operator hs-var hs-var hs-var">:-&gt;</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679263592"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Imp"><span class="hs-identifier hs-type">Imp</span></a></span><span> </span><span id="local-6989586621679263589"><span class="annot"><a href="#local-6989586621679263589"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679263592"><span class="annot"><a href="#local-6989586621679263592"><span class="hs-identifier hs-var">b</span></a></span></span><span>
+</span><span id="line-63"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="#local-6989586621679263594"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span id="%3A%3C-%3E"><span id="%24b%3A%3C-%3E"><span id="%24m%3A%3C-%3E"><span class="annot"><span class="annottext">$b:&lt;-&gt; :: Formula -&gt; Formula -&gt; Formula
+$m:&lt;-&gt; :: forall {r}.
+Formula -&gt; (Formula -&gt; Formula -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+</span><a href="SAD.Structures.StructureTree.html#%3A%3C-%3E"><span class="hs-operator hs-var hs-var hs-var">:&lt;-&gt;</span></a></span></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679263597"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Iff"><span class="hs-identifier hs-type">Iff</span></a></span><span> </span><span id="local-6989586621679263594"><span class="annot"><a href="#local-6989586621679263594"><span class="hs-identifier hs-var">a</span></a></span></span><span> </span><span id="local-6989586621679263597"><span class="annot"><a href="#local-6989586621679263597"><span class="hs-identifier hs-var">b</span></a></span></span><span>
+</span><span id="line-64"></span><span class="hs-keyword">pattern</span><span> </span><span class="annot"><a href="#local-6989586621679263599"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span id="%3A%3D%3D"><span id="%24m%3A%3D%3D"><span class="annot"><span class="annottext">$m:== :: forall {r}.
+Formula -&gt; (Formula -&gt; Formula -&gt; r) -&gt; ((# #) -&gt; r) -&gt; r
+</span><a href="SAD.Structures.StructureTree.html#%3A%3D%3D"><span class="hs-operator hs-var hs-var">:==</span></a></span></span></span><span> </span><span class="annot"><a href="#local-6989586621679263601"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="annot"><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">[</span><span id="local-6989586621679263599"><span class="annot"><a href="#local-6989586621679263599"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679263601"><span class="annot"><a href="#local-6989586621679263601"><span class="hs-identifier hs-var">b</span></a></span></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="hs-identifier">_</span></span><span> </span><span class="annot"><a href="SAD.Data.Terms.html#EqualityId"><span class="hs-identifier hs-type">EqualityId</span></a></span><span>
+</span><span id="line-65"></span><span>
+</span><span id="line-66"></span><span class="hs-comment">-- TODO: By removing the de-brujin indices,</span><span>
+</span><span id="line-67"></span><span class="hs-comment">-- we might end up with wrong bindings of variables.</span><span>
+</span><span id="line-68"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#toDeclaration"><span class="hs-identifier hs-type">toDeclaration</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Structures.StructureTree.html#ForthelExpr"><span class="hs-identifier hs-type">ForthelExpr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Declaration"><span class="hs-identifier hs-type">F.Declaration</span></a></span><span>
+</span><span id="line-69"></span><span id="toDeclaration"><span class="annot"><span class="annottext">toDeclaration :: ForthelExpr -&gt; Declaration
+</span><a href="SAD.Structures.StructureTree.html#toDeclaration"><span class="hs-identifier hs-var hs-var">toDeclaration</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Structures.StructureTree.html#ForthelExpr"><span class="hs-identifier hs-type">ForthelExpr</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679263605"><span id="local-6989586621679263606"><span id="local-6989586621679263607"><span id="local-6989586621679263608"><span id="local-6989586621679263609"><span id="local-6989586621679263610"><span class="annot"><span class="annottext">Bool
+[Formula]
+Text
+Formula
+forthelName :: ForthelExpr -&gt; Text
+forthelAssumptions :: ForthelExpr -&gt; [Formula]
+forthelTopLevel :: ForthelExpr -&gt; Bool
+forthelNeedsProof :: ForthelExpr -&gt; Bool
+forthelCanDeclare :: ForthelExpr -&gt; Bool
+forthelFormula :: ForthelExpr -&gt; Formula
+forthelName :: Text
+forthelAssumptions :: [Formula]
+forthelTopLevel :: Bool
+forthelNeedsProof :: Bool
+forthelCanDeclare :: Bool
+forthelFormula :: Formula
+</span><a href="SAD.Structures.StructureTree.html#forthelName"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-70"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679263611"><span class="annot"><span class="annottext">work :: Formula -&gt; Formula
+</span><a href="#local-6989586621679263611"><span class="hs-identifier hs-var hs-var">work</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-71"></span><span>      </span><span id="local-6989586621679263612"><span class="annot"><span class="annottext">go :: [Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span id="local-6989586621679263621"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263621"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#All"><span class="hs-identifier hs-type">All</span></a></span><span> </span><span id="local-6989586621679263623"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679263623"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span id="local-6989586621679263624"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263624"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679263626"><span class="annot"><span class="annottext">v :: Text
+</span><a href="#local-6989586621679263626"><span class="hs-identifier hs-var hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Text
+</span><span class="hs-identifier hs-var">T.pack</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Text) -&gt; [Char] -&gt; Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">(VariableName -&gt; [Char]) -&gt; VariableName -&gt; [Char]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Decl -&gt; VariableName
+</span><a href="SAD.Data.Text.Decl.html#declName"><span class="hs-identifier hs-var">declName</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679263623"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-72"></span><span>        </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Formula -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#All"><span class="hs-identifier hs-var">F.All</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263626"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263626"><span class="hs-identifier hs-var">v</span></a></span><span class="annot"><span class="annottext">Text -&gt; [Text] -&gt; [Text]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263621"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263624"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263631"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263631"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Exi"><span class="hs-identifier hs-type">Exi</span></a></span><span> </span><span id="local-6989586621679263633"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679263633"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span id="local-6989586621679263634"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263634"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679263636"><span class="annot"><span class="annottext">v :: Text
+</span><a href="#local-6989586621679263636"><span class="hs-identifier hs-var hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Text
+</span><span class="hs-identifier hs-var">T.pack</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Text) -&gt; [Char] -&gt; Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">(VariableName -&gt; [Char]) -&gt; VariableName -&gt; [Char]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Decl -&gt; VariableName
+</span><a href="SAD.Data.Text.Decl.html#declName"><span class="hs-identifier hs-var">declName</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679263633"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-74"></span><span>        </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Formula -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#Exists"><span class="hs-identifier hs-var">F.Exists</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263636"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263636"><span class="hs-identifier hs-var">v</span></a></span><span class="annot"><span class="annottext">Text -&gt; [Text] -&gt; [Text]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263631"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263634"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-75"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263638"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263638"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Iff"><span class="hs-identifier hs-type">Iff</span></a></span><span> </span><span id="local-6989586621679263639"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263639"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679263640"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263640"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263638"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263639"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#%3A%3C-%3E"><span class="hs-operator hs-var">F.:&lt;-&gt;</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263638"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263640"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-76"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263642"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263642"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Imp"><span class="hs-identifier hs-type">Imp</span></a></span><span> </span><span id="local-6989586621679263643"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263643"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679263644"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263644"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263642"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263643"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#%3A-%3E"><span class="hs-operator hs-var">F.:-&gt;</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263642"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263644"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-77"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263646"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263646"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Or"><span class="hs-identifier hs-type">Or</span></a></span><span> </span><span id="local-6989586621679263647"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263647"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679263648"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263648"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263646"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263647"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#%3A%5C%2F"><span class="hs-operator hs-var">F.:\/</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263646"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263648"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-78"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263650"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263650"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-identifier hs-type">And</span></a></span><span> </span><span id="local-6989586621679263651"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263651"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679263652"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263652"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263650"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263651"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#%3A%2F%5C"><span class="hs-operator hs-var">F.:/\</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263650"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263652"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-79"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263654"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263654"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679263656"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263656"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263654"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263656"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-80"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263657"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263657"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Not"><span class="hs-identifier hs-type">Not</span></a></span><span> </span><span id="local-6989586621679263659"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263659"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#Const"><span class="hs-identifier hs-var">F.Const</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;not&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#%3A%40"><span class="hs-operator hs-var">F.:@</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263657"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263659"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-81"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263662"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263662"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Data.Formula.Base.html#Top"><span class="hs-identifier hs-var">Top</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Structures.Formula.html#Top"><span class="hs-identifier hs-var">F.Top</span></a></span><span>
+</span><span id="line-82"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263665"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263665"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Data.Formula.Base.html#Bot"><span class="hs-identifier hs-var">Bot</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Structures.Formula.html#Bot"><span class="hs-identifier hs-var">F.Bot</span></a></span><span>
+</span><span id="line-83"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263668"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263668"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="annot"><span class="annottext">TermName
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">[</span><span id="local-6989586621679263669"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263669"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679263670"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263670"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[Formula]
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="SAD.Data.Terms.html#EqualityId"><span class="hs-identifier hs-var">EqualityId</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263668"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263669"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#%3A%3D%3D"><span class="hs-operator hs-var">F.:==</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263668"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263670"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-84"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263672"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263672"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Terms.html#TermNotion"><span class="hs-identifier hs-type">TermNotion</span></a></span><span> </span><span id="local-6989586621679263674"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263674"><span class="hs-identifier hs-var">name</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679263675"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263675"><span class="hs-identifier hs-var">args</span></a></span></span><span> </span><span id="local-6989586621679263676"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263676"><span class="hs-identifier hs-var">info</span></a></span></span><span> </span><span id="local-6989586621679263677"><span class="annot"><span class="annottext">TermId
+</span><a href="#local-6989586621679263677"><span class="hs-identifier hs-var">id</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-85"></span><span>        </span><span class="annot"><span class="annottext">(Formula -&gt; Formula -&gt; Formula) -&gt; Formula -&gt; [Formula] -&gt; Formula
+forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; [a] -&gt; b
+forall (t :: * -&gt; *) b a.
+Foldable t =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldl'</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#%3A%40"><span class="hs-operator hs-var">(F.:@)</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#TyPredicate"><span class="hs-identifier hs-var">F.TyPredicate</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263674"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; [Formula] -&gt; [Formula]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263672"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263675"><span class="hs-identifier hs-var">args</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-86"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263679"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263679"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Terms.html#TermUnaryAdjective"><span class="hs-identifier hs-type">TermUnaryAdjective</span></a></span><span> </span><span id="local-6989586621679263681"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263681"><span class="hs-identifier hs-var">name</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679263682"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263682"><span class="hs-identifier hs-var">args</span></a></span></span><span> </span><span id="local-6989586621679263683"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263683"><span class="hs-identifier hs-var">info</span></a></span></span><span> </span><span id="local-6989586621679263684"><span class="annot"><span class="annottext">TermId
+</span><a href="#local-6989586621679263684"><span class="hs-identifier hs-var">id</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-87"></span><span>        </span><span class="annot"><span class="annottext">(Formula -&gt; Formula -&gt; Formula) -&gt; Formula -&gt; [Formula] -&gt; Formula
+forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; [a] -&gt; b
+forall (t :: * -&gt; *) b a.
+Foldable t =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldl'</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#%3A%40"><span class="hs-operator hs-var">(F.:@)</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#Predicate"><span class="hs-identifier hs-var">F.Predicate</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263681"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; [Formula] -&gt; [Formula]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263679"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263682"><span class="hs-identifier hs-var">args</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-88"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263686"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263686"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Terms.html#TermMultiAdjective"><span class="hs-identifier hs-type">TermMultiAdjective</span></a></span><span> </span><span id="local-6989586621679263688"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263688"><span class="hs-identifier hs-var">name</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679263689"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263689"><span class="hs-identifier hs-var">args</span></a></span></span><span> </span><span id="local-6989586621679263690"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263690"><span class="hs-identifier hs-var">info</span></a></span></span><span> </span><span id="local-6989586621679263691"><span class="annot"><span class="annottext">TermId
+</span><a href="#local-6989586621679263691"><span class="hs-identifier hs-var">id</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-89"></span><span>        </span><span class="annot"><span class="annottext">(Formula -&gt; Formula -&gt; Formula) -&gt; Formula -&gt; [Formula] -&gt; Formula
+forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; [a] -&gt; b
+forall (t :: * -&gt; *) b a.
+Foldable t =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldl'</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#%3A%40"><span class="hs-operator hs-var">(F.:@)</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#Predicate"><span class="hs-identifier hs-var">F.Predicate</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263688"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; [Formula] -&gt; [Formula]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263686"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263689"><span class="hs-identifier hs-var">args</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-90"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263692"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263692"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span id="local-6989586621679263693"><span class="annot"><span class="annottext">TermName
+</span><a href="#local-6989586621679263693"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679263694"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263694"><span class="hs-identifier hs-var">args</span></a></span></span><span> </span><span id="local-6989586621679263695"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263695"><span class="hs-identifier hs-var">info</span></a></span></span><span> </span><span id="local-6989586621679263696"><span class="annot"><span class="annottext">TermId
+</span><a href="#local-6989586621679263696"><span class="hs-identifier hs-var">id</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-91"></span><span>        </span><span class="annot"><span class="annottext">(Formula -&gt; Formula -&gt; Formula) -&gt; Formula -&gt; [Formula] -&gt; Formula
+forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; [a] -&gt; b
+forall (t :: * -&gt; *) b a.
+Foldable t =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldl'</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#%3A%40"><span class="hs-operator hs-var">(F.:@)</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#Const"><span class="hs-identifier hs-var">F.Const</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">TermName -&gt; Text
+</span><a href="SAD.Structures.StructureTree.html#termToText"><span class="hs-identifier hs-var">termToText</span></a></span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="#local-6989586621679263693"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; [Formula] -&gt; [Formula]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Formula -&gt; Formula
+</span><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263692"><span class="hs-identifier hs-var">xs</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263694"><span class="hs-identifier hs-var">args</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-92"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263698"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263698"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Var"><span class="hs-identifier hs-type">Var</span></a></span><span> </span><span id="local-6989586621679263700"><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679263700"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679263701"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263701"><span class="hs-identifier hs-var">info</span></a></span></span><span> </span><span id="local-6989586621679263702"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679263702"><span class="hs-identifier hs-var">pos</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#Variable"><span class="hs-identifier hs-var">F.Variable</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">VariableName -&gt; Text
+</span><a href="SAD.Structures.StructureTree.html#varToText"><span class="hs-identifier hs-var">varToText</span></a></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679263700"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-93"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263705"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263705"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Ind"><span class="hs-identifier hs-type">Ind</span></a></span><span> </span><span id="local-6989586621679263707"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679263707"><span class="hs-identifier hs-var">idx</span></a></span></span><span> </span><span id="local-6989586621679263708"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679263708"><span class="hs-identifier hs-var">pos</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#Variable"><span class="hs-identifier hs-var">F.Variable</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263705"><span class="hs-identifier hs-var">xs</span></a></span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; Int -&gt; Text
+forall a. HasCallStack =&gt; [a] -&gt; Int -&gt; a
+</span><span class="hs-operator hs-var">!!</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679263707"><span class="hs-identifier hs-var">idx</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-94"></span><span>      </span><span class="annot"><a href="#local-6989586621679263612"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span id="local-6989586621679263710"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679263710"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Data.Formula.Base.html#ThisT"><span class="hs-identifier hs-var">ThisT</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Formula
+</span><a href="SAD.Structures.Formula.html#Const"><span class="hs-identifier hs-var">F.Const</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;ThisT&quot;</span></span><span>
+</span><span id="line-95"></span><span>  </span><span class="hs-keyword">in</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679263608"><span class="hs-identifier hs-var">forthelNeedsProof</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-96"></span><span>    </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Formula] -&gt; Formula -&gt; Declaration
+</span><a href="SAD.Structures.Formula.html#Conjecture"><span class="hs-identifier hs-var">F.Conjecture</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263605"><span class="hs-identifier hs-var">forthelName</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; [Formula] -&gt; [Formula]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679263611"><span class="hs-identifier hs-var">work</span></a></span><span> </span><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263606"><span class="hs-identifier hs-var">forthelAssumptions</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679263611"><span class="hs-identifier hs-var">work</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263610"><span class="hs-identifier hs-var">forthelFormula</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-97"></span><span>    </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Formula] -&gt; Declaration
+</span><a href="SAD.Structures.Formula.html#Hypothesis"><span class="hs-identifier hs-var">F.Hypothesis</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263605"><span class="hs-identifier hs-var">forthelName</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; [Formula] -&gt; [Formula]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679263611"><span class="hs-identifier hs-var">work</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263606"><span class="hs-identifier hs-var">forthelAssumptions</span></a></span><span> </span><span class="annot"><span class="annottext">[Formula] -&gt; [Formula] -&gt; [Formula]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263610"><span class="hs-identifier hs-var">forthelFormula</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-98"></span><span>
+</span><span id="line-99"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#varToText"><span class="hs-identifier hs-type">varToText</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.VarName.html#VariableName"><span class="hs-identifier hs-type">VariableName</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-100"></span><span id="varToText"><span class="annot"><span class="annottext">varToText :: VariableName -&gt; Text
+</span><a href="SAD.Structures.StructureTree.html#varToText"><span class="hs-identifier hs-var hs-var">varToText</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.VarName.html#VarConstant"><span class="hs-identifier hs-type">VarConstant</span></a></span><span> </span><span id="local-6989586621679263715"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263715"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263715"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-101"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#varToText"><span class="hs-identifier hs-var">varToText</span></a></span><span> </span><span id="local-6989586621679263716"><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679263716"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Text
+</span><span class="hs-identifier hs-var">T.pack</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Text) -&gt; [Char] -&gt; Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679263716"><span class="hs-identifier hs-var">v</span></a></span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#termToText"><span class="hs-identifier hs-type">termToText</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Terms.html#TermName"><span class="hs-identifier hs-type">TermName</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-104"></span><span id="termToText"><span class="annot"><span class="annottext">termToText :: TermName -&gt; Text
+</span><a href="SAD.Structures.StructureTree.html#termToText"><span class="hs-identifier hs-var hs-var">termToText</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Terms.html#TermName"><span class="hs-identifier hs-type">TermName</span></a></span><span> </span><span id="local-6989586621679263718"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263718"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263718"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-105"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#termToText"><span class="hs-identifier hs-var">termToText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Terms.html#TermSymbolic"><span class="hs-identifier hs-type">TermSymbolic</span></a></span><span> </span><span id="local-6989586621679263720"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263720"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263720"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-106"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#termToText"><span class="hs-identifier hs-var">termToText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Terms.html#TermNotion"><span class="hs-identifier hs-type">TermNotion</span></a></span><span> </span><span id="local-6989586621679263721"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263721"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263721"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-107"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#termToText"><span class="hs-identifier hs-var">termToText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Terms.html#TermThe"><span class="hs-identifier hs-type">TermThe</span></a></span><span> </span><span id="local-6989586621679263723"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263723"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263723"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-108"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#termToText"><span class="hs-identifier hs-var">termToText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Terms.html#TermUnaryAdjective"><span class="hs-identifier hs-type">TermUnaryAdjective</span></a></span><span> </span><span id="local-6989586621679263724"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263724"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263724"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-109"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#termToText"><span class="hs-identifier hs-var">termToText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Terms.html#TermMultiAdjective"><span class="hs-identifier hs-type">TermMultiAdjective</span></a></span><span> </span><span id="local-6989586621679263725"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263725"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263725"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-110"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#termToText"><span class="hs-identifier hs-var">termToText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Terms.html#TermUnaryVerb"><span class="hs-identifier hs-type">TermUnaryVerb</span></a></span><span> </span><span id="local-6989586621679263727"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263727"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263727"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-111"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#termToText"><span class="hs-identifier hs-var">termToText</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Terms.html#TermMultiVerb"><span class="hs-identifier hs-type">TermMultiVerb</span></a></span><span> </span><span id="local-6989586621679263729"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263729"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263729"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-112"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#termToText"><span class="hs-identifier hs-var">termToText</span></a></span><span> </span><span id="local-6989586621679263730"><span class="annot"><span class="annottext">TermName
+</span><a href="#local-6989586621679263730"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Text
+</span><span class="hs-identifier hs-var">T.pack</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Text) -&gt; [Char] -&gt; Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">TermName -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="#local-6989586621679263730"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-113"></span><span>
+</span><span id="line-114"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#toLeanCode"><span class="hs-identifier hs-type">toLeanCode</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Structures.StructureTree.html#ForthelExpr"><span class="hs-identifier hs-type">ForthelExpr</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-115"></span><span id="toLeanCode"><span class="annot"><span class="annottext">toLeanCode :: [ForthelExpr] -&gt; Text
+</span><a href="SAD.Structures.StructureTree.html#toLeanCode"><span class="hs-identifier hs-var hs-var">toLeanCode</span></a></span></span><span> </span><span id="local-6989586621679263732"><span class="annot"><span class="annottext">[ForthelExpr]
+</span><a href="#local-6989586621679263732"><span class="hs-identifier hs-var">fs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;axiom omitted {p : Prop} : p\n\n&quot;</span></span><span>
+</span><span id="line-116"></span><span>  </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">[Decl] -&gt; Text
+forall e. Exportable e =&gt; e -&gt; Text
+</span><a href="SAD.Structures.Export.html#export"><span class="hs-identifier hs-var">E.export</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Document -&gt; [Decl]
+</span><a href="SAD.Structures.Translate.html#translateDoc"><span class="hs-identifier hs-var">T.translateDoc</span></a></span><span> </span><span class="annot"><span class="annottext">(Document -&gt; [Decl]) -&gt; Document -&gt; [Decl]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Declaration] -&gt; Document
+</span><a href="SAD.Structures.Formula.html#Document"><span class="hs-identifier hs-var">F.Document</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(ForthelExpr -&gt; Declaration) -&gt; [ForthelExpr] -&gt; [Declaration]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">ForthelExpr -&gt; Declaration
+</span><a href="SAD.Structures.StructureTree.html#toDeclaration"><span class="hs-identifier hs-var">toDeclaration</span></a></span><span> </span><span class="annot"><span class="annottext">[ForthelExpr]
+</span><a href="#local-6989586621679263732"><span class="hs-identifier hs-var">fs</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-117"></span><span>
+</span><span id="line-118"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#ppForthelExpr"><span class="hs-identifier hs-type">ppForthelExpr</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Structures.StructureTree.html#ForthelExpr"><span class="hs-identifier hs-type">ForthelExpr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-119"></span><span id="ppForthelExpr"><span class="annot"><span class="annottext">ppForthelExpr :: ForthelExpr -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#ppForthelExpr"><span class="hs-identifier hs-var hs-var">ppForthelExpr</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Structures.StructureTree.html#ForthelExpr"><span class="hs-identifier hs-type">ForthelExpr</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679263737"><span id="local-6989586621679263738"><span id="local-6989586621679263739"><span id="local-6989586621679263740"><span id="local-6989586621679263741"><span id="local-6989586621679263742"><span class="annot"><span class="annottext">Bool
+[Formula]
+Text
+Formula
+forthelName :: ForthelExpr -&gt; Text
+forthelAssumptions :: ForthelExpr -&gt; [Formula]
+forthelTopLevel :: ForthelExpr -&gt; Bool
+forthelNeedsProof :: ForthelExpr -&gt; Bool
+forthelCanDeclare :: ForthelExpr -&gt; Bool
+forthelFormula :: ForthelExpr -&gt; Formula
+forthelName :: Text
+forthelAssumptions :: [Formula]
+forthelTopLevel :: Bool
+forthelNeedsProof :: Bool
+forthelCanDeclare :: Bool
+forthelFormula :: Formula
+</span><a href="SAD.Structures.StructureTree.html#forthelName"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-120"></span><span>  </span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679263740"><span class="hs-identifier hs-var">forthelNeedsProof</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;T &quot;</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;A &quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-121"></span><span>  </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Char]
+</span><span class="hs-identifier hs-var">Text.unpack</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679263737"><span class="hs-identifier hs-var">forthelName</span></a></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;: &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Formula -&gt; Formula -&gt; Formula) -&gt; Formula -&gt; [Formula] -&gt; Formula
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; [a] -&gt; b
+forall (t :: * -&gt; *) a b.
+Foldable t =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldr</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Imp"><span class="hs-identifier hs-var">Imp</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263742"><span class="hs-identifier hs-var">forthelFormula</span></a></span><span> </span><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263738"><span class="hs-identifier hs-var">forthelAssumptions</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-122"></span><span>
+</span><span id="line-123"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-type">debugShow</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-124"></span><span id="debugShow"><span class="annot"><span class="annottext">debugShow :: Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var hs-var">debugShow</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#All"><span class="hs-identifier hs-type">All</span></a></span><span> </span><span id="local-6989586621679263746"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679263746"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span id="local-6989586621679263747"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263747"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;All &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Decl -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679263746"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot; &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">ShowS
+</span><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263747"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-125"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Exi"><span class="hs-identifier hs-type">Exi</span></a></span><span> </span><span id="local-6989586621679263749"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679263749"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span id="local-6989586621679263750"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263750"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;Exi &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Decl -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679263749"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot; &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">ShowS
+</span><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263750"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-126"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Iff"><span class="hs-identifier hs-type">Iff</span></a></span><span> </span><span id="local-6989586621679263751"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263751"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679263752"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263752"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShowS
+</span><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263751"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot; &lt;=&gt; &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">ShowS
+</span><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263752"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-127"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Imp"><span class="hs-identifier hs-type">Imp</span></a></span><span> </span><span id="local-6989586621679263753"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263753"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679263754"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263754"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShowS
+</span><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263753"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot; =&gt; &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">ShowS
+</span><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263754"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-128"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Or"><span class="hs-identifier hs-type">Or</span></a></span><span> </span><span id="local-6989586621679263755"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263755"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679263756"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263756"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShowS
+</span><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263755"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot; or &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">ShowS
+</span><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263756"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-129"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#And"><span class="hs-identifier hs-type">And</span></a></span><span> </span><span id="local-6989586621679263757"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263757"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679263758"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263758"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShowS
+</span><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263757"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot; and &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">ShowS
+</span><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263758"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-130"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-type">Tag</span></a></span><span> </span><span id="local-6989586621679263759"><span class="annot"><span class="annottext">Tag
+</span><a href="#local-6989586621679263759"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679263760"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263760"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;(Tag: &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Tag -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="#local-6989586621679263759"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;) &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">ShowS
+</span><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263760"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-131"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Not"><span class="hs-identifier hs-type">Not</span></a></span><span> </span><span id="local-6989586621679263761"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263761"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;not &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679263761"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-132"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Data.Formula.Base.html#Top"><span class="hs-identifier hs-var">Top</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;true&quot;</span></span><span>
+</span><span id="line-133"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Data.Formula.Base.html#Bot"><span class="hs-identifier hs-var">Bot</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;false&quot;</span></span><span>
+</span><span id="line-134"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span id="local-6989586621679263762"><span class="annot"><span class="annottext">TermName
+</span><a href="#local-6989586621679263762"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679263763"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263763"><span class="hs-identifier hs-var">args</span></a></span></span><span> </span><span id="local-6989586621679263764"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263764"><span class="hs-identifier hs-var">info</span></a></span></span><span> </span><span id="local-6989586621679263765"><span class="annot"><span class="annottext">TermId
+</span><a href="#local-6989586621679263765"><span class="hs-identifier hs-var">id</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TermName -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="#local-6989586621679263762"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;(args: &quot;</span></span><span>
+</span><span id="line-135"></span><span>  </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Formula -&gt; [Char]) -&gt; [Formula] -&gt; [Char]
+forall (t :: * -&gt; *) a b. Foldable t =&gt; (a -&gt; [b]) -&gt; t a -&gt; [b]
+</span><span class="hs-identifier hs-var">concatMap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ShowS
+</span><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; (Formula -&gt; [Char]) -&gt; Formula -&gt; [Char]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263763"><span class="hs-identifier hs-var">args</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;) (info: &quot;</span></span><span>
+</span><span id="line-136"></span><span>  </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Formula -&gt; [Char]) -&gt; [Formula] -&gt; [Char]
+forall (t :: * -&gt; *) a b. Foldable t =&gt; (a -&gt; [b]) -&gt; t a -&gt; [b]
+</span><span class="hs-identifier hs-var">concatMap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ShowS
+</span><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; (Formula -&gt; [Char]) -&gt; Formula -&gt; [Char]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263764"><span class="hs-identifier hs-var">info</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;) (id: &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">TermId -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="#local-6989586621679263765"><span class="hs-identifier hs-var">id</span></a></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;)&quot;</span></span><span>
+</span><span id="line-137"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Var"><span class="hs-identifier hs-type">Var</span></a></span><span> </span><span id="local-6989586621679263766"><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679263766"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679263767"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263767"><span class="hs-identifier hs-var">info</span></a></span></span><span> </span><span id="local-6989586621679263768"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679263768"><span class="hs-identifier hs-var">pos</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679263766"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;(info: &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Formula -&gt; [Char]) -&gt; [Formula] -&gt; [Char]
+forall (t :: * -&gt; *) a b. Foldable t =&gt; (a -&gt; [b]) -&gt; t a -&gt; [b]
+</span><span class="hs-identifier hs-var">concatMap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ShowS
+</span><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-var">parens</span></a></span><span> </span><span class="annot"><span class="annottext">ShowS -&gt; (Formula -&gt; [Char]) -&gt; Formula -&gt; [Char]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+</span><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679263767"><span class="hs-identifier hs-var">info</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-138"></span><span>  </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;) (pos: &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">T -&gt; [Char]
+</span><a href="SAD.Core.Message.html#show_position"><span class="hs-identifier hs-var">show_position</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679263768"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;)&quot;</span></span><span>
+</span><span id="line-139"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Ind"><span class="hs-identifier hs-type">Ind</span></a></span><span> </span><span id="local-6989586621679263769"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679263769"><span class="hs-identifier hs-var">idx</span></a></span></span><span> </span><span id="local-6989586621679263770"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679263770"><span class="hs-identifier hs-var">pos</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679263769"><span class="hs-identifier hs-var">idx</span></a></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;(pos: &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">T -&gt; [Char]
+</span><a href="SAD.Core.Message.html#show_position"><span class="hs-identifier hs-var">show_position</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679263770"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;)&quot;</span></span><span>
+</span><span id="line-140"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#debugShow"><span class="hs-identifier hs-var">debugShow</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Data.Formula.Base.html#ThisT"><span class="hs-identifier hs-var">ThisT</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;ThisT&quot;</span></span><span>
+</span><span id="line-141"></span><span>
+</span><span id="line-142"></span><span class="annot"><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-type">parens</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-143"></span><span id="parens"><span class="annot"><span class="annottext">parens :: ShowS
+</span><a href="SAD.Structures.StructureTree.html#parens"><span class="hs-identifier hs-var hs-var">parens</span></a></span></span><span> </span><span id="local-6989586621679263771"><span class="annot"><span class="annottext">[Char]
+</span><a href="#local-6989586621679263771"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;(&quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><a href="#local-6989586621679263771"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; ShowS
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;)&quot;</span></span><span>
+</span><span id="line-144"></span><span>
+</span><span id="line-145"></span><span class="hs-comment">-- TODO:</span><span>
+</span><span id="line-146"></span><span class="hs-comment">-- Fix -&gt; Top in Prime no square, tenth hypothesis</span><span>
+</span><span id="line-147"></span><span class="hs-comment">-- Statement after fails to translate</span><span>
+</span><span id="line-148"></span></pre></body></html>

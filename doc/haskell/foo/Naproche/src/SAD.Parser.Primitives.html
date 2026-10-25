@@ -1,0 +1,856 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.Parser.Primitives</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2017 - 2018, Steffen Frerix</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-5"></span><span class="hs-comment">--</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Primitive parsers</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.Parser.Primitives</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-12"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Primitive Token operations</span></span><span>
+</span><span id="line-13"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#tokenPrim"><span class="hs-identifier">tokenPrim</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#tokenGuard"><span class="hs-identifier">tokenGuard</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#eof"><span class="hs-identifier">eof</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#inspectError"><span class="hs-identifier">inspectError</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#mapInput"><span class="hs-identifier">mapInput</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span>  </span><span class="annot"><span class="hs-comment">-- * Useful macros</span></span><span>
+</span><span id="line-20"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#satisfy"><span class="hs-identifier">satisfy</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-21"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#anyToken"><span class="hs-identifier">anyToken</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-22"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#word"><span class="hs-identifier">word</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-23"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#digit"><span class="hs-identifier">digit</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-24"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#symb"><span class="hs-identifier">symb</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-25"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#token"><span class="hs-identifier">token</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-26"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier">token'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-27"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#tokenPos%27"><span class="hs-identifier">tokenPos'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-28"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#tokenOf"><span class="hs-identifier">tokenOf</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-29"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#tokenOf%27"><span class="hs-identifier">tokenOf'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-30"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#tokenSeq"><span class="hs-identifier">tokenSeq</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-31"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#tokenSeq%27"><span class="hs-identifier">tokenSeq'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-32"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#tokenSeqOf"><span class="hs-identifier">tokenSeqOf</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-33"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#tokenSeqOf%27"><span class="hs-identifier">tokenSeqOf'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-34"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#getToken"><span class="hs-identifier">getToken</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-35"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#getToken%27"><span class="hs-identifier">getToken'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-36"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#getTokenOf"><span class="hs-identifier">getTokenOf</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-37"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#getTokenOf%27"><span class="hs-identifier">getTokenOf'</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-38"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#symbol"><span class="hs-identifier">symbol</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-39"></span><span>  </span><span class="annot"><a href="SAD.Parser.Primitives.html#symbolNotAfterSpace"><span class="hs-identifier">symbolNotAfterSpace</span></a></span><span>
+</span><span id="line-40"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Applicative</span></span><span>
+</span><span id="line-43"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">void</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">guard</span></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Text</span></span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html"><span class="hs-identifier">SAD.Parser.Base</span></a></span><span>
+</span><span id="line-48"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.Error.html"><span class="hs-identifier">SAD.Parser.Error</span></a></span><span>
+</span><span id="line-49"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.Token.html"><span class="hs-identifier">SAD.Parser.Token</span></a></span><span>
+</span><span id="line-50"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Helpers.html"><span class="hs-identifier">SAD.Helpers</span></a></span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Position.html"><span class="hs-identifier">Isabelle.Position</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Position</span></span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span>
+</span><span id="line-55"></span><span class="hs-comment">-- | Parse the current token or return an @EmptyFail@</span><span>
+</span><span id="line-56"></span><span class="hs-comment">-- if the input is empty, eof or the supplied test functions returns @Nothing@.</span><span>
+</span><span id="line-57"></span><span id="local-6989586621679241123"><span id="local-6989586621679241124"><span class="annot"><a href="SAD.Parser.Primitives.html#tokenPrim"><span class="hs-identifier hs-type">tokenPrim</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Parser.Token.html#Token"><span class="hs-identifier hs-type">Token</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679241123"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241124"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241123"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-58"></span><span id="tokenPrim"><span class="annot"><span class="annottext">tokenPrim :: forall a st. (Token -&gt; Maybe a) -&gt; Parser st a
+</span><a href="SAD.Parser.Primitives.html#tokenPrim"><span class="hs-identifier hs-var hs-var">tokenPrim</span></a></span></span><span> </span><span id="local-6989586621679241264"><span class="annot"><span class="annottext">Token -&gt; Maybe a
+</span><a href="#local-6989586621679241264"><span class="hs-identifier hs-var">test</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(forall r.
+ State st
+ -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+-&gt; Parser st a
+forall st a.
+(forall r.
+ State st
+ -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+-&gt; Parser st a
+</span><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-var">Parser</span></a></span><span> </span><span class="annot"><span class="annottext">((forall r.
+  State st
+  -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+ -&gt; Parser st a)
+-&gt; (forall r.
+    State st
+    -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+-&gt; Parser st a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span id="local-6989586621679241273"><span class="annot"><span class="annottext">st
+</span><a href="#local-6989586621679241273"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span id="local-6989586621679241274"><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679241274"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span id="local-6989586621679241275"><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679241275"><span class="hs-identifier hs-var">parserKind</span></a></span></span><span> </span><span class="annot"><span class="annottext">T
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679241276"><span class="annot"><span class="annottext">Continuation r st a
+</span><a href="#local-6989586621679241276"><span class="hs-identifier hs-var">ok</span></a></span></span><span> </span><span class="annot"><span class="annottext">ConsumedFail r
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679241277"><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241277"><span class="hs-identifier hs-var">eerr</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-59"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679241274"><span class="hs-identifier hs-var">input</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-60"></span><span>    </span><span class="hs-special">[</span><span class="hs-special">]</span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241277"><span class="hs-identifier hs-var">eerr</span></a></span><span> </span><span class="annot"><span class="annottext">ConsumedFail r -&gt; ConsumedFail r
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; T -&gt; ParseError
+</span><a href="SAD.Parser.Error.html#unexpectError"><span class="hs-identifier hs-var">unexpectError</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;&quot;</span></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span>
+</span><span id="line-61"></span><span>    </span><span id="local-6989586621679241280"><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241280"><span class="hs-identifier hs-var">t</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679241281"><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679241281"><span class="hs-identifier hs-var">ts</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Maybe ()
+forall (f :: * -&gt; *). Alternative f =&gt; Bool -&gt; f ()
+</span><span class="hs-identifier hs-var">guard</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">(Bool -&gt; Bool) -&gt; Bool -&gt; Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Token -&gt; Bool
+</span><a href="SAD.Parser.Token.html#isEOF"><span class="hs-identifier hs-var">isEOF</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241280"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Maybe () -&gt; Maybe a -&gt; Maybe a
+forall a b. Maybe a -&gt; Maybe b -&gt; Maybe b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; m b -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Token -&gt; Maybe a
+</span><a href="#local-6989586621679241264"><span class="hs-identifier hs-var">test</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241280"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-62"></span><span>      </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679241284"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679241284"><span class="hs-identifier hs-var">x</span></a></span></span><span>  </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-63"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679241285"><span class="annot"><span class="annottext">newstate :: State st
+</span><a href="#local-6989586621679241285"><span class="hs-identifier hs-var hs-var">newstate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">st -&gt; [Token] -&gt; ParserKind -&gt; T -&gt; State st
+forall st. st -&gt; [Token] -&gt; ParserKind -&gt; T -&gt; State st
+</span><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-var">State</span></a></span><span> </span><span class="annot"><span class="annottext">st
+</span><a href="#local-6989586621679241273"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679241281"><span class="hs-identifier hs-var">ts</span></a></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679241275"><span class="hs-identifier hs-var">parserKind</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Token -&gt; T
+</span><a href="SAD.Parser.Token.html#tokenPos"><span class="hs-identifier hs-var">tokenPos</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241280"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-64"></span><span>            </span><span id="local-6989586621679241287"><span class="annot"><span class="annottext">newerr :: ParseError
+</span><a href="#local-6989586621679241287"><span class="hs-identifier hs-var hs-var">newerr</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">T -&gt; ParseError
+</span><a href="SAD.Parser.Error.html#newErrorUnknown"><span class="hs-identifier hs-var">newErrorUnknown</span></a></span><span> </span><span class="annot"><span class="annottext">(T -&gt; ParseError) -&gt; T -&gt; ParseError
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Token -&gt; T
+</span><a href="SAD.Parser.Token.html#tokenPos"><span class="hs-identifier hs-var">tokenPos</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241280"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-65"></span><span>        </span><span class="hs-keyword">in</span><span>  </span><span class="annot"><span class="annottext">Continuation r st a
+</span><a href="#local-6989586621679241276"><span class="hs-identifier hs-var">ok</span></a></span><span> </span><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679241287"><span class="hs-identifier hs-var">newerr</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">a -&gt; State st -&gt; ParseResult st a
+forall st a. a -&gt; State st -&gt; ParseResult st a
+</span><a href="SAD.Parser.Base.html#PR"><span class="hs-identifier hs-var">PR</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679241284"><span class="hs-identifier hs-var">x</span></a></span><span> </span><span class="annot"><span class="annottext">State st
+</span><a href="#local-6989586621679241285"><span class="hs-identifier hs-var">newstate</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-66"></span><span>      </span><span class="annot"><span class="annottext">Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241277"><span class="hs-identifier hs-var">eerr</span></a></span><span> </span><span class="annot"><span class="annottext">ConsumedFail r -&gt; ConsumedFail r
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; T -&gt; ParseError
+</span><a href="SAD.Parser.Error.html#unexpectError"><span class="hs-identifier hs-var">unexpectError</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Token -&gt; Text
+</span><a href="SAD.Parser.Token.html#showToken"><span class="hs-identifier hs-var">showToken</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241280"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Token -&gt; T
+</span><a href="SAD.Parser.Token.html#tokenPos"><span class="hs-identifier hs-var">tokenPos</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241280"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-67"></span><span>
+</span><span id="line-68"></span><span class="hs-comment">-- | @tokenGuard test p@ parses the current token using @p@ only if the token</span><span>
+</span><span id="line-69"></span><span class="hs-comment">-- passes the predicate @test@. Does not produce particularly useful error</span><span>
+</span><span id="line-70"></span><span class="hs-comment">-- messages.</span><span>
+</span><span id="line-71"></span><span id="local-6989586621679241152"><span id="local-6989586621679241153"><span class="annot"><a href="SAD.Parser.Primitives.html#tokenGuard"><span class="hs-identifier hs-type">tokenGuard</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Parser.Token.html#Token"><span class="hs-identifier hs-type">Token</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241152"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241153"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241152"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241153"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-72"></span><span id="tokenGuard"><span class="annot"><span class="annottext">tokenGuard :: forall st a. (Token -&gt; Bool) -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Primitives.html#tokenGuard"><span class="hs-identifier hs-var hs-var">tokenGuard</span></a></span></span><span> </span><span id="local-6989586621679241291"><span class="annot"><span class="annottext">Token -&gt; Bool
+</span><a href="#local-6989586621679241291"><span class="hs-identifier hs-var">test</span></a></span></span><span> </span><span id="local-6989586621679241292"><span class="annot"><span class="annottext">Parser st a
+</span><a href="#local-6989586621679241292"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(forall r.
+ State st
+ -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+-&gt; Parser st a
+forall st a.
+(forall r.
+ State st
+ -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+-&gt; Parser st a
+</span><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-var">Parser</span></a></span><span> </span><span class="annot"><span class="annottext">((forall r.
+  State st
+  -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+ -&gt; Parser st a)
+-&gt; (forall r.
+    State st
+    -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+-&gt; Parser st a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679241294"><span class="annot"><span class="annottext">st :: State st
+</span><a href="#local-6989586621679241294"><span class="hs-identifier hs-var">st</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span class="annot"><span class="annottext">st
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679241295"><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679241295"><span class="hs-identifier hs-var">input</span></a></span></span><span>  </span><span class="annot"><span class="annottext">ParserKind
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">T
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679241296"><span class="annot"><span class="annottext">Continuation r st a
+</span><a href="#local-6989586621679241296"><span class="hs-identifier hs-var">ok</span></a></span></span><span> </span><span id="local-6989586621679241297"><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241297"><span class="hs-identifier hs-var">cerr</span></a></span></span><span> </span><span id="local-6989586621679241298"><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241298"><span class="hs-identifier hs-var">eerr</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-73"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679241295"><span class="hs-identifier hs-var">input</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-74"></span><span>    </span><span class="hs-special">[</span><span class="hs-special">]</span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241298"><span class="hs-identifier hs-var">eerr</span></a></span><span> </span><span class="annot"><span class="annottext">ConsumedFail r -&gt; ConsumedFail r
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; T -&gt; ParseError
+</span><a href="SAD.Parser.Error.html#unexpectError"><span class="hs-identifier hs-var">unexpectError</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;&quot;</span></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span>
+</span><span id="line-75"></span><span>    </span><span id="local-6989586621679241299"><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241299"><span class="hs-identifier hs-var">t</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679241300"><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679241300"><span class="hs-identifier hs-var">ts</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Token -&gt; Bool
+</span><a href="#local-6989586621679241291"><span class="hs-identifier hs-var">test</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241299"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-76"></span><span>      </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Parser st a
+-&gt; forall r.
+   State st
+   -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r
+forall st a.
+Parser st a
+-&gt; forall r.
+   State st
+   -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r
+</span><a href="SAD.Parser.Base.html#runParser"><span class="hs-identifier hs-var">runParser</span></a></span><span> </span><span class="annot"><span class="annottext">Parser st a
+</span><a href="#local-6989586621679241292"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">State st
+</span><a href="#local-6989586621679241294"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="annot"><span class="annottext">Continuation r st a
+</span><a href="#local-6989586621679241296"><span class="hs-identifier hs-var">ok</span></a></span><span> </span><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241297"><span class="hs-identifier hs-var">cerr</span></a></span><span> </span><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241298"><span class="hs-identifier hs-var">eerr</span></a></span><span>
+</span><span id="line-77"></span><span>      </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241298"><span class="hs-identifier hs-var">eerr</span></a></span><span> </span><span class="annot"><span class="annottext">ConsumedFail r -&gt; ConsumedFail r
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; T -&gt; ParseError
+</span><a href="SAD.Parser.Error.html#unexpectError"><span class="hs-identifier hs-var">unexpectError</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Token -&gt; Text
+</span><a href="SAD.Parser.Token.html#showToken"><span class="hs-identifier hs-var">showToken</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241299"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Token -&gt; T
+</span><a href="SAD.Parser.Token.html#tokenPos"><span class="hs-identifier hs-var">tokenPos</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241299"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-78"></span><span>
+</span><span id="line-79"></span><span class="annot"><span class="hs-comment">-- | Parse the end of input</span></span><span>
+</span><span id="line-80"></span><span id="local-6989586621679241160"><span class="annot"><a href="SAD.Parser.Primitives.html#eof"><span class="hs-identifier hs-type">eof</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241160"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-81"></span><span id="eof"><span class="annot"><span class="annottext">eof :: forall st. Parser st ()
+</span><a href="SAD.Parser.Primitives.html#eof"><span class="hs-identifier hs-var hs-var">eof</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(forall r.
+ State st
+ -&gt; Continuation r st () -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+-&gt; Parser st ()
+forall st a.
+(forall r.
+ State st
+ -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+-&gt; Parser st a
+</span><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-var">Parser</span></a></span><span> </span><span class="annot"><span class="annottext">((forall r.
+  State st
+  -&gt; Continuation r st () -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+ -&gt; Parser st ())
+-&gt; (forall r.
+    State st
+    -&gt; Continuation r st () -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+-&gt; Parser st ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="annot"><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-type">State</span></a></span><span> </span><span id="local-6989586621679241303"><span class="annot"><span class="annottext">st
+</span><a href="#local-6989586621679241303"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span id="local-6989586621679241304"><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679241304"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span id="local-6989586621679241305"><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679241305"><span class="hs-identifier hs-var">parserKind</span></a></span></span><span> </span><span class="annot"><span class="annottext">T
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679241306"><span class="annot"><span class="annottext">Continuation r st ()
+</span><a href="#local-6989586621679241306"><span class="hs-identifier hs-var">ok</span></a></span></span><span> </span><span class="annot"><span class="annottext">ConsumedFail r
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679241307"><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241307"><span class="hs-identifier hs-var">eerr</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-82"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679241304"><span class="hs-identifier hs-var">input</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-83"></span><span>    </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241307"><span class="hs-identifier hs-var">eerr</span></a></span><span> </span><span class="annot"><span class="annottext">ConsumedFail r -&gt; ConsumedFail r
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; T -&gt; ParseError
+</span><a href="SAD.Parser.Error.html#unexpectError"><span class="hs-identifier hs-var">unexpectError</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;&quot;</span></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span>
+</span><span id="line-84"></span><span>    </span><span class="hs-special">(</span><span id="local-6989586621679241308"><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241308"><span class="hs-identifier hs-var">t</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679241309"><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679241309"><span class="hs-identifier hs-var">ts</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-85"></span><span>      </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Token -&gt; Bool
+</span><a href="SAD.Parser.Token.html#isEOF"><span class="hs-identifier hs-var">isEOF</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241308"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-86"></span><span>      </span><span class="hs-keyword">then</span><span>
+</span><span id="line-87"></span><span>        </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679241310"><span class="annot"><span class="annottext">newstate :: State st
+</span><a href="#local-6989586621679241310"><span class="hs-identifier hs-var hs-var">newstate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">st -&gt; [Token] -&gt; ParserKind -&gt; T -&gt; State st
+forall st. st -&gt; [Token] -&gt; ParserKind -&gt; T -&gt; State st
+</span><a href="SAD.Parser.Base.html#State"><span class="hs-identifier hs-var">State</span></a></span><span> </span><span class="annot"><span class="annottext">st
+</span><a href="#local-6989586621679241303"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679241309"><span class="hs-identifier hs-var">ts</span></a></span><span> </span><span class="annot"><span class="annottext">ParserKind
+</span><a href="#local-6989586621679241305"><span class="hs-identifier hs-var">parserKind</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Token -&gt; T
+</span><a href="SAD.Parser.Token.html#tokenPos"><span class="hs-identifier hs-var">tokenPos</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241308"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-88"></span><span>            </span><span id="local-6989586621679241311"><span class="annot"><span class="annottext">newerr :: ParseError
+</span><a href="#local-6989586621679241311"><span class="hs-identifier hs-var hs-var">newerr</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">T -&gt; ParseError
+</span><a href="SAD.Parser.Error.html#newErrorUnknown"><span class="hs-identifier hs-var">newErrorUnknown</span></a></span><span> </span><span class="annot"><span class="annottext">(T -&gt; ParseError) -&gt; T -&gt; ParseError
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Token -&gt; T
+</span><a href="SAD.Parser.Token.html#tokenPos"><span class="hs-identifier hs-var">tokenPos</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241308"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-89"></span><span>        </span><span class="hs-keyword">in</span><span>  </span><span class="annot"><span class="annottext">Continuation r st ()
+</span><a href="#local-6989586621679241306"><span class="hs-identifier hs-var">ok</span></a></span><span> </span><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679241311"><span class="hs-identifier hs-var">newerr</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">() -&gt; State st -&gt; ParseResult st ()
+forall st a. a -&gt; State st -&gt; ParseResult st a
+</span><a href="SAD.Parser.Base.html#PR"><span class="hs-identifier hs-var">PR</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">State st
+</span><a href="#local-6989586621679241310"><span class="hs-identifier hs-var">newstate</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-90"></span><span>      </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241307"><span class="hs-identifier hs-var">eerr</span></a></span><span> </span><span class="annot"><span class="annottext">ConsumedFail r -&gt; ConsumedFail r
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; T -&gt; ParseError
+</span><a href="SAD.Parser.Error.html#unexpectError"><span class="hs-identifier hs-var">unexpectError</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Token -&gt; Text
+</span><a href="SAD.Parser.Token.html#showToken"><span class="hs-identifier hs-var">showToken</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241308"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Token -&gt; T
+</span><a href="SAD.Parser.Token.html#tokenPos"><span class="hs-identifier hs-var">tokenPos</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241308"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-91"></span><span>
+</span><span id="line-92"></span><span class="hs-comment">-- Turn @ParseError@s into valid @ParseResult@s.</span><span>
+</span><span id="line-93"></span><span id="local-6989586621679241163"><span id="local-6989586621679241164"><span class="annot"><a href="SAD.Parser.Primitives.html#catchError"><span class="hs-identifier hs-type">catchError</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Parser.Error.html#ParseError"><span class="hs-identifier hs-type">ParseError</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679241163"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241164"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241163"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241164"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241163"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-94"></span><span id="catchError"><span class="annot"><span class="annottext">catchError :: forall a st. (ParseError -&gt; a) -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Primitives.html#catchError"><span class="hs-identifier hs-var hs-var">catchError</span></a></span></span><span> </span><span id="local-6989586621679241313"><span class="annot"><span class="annottext">ParseError -&gt; a
+</span><a href="#local-6989586621679241313"><span class="hs-identifier hs-var">catch</span></a></span></span><span> </span><span id="local-6989586621679241314"><span class="annot"><span class="annottext">Parser st a
+</span><a href="#local-6989586621679241314"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(forall r.
+ State st
+ -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+-&gt; Parser st a
+forall st a.
+(forall r.
+ State st
+ -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+-&gt; Parser st a
+</span><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-var">Parser</span></a></span><span> </span><span class="annot"><span class="annottext">((forall r.
+  State st
+  -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+ -&gt; Parser st a)
+-&gt; (forall r.
+    State st
+    -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+-&gt; Parser st a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679241315"><span class="annot"><span class="annottext">State st
+</span><a href="#local-6989586621679241315"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span id="local-6989586621679241316"><span class="annot"><span class="annottext">Continuation r st a
+</span><a href="#local-6989586621679241316"><span class="hs-identifier hs-var">ok</span></a></span></span><span> </span><span id="local-6989586621679241317"><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241317"><span class="hs-identifier hs-var">_cerr</span></a></span></span><span> </span><span id="local-6989586621679241318"><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241318"><span class="hs-identifier hs-var">_eerr</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-95"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679241319"><span class="annot"><span class="annottext">pcerr :: ConsumedFail r
+</span><a href="#local-6989586621679241319"><span class="hs-identifier hs-var hs-var">pcerr</span></a></span></span><span> </span><span id="local-6989586621679241320"><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679241320"><span class="hs-identifier hs-var">err</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Continuation r st a
+</span><a href="#local-6989586621679241316"><span class="hs-identifier hs-var">ok</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T -&gt; ParseError
+</span><a href="SAD.Parser.Error.html#newErrorUnknown"><span class="hs-identifier hs-var">newErrorUnknown</span></a></span><span> </span><span class="annot"><span class="annottext">(T -&gt; ParseError) -&gt; T -&gt; ParseError
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">State st -&gt; T
+forall st. State st -&gt; T
+</span><a href="SAD.Parser.Base.html#stPosition"><span class="hs-identifier hs-var">stPosition</span></a></span><span> </span><span class="annot"><span class="annottext">State st
+</span><a href="#local-6989586621679241315"><span class="hs-identifier hs-var">st</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">a -&gt; State st -&gt; ParseResult st a
+forall st a. a -&gt; State st -&gt; ParseResult st a
+</span><a href="SAD.Parser.Base.html#PR"><span class="hs-identifier hs-var">PR</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ParseError -&gt; a
+</span><a href="#local-6989586621679241313"><span class="hs-identifier hs-var">catch</span></a></span><span> </span><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679241320"><span class="hs-identifier hs-var">err</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">State st
+</span><a href="#local-6989586621679241315"><span class="hs-identifier hs-var">st</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-96"></span><span>      </span><span id="local-6989586621679241322"><span class="annot"><span class="annottext">peerr :: ConsumedFail r
+</span><a href="#local-6989586621679241322"><span class="hs-identifier hs-var hs-var">peerr</span></a></span></span><span> </span><span id="local-6989586621679241323"><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679241323"><span class="hs-identifier hs-var">err</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Continuation r st a
+</span><a href="#local-6989586621679241316"><span class="hs-identifier hs-var">ok</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T -&gt; ParseError
+</span><a href="SAD.Parser.Error.html#newErrorUnknown"><span class="hs-identifier hs-var">newErrorUnknown</span></a></span><span> </span><span class="annot"><span class="annottext">(T -&gt; ParseError) -&gt; T -&gt; ParseError
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">State st -&gt; T
+forall st. State st -&gt; T
+</span><a href="SAD.Parser.Base.html#stPosition"><span class="hs-identifier hs-var">stPosition</span></a></span><span> </span><span class="annot"><span class="annottext">State st
+</span><a href="#local-6989586621679241315"><span class="hs-identifier hs-var">st</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">a -&gt; State st -&gt; ParseResult st a
+forall st a. a -&gt; State st -&gt; ParseResult st a
+</span><a href="SAD.Parser.Base.html#PR"><span class="hs-identifier hs-var">PR</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ParseError -&gt; a
+</span><a href="#local-6989586621679241313"><span class="hs-identifier hs-var">catch</span></a></span><span> </span><span class="annot"><span class="annottext">ParseError
+</span><a href="#local-6989586621679241323"><span class="hs-identifier hs-var">err</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">State st
+</span><a href="#local-6989586621679241315"><span class="hs-identifier hs-var">st</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-97"></span><span>  </span><span class="hs-keyword">in</span><span>  </span><span class="annot"><span class="annottext">Parser st a
+-&gt; forall r.
+   State st
+   -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r
+forall st a.
+Parser st a
+-&gt; forall r.
+   State st
+   -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r
+</span><a href="SAD.Parser.Base.html#runParser"><span class="hs-identifier hs-var">runParser</span></a></span><span> </span><span class="annot"><span class="annottext">Parser st a
+</span><a href="#local-6989586621679241314"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">State st
+</span><a href="#local-6989586621679241315"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="annot"><span class="annottext">Continuation r st a
+</span><a href="#local-6989586621679241316"><span class="hs-identifier hs-var">ok</span></a></span><span> </span><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241319"><span class="hs-identifier hs-var">pcerr</span></a></span><span> </span><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241322"><span class="hs-identifier hs-var">peerr</span></a></span><span>
+</span><span id="line-98"></span><span>
+</span><span id="line-99"></span><span class="annot"><span class="hs-comment">-- | Lift possible parse errors into the @ParseResult@ using @catchError@.</span></span><span>
+</span><span id="line-100"></span><span id="local-6989586621679241169"><span id="local-6989586621679241170"><span class="annot"><a href="SAD.Parser.Primitives.html#inspectError"><span class="hs-identifier hs-type">inspectError</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241169"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241170"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241169"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><a href="SAD.Parser.Error.html#ParseError"><span class="hs-identifier hs-type">ParseError</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241170"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span></span><span>
+</span><span id="line-101"></span><span id="inspectError"><span class="annot"><span class="annottext">inspectError :: forall st a. Parser st a -&gt; Parser st (Either ParseError a)
+</span><a href="SAD.Parser.Primitives.html#inspectError"><span class="hs-identifier hs-var hs-var">inspectError</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(ParseError -&gt; Either ParseError a)
+-&gt; Parser st (Either ParseError a)
+-&gt; Parser st (Either ParseError a)
+forall a st. (ParseError -&gt; a) -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Primitives.html#catchError"><span class="hs-identifier hs-var">catchError</span></a></span><span> </span><span class="annot"><span class="annottext">ParseError -&gt; Either ParseError a
+forall a b. a -&gt; Either a b
+</span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="annot"><span class="annottext">(Parser st (Either ParseError a)
+ -&gt; Parser st (Either ParseError a))
+-&gt; (Parser st a -&gt; Parser st (Either ParseError a))
+-&gt; Parser st a
+-&gt; Parser st (Either ParseError a)
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(a -&gt; Either ParseError a)
+-&gt; Parser st a -&gt; Parser st (Either ParseError a)
+forall a b. (a -&gt; b) -&gt; Parser st a -&gt; Parser st b
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">a -&gt; Either ParseError a
+forall a b. b -&gt; Either a b
+</span><span class="hs-identifier hs-var">Right</span></span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span class="annot"><span class="hs-comment">-- | Map a function over the input in the Parser @State@.</span></span><span>
+</span><span id="line-104"></span><span id="local-6989586621679241182"><span id="local-6989586621679241183"><span class="annot"><a href="SAD.Parser.Primitives.html#mapInput"><span class="hs-identifier hs-type">mapInput</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><a href="SAD.Parser.Token.html#Token"><span class="hs-identifier hs-type">Token</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Parser.Token.html#Token"><span class="hs-identifier hs-type">Token</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241182"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241183"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241182"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241183"><span class="hs-identifier hs-type">a</span></a></span></span></span><span>
+</span><span id="line-105"></span><span id="mapInput"><span class="annot"><span class="annottext">mapInput :: forall st a. ([Token] -&gt; [Token]) -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Primitives.html#mapInput"><span class="hs-identifier hs-var hs-var">mapInput</span></a></span></span><span> </span><span id="local-6989586621679241327"><span class="annot"><span class="annottext">[Token] -&gt; [Token]
+</span><a href="#local-6989586621679241327"><span class="hs-identifier hs-var">jump</span></a></span></span><span> </span><span id="local-6989586621679241328"><span class="annot"><span class="annottext">Parser st a
+</span><a href="#local-6989586621679241328"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(forall r.
+ State st
+ -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+-&gt; Parser st a
+forall st a.
+(forall r.
+ State st
+ -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+-&gt; Parser st a
+</span><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-var">Parser</span></a></span><span> </span><span class="annot"><span class="annottext">((forall r.
+  State st
+  -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+ -&gt; Parser st a)
+-&gt; (forall r.
+    State st
+    -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r)
+-&gt; Parser st a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679241329"><span class="annot"><span class="annottext">State st
+</span><a href="#local-6989586621679241329"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span id="local-6989586621679241330"><span class="annot"><span class="annottext">Continuation r st a
+</span><a href="#local-6989586621679241330"><span class="hs-identifier hs-var">ok</span></a></span></span><span> </span><span id="local-6989586621679241331"><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241331"><span class="hs-identifier hs-var">cerr</span></a></span></span><span> </span><span id="local-6989586621679241332"><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241332"><span class="hs-identifier hs-var">err</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-106"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679241333"><span class="annot"><span class="annottext">newInput :: [Token]
+</span><a href="#local-6989586621679241333"><span class="hs-identifier hs-var hs-var">newInput</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Token] -&gt; [Token]
+</span><a href="#local-6989586621679241327"><span class="hs-identifier hs-var">jump</span></a></span><span> </span><span class="annot"><span class="annottext">([Token] -&gt; [Token]) -&gt; [Token] -&gt; [Token]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">State st -&gt; [Token]
+forall st. State st -&gt; [Token]
+</span><a href="SAD.Parser.Base.html#stInput"><span class="hs-identifier hs-var">stInput</span></a></span><span> </span><span class="annot"><span class="annottext">State st
+</span><a href="#local-6989586621679241329"><span class="hs-identifier hs-var">st</span></a></span><span>
+</span><span id="line-107"></span><span>  </span><span class="hs-keyword">in</span><span>  </span><span class="annot"><span class="annottext">Parser st a
+-&gt; forall r.
+   State st
+   -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r
+forall st a.
+Parser st a
+-&gt; forall r.
+   State st
+   -&gt; Continuation r st a -&gt; ConsumedFail r -&gt; ConsumedFail r -&gt; r
+</span><a href="SAD.Parser.Base.html#runParser"><span class="hs-identifier hs-var">runParser</span></a></span><span> </span><span class="annot"><span class="annottext">Parser st a
+</span><a href="#local-6989586621679241328"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">State st
+</span><a href="#local-6989586621679241329"><span class="hs-identifier hs-var">st</span></a></span><span class="hs-special">{</span><span class="annot"><a href="SAD.Parser.Base.html#stInput"><span class="hs-identifier hs-var">stInput</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="#local-6989586621679241333"><span class="hs-identifier hs-type">newInput</span></a></span><span class="hs-special">}</span><span> </span><span class="annot"><span class="annottext">Continuation r st a
+</span><a href="#local-6989586621679241330"><span class="hs-identifier hs-var">ok</span></a></span><span> </span><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241331"><span class="hs-identifier hs-var">cerr</span></a></span><span> </span><span class="annot"><span class="annottext">ConsumedFail r
+</span><a href="#local-6989586621679241332"><span class="hs-identifier hs-var">err</span></a></span><span>
+</span><span id="line-108"></span><span>
+</span><span id="line-109"></span><span>
+</span><span id="line-110"></span><span class="annot"><span class="hs-comment">-- | Check if the current token satisfies a predicate; if not fail</span></span><span>
+</span><span id="line-111"></span><span id="local-6989586621679241188"><span class="annot"><a href="SAD.Parser.Primitives.html#satisfy"><span class="hs-identifier hs-type">satisfy</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241188"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-112"></span><span id="satisfy"><span class="annot"><span class="annottext">satisfy :: forall st. (Text -&gt; Bool) -&gt; Parser st Text
+</span><a href="SAD.Parser.Primitives.html#satisfy"><span class="hs-identifier hs-var hs-var">satisfy</span></a></span></span><span> </span><span id="local-6989586621679241335"><span class="annot"><span class="annottext">Text -&gt; Bool
+</span><a href="#local-6989586621679241335"><span class="hs-identifier hs-var">pr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Token -&gt; Maybe Text) -&gt; Parser st Text
+forall a st. (Token -&gt; Maybe a) -&gt; Parser st a
+</span><a href="SAD.Parser.Primitives.html#tokenPrim"><span class="hs-identifier hs-var">tokenPrim</span></a></span><span> </span><span class="annot"><span class="annottext">Token -&gt; Maybe Text
+</span><a href="#local-6989586621679241336"><span class="hs-identifier hs-var">prTest</span></a></span><span>
+</span><span id="line-113"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-114"></span><span>    </span><span class="annot"><a href="#local-6989586621679241336"><span class="hs-identifier hs-type">prTest</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Parser.Token.html#Token"><span class="hs-identifier hs-type">Token</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-115"></span><span>    </span><span id="local-6989586621679241336"><span class="annot"><span class="annottext">prTest :: Token -&gt; Maybe Text
+</span><a href="#local-6989586621679241336"><span class="hs-identifier hs-var hs-var">prTest</span></a></span></span><span> </span><span id="local-6989586621679241337"><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241337"><span class="hs-identifier hs-var">tk</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679241338"><span class="annot"><span class="annottext">s :: Text
+</span><a href="#local-6989586621679241338"><span class="hs-identifier hs-var hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Token -&gt; Text
+</span><a href="SAD.Parser.Token.html#showToken"><span class="hs-identifier hs-var">showToken</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241337"><span class="hs-identifier hs-var">tk</span></a></span><span> </span><span class="hs-keyword">in</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Bool
+</span><a href="#local-6989586621679241335"><span class="hs-identifier hs-var">pr</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241338"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe Text
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241338"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Maybe Text
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-116"></span><span>
+</span><span id="line-117"></span><span class="annot"><span class="hs-comment">-- | Always succeed and pass on the string of the token</span></span><span>
+</span><span id="line-118"></span><span id="local-6989586621679241190"><span class="annot"><a href="SAD.Parser.Primitives.html#anyToken"><span class="hs-identifier hs-type">anyToken</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241190"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-119"></span><span id="anyToken"><span class="annot"><span class="annottext">anyToken :: forall st. Parser st Text
+</span><a href="SAD.Parser.Primitives.html#anyToken"><span class="hs-identifier hs-var hs-var">anyToken</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Token -&gt; Maybe Text) -&gt; Parser st Text
+forall a st. (Token -&gt; Maybe a) -&gt; Parser st a
+</span><a href="SAD.Parser.Primitives.html#tokenPrim"><span class="hs-identifier hs-var">tokenPrim</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Maybe Text
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Maybe Text) -&gt; (Token -&gt; Text) -&gt; Token -&gt; Maybe Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Token -&gt; Text
+</span><a href="SAD.Parser.Token.html#showToken"><span class="hs-identifier hs-var">showToken</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-120"></span><span>
+</span><span id="line-121"></span><span class="annot"><span class="hs-comment">-- | Parses a token that is a word (i.e. consists of only alphabetic characters).</span></span><span>
+</span><span id="line-122"></span><span id="local-6989586621679241339"><span class="annot"><a href="SAD.Parser.Primitives.html#word"><span class="hs-identifier hs-type">word</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241339"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-123"></span><span id="word"><span class="annot"><span class="annottext">word :: forall st. Parser st Text
+</span><a href="SAD.Parser.Primitives.html#word"><span class="hs-identifier hs-var hs-var">word</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Bool) -&gt; Parser st Text
+forall st. (Text -&gt; Bool) -&gt; Parser st Text
+</span><a href="SAD.Parser.Primitives.html#satisfy"><span class="hs-identifier hs-var">satisfy</span></a></span><span> </span><span class="annot"><span class="annottext">((Text -&gt; Bool) -&gt; Parser st Text)
+-&gt; (Text -&gt; Bool) -&gt; Parser st Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679241340"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241340"><span class="hs-identifier hs-var">tk</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; Text -&gt; Bool
+</span><span class="hs-identifier hs-var">Text.all</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="SAD.Helpers.html#isAsciiLetter"><span class="hs-identifier hs-var">isAsciiLetter</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241340"><span class="hs-identifier hs-var">tk</span></a></span><span>
+</span><span id="line-124"></span><span>
+</span><span id="line-125"></span><span class="annot"><span class="hs-comment">-- | Parse a token that is a digit.</span></span><span>
+</span><span id="line-126"></span><span id="local-6989586621679241343"><span class="annot"><a href="SAD.Parser.Primitives.html#digit"><span class="hs-identifier hs-type">digit</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241343"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-127"></span><span id="digit"><span class="annot"><span class="annottext">digit :: forall st. Parser st Text
+</span><a href="SAD.Parser.Primitives.html#digit"><span class="hs-identifier hs-var hs-var">digit</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Bool) -&gt; Parser st Text
+forall st. (Text -&gt; Bool) -&gt; Parser st Text
+</span><a href="SAD.Parser.Primitives.html#satisfy"><span class="hs-identifier hs-var">satisfy</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679241350"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241350"><span class="hs-identifier hs-var">tk</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Int64
+</span><span class="hs-identifier hs-var">Text.length</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241350"><span class="hs-identifier hs-var">tk</span></a></span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Int64 -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int64
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="SAD.Helpers.html#isAsciiDigit"><span class="hs-identifier hs-var">isAsciiDigit</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">HasCallStack =&gt; Text -&gt; Char
+Text -&gt; Char
+</span><span class="hs-identifier hs-var">Text.head</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241350"><span class="hs-identifier hs-var">tk</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-128"></span><span>
+</span><span id="line-129"></span><span class="annot"><span class="hs-comment">-- | Parse a symbolic token, i.e. a TeX command or a single symbolic character</span></span><span>
+</span><span id="line-130"></span><span id="local-6989586621679241355"><span class="annot"><a href="SAD.Parser.Primitives.html#symb"><span class="hs-identifier hs-type">symb</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241355"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-131"></span><span id="symb"><span class="annot"><span class="annottext">symb :: forall st. Parser st Text
+</span><a href="SAD.Parser.Primitives.html#symb"><span class="hs-identifier hs-var hs-var">symb</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Token -&gt; Maybe Text) -&gt; Parser st Text
+forall a st. (Token -&gt; Maybe a) -&gt; Parser st a
+</span><a href="SAD.Parser.Primitives.html#tokenPrim"><span class="hs-identifier hs-var">tokenPrim</span></a></span><span> </span><span class="annot"><span class="annottext">((Token -&gt; Maybe Text) -&gt; Parser st Text)
+-&gt; (Token -&gt; Maybe Text) -&gt; Parser st Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679241361"><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241361"><span class="hs-identifier hs-var">tok</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-132"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679241362"><span class="annot"><span class="annottext">t :: Text
+</span><a href="#local-6989586621679241362"><span class="hs-identifier hs-var hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Token -&gt; Text
+</span><a href="SAD.Parser.Token.html#showToken"><span class="hs-identifier hs-var">showToken</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241361"><span class="hs-identifier hs-var">tok</span></a></span><span>
+</span><span id="line-133"></span><span>  </span><span class="hs-keyword">in</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe (Char, Text)
+</span><span class="hs-identifier hs-var">Text.uncons</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241362"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-134"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'\\'</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679241364"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241364"><span class="hs-identifier hs-var">rest</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-135"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; Text -&gt; Bool
+</span><span class="hs-identifier hs-var">Text.all</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="SAD.Helpers.html#isAsciiLetter"><span class="hs-identifier hs-var">isAsciiLetter</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241364"><span class="hs-identifier hs-var">rest</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe Text
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241362"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-136"></span><span>      </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Int64
+</span><span class="hs-identifier hs-var">Text.length</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241364"><span class="hs-identifier hs-var">rest</span></a></span><span> </span><span class="annot"><span class="annottext">Int64 -&gt; Int64 -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int64
+</span><span class="hs-number">1</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Bool) -&gt; Text -&gt; Bool
+</span><span class="hs-identifier hs-var">Text.all</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="SAD.Helpers.html#isAsciiSymbol"><span class="hs-identifier hs-var">isAsciiSymbol</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241364"><span class="hs-identifier hs-var">rest</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe Text
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241362"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-137"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679241366"><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679241366"><span class="hs-identifier hs-var">c</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;&quot;</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="SAD.Helpers.html#isAsciiSymbol"><span class="hs-identifier hs-var">isAsciiSymbol</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679241366"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char -&gt; Bool
+</span><a href="SAD.Helpers.html#isAsciiPeriod"><span class="hs-identifier hs-var">isAsciiPeriod</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+</span><a href="#local-6989586621679241366"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe Text
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241362"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-138"></span><span>    </span><span class="annot"><span class="annottext">Maybe (Char, Text)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe Text
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-139"></span><span>
+</span><span id="line-140"></span><span>
+</span><span id="line-141"></span><span class="hs-comment">-- | @token tok@ succeeds iff the current token is equal to @tok@. Consumes the</span><span>
+</span><span id="line-142"></span><span class="hs-comment">-- token.</span><span>
+</span><span id="line-143"></span><span class="hs-pragma">{-# INLINE</span><span> </span><span class="annot"><a href="SAD.Parser.Primitives.html#token"><span class="hs-pragma hs-type">token</span></a></span><span> </span><span class="hs-pragma">#-}</span><span>
+</span><span id="line-144"></span><span id="local-6989586621679241197"><span class="annot"><a href="SAD.Parser.Primitives.html#token"><span class="hs-identifier hs-type">token</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241197"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-145"></span><span id="token"><span class="annot"><span class="annottext">token :: forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token"><span class="hs-identifier hs-var hs-var">token</span></a></span></span><span> </span><span id="local-6989586621679241370"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241370"><span class="hs-identifier hs-var">tok</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parser st Text -&gt; Parser st ()
+forall (f :: * -&gt; *) a. Functor f =&gt; f a -&gt; f ()
+</span><span class="hs-identifier hs-var">void</span></span><span> </span><span class="annot"><span class="annottext">(Parser st Text -&gt; Parser st ()) -&gt; Parser st Text -&gt; Parser st ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Bool) -&gt; Parser st Text
+forall st. (Text -&gt; Bool) -&gt; Parser st Text
+</span><a href="SAD.Parser.Primitives.html#satisfy"><span class="hs-identifier hs-var">satisfy</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241370"><span class="hs-identifier hs-var">tok</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span class="hs-special">)</span><span>
+</span><span id="line-146"></span><span>
+</span><span id="line-147"></span><span class="hs-comment">-- | Case-insensitive version of @token@. The argument is assumed to be in</span><span>
+</span><span id="line-148"></span><span class="hs-comment">-- folded case.</span><span>
+</span><span id="line-149"></span><span class="hs-pragma">{-# INLINE</span><span> </span><span class="annot"><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-pragma hs-type">token'</span></a></span><span> </span><span class="hs-pragma">#-}</span><span>
+</span><span id="line-150"></span><span id="local-6989586621679241371"><span class="annot"><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier hs-type">token'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241371"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-151"></span><span id="token%27"><span class="annot"><span class="annottext">token' :: forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier hs-var hs-var">token'</span></a></span></span><span> </span><span id="local-6989586621679241374"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241374"><span class="hs-identifier hs-var">tok</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parser st Text -&gt; Parser st ()
+forall (f :: * -&gt; *) a. Functor f =&gt; f a -&gt; f ()
+</span><span class="hs-identifier hs-var">void</span></span><span> </span><span class="annot"><span class="annottext">(Parser st Text -&gt; Parser st ()) -&gt; Parser st Text -&gt; Parser st ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Bool) -&gt; Parser st Text
+forall st. (Text -&gt; Bool) -&gt; Parser st Text
+</span><a href="SAD.Parser.Primitives.html#satisfy"><span class="hs-identifier hs-var">satisfy</span></a></span><span> </span><span class="annot"><span class="annottext">((Text -&gt; Bool) -&gt; Parser st Text)
+-&gt; (Text -&gt; Bool) -&gt; Parser st Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241374"><span class="hs-identifier hs-var">tok</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Bool) -&gt; (Text -&gt; Text) -&gt; Text -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+</span><span class="hs-identifier hs-var">Text.toCaseFold</span></span><span>
+</span><span id="line-152"></span><span>
+</span><span id="line-153"></span><span class="hs-comment">-- | A version of @token'@ that returns the position of the token instead of</span><span>
+</span><span id="line-154"></span><span class="hs-comment">-- @()@.</span><span>
+</span><span id="line-155"></span><span id="local-6989586621679241202"><span class="annot"><a href="SAD.Parser.Primitives.html#tokenPos%27"><span class="hs-identifier hs-type">tokenPos'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241202"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span></span><span>
+</span><span id="line-156"></span><span id="tokenPos%27"><span class="annot"><span class="annottext">tokenPos' :: forall st. Text -&gt; Parser st T
+</span><a href="SAD.Parser.Primitives.html#tokenPos%27"><span class="hs-identifier hs-var hs-var">tokenPos'</span></a></span></span><span> </span><span id="local-6989586621679241380"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241380"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-157"></span><span>  </span><span id="local-6989586621679241381"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679241381"><span class="hs-identifier hs-var">pos</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser st T
+forall st. Parser st T
+</span><a href="SAD.Parser.Base.html#getPos"><span class="hs-identifier hs-var">getPos</span></a></span><span>
+</span><span id="line-158"></span><span>  </span><span class="annot"><span class="annottext">Text -&gt; Parser st ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier hs-var">token'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241380"><span class="hs-identifier hs-var">s</span></a></span><span>
+</span><span id="line-159"></span><span>  </span><span class="annot"><span class="annottext">T -&gt; Parser st T
+forall a. a -&gt; Parser st a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679241381"><span class="hs-identifier hs-var">pos</span></a></span><span>
+</span><span id="line-160"></span><span>
+</span><span id="line-161"></span><span class="hs-comment">-- | @tokenOf toks@ succeeds iff the current token is an element of @toks@.</span><span>
+</span><span id="line-162"></span><span class="hs-comment">-- Consumes the token.</span><span>
+</span><span id="line-163"></span><span id="local-6989586621679241207"><span class="annot"><a href="SAD.Parser.Primitives.html#tokenOf"><span class="hs-identifier hs-type">tokenOf</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241207"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-164"></span><span id="tokenOf"><span class="annot"><span class="annottext">tokenOf :: forall st. [Text] -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#tokenOf"><span class="hs-identifier hs-var hs-var">tokenOf</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parser st Text -&gt; Parser st ()
+forall (f :: * -&gt; *) a. Functor f =&gt; f a -&gt; f ()
+</span><span class="hs-identifier hs-var">void</span></span><span> </span><span class="annot"><span class="annottext">(Parser st Text -&gt; Parser st ())
+-&gt; ([Text] -&gt; Parser st Text) -&gt; [Text] -&gt; Parser st ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; Parser st Text
+forall st. [Text] -&gt; Parser st Text
+</span><a href="SAD.Parser.Primitives.html#getTokenOf"><span class="hs-identifier hs-var">getTokenOf</span></a></span><span>
+</span><span id="line-165"></span><span>
+</span><span id="line-166"></span><span class="annot"><span class="hs-comment">-- | A sequence of tokens.</span></span><span>
+</span><span id="line-167"></span><span id="local-6989586621679241384"><span class="annot"><a href="SAD.Parser.Primitives.html#tokenSeq"><span class="hs-identifier hs-type">tokenSeq</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241384"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-168"></span><span id="tokenSeq"><span class="annot"><span class="annottext">tokenSeq :: forall st. [Text] -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#tokenSeq"><span class="hs-identifier hs-var hs-var">tokenSeq</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Parser st ()) -&gt; [Text] -&gt; Parser st ()
+forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
+(Foldable t, Monad m) =&gt;
+(a -&gt; m b) -&gt; t a -&gt; m ()
+</span><span class="hs-identifier hs-var">mapM_</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser st ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token"><span class="hs-identifier hs-var">token</span></a></span><span>
+</span><span id="line-169"></span><span>
+</span><span id="line-170"></span><span class="hs-comment">-- | @tokenSeqOf tokSeqs@ succeeds iff one of the token sequences in @tokSeq@</span><span>
+</span><span id="line-171"></span><span class="hs-comment">-- can be consumed.</span><span>
+</span><span id="line-172"></span><span id="local-6989586621679241215"><span class="annot"><a href="SAD.Parser.Primitives.html#tokenSeqOf"><span class="hs-identifier hs-type">tokenSeqOf</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">]</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241215"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-173"></span><span id="tokenSeqOf"><span class="annot"><span class="annottext">tokenSeqOf :: forall st. [[Text]] -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#tokenSeqOf"><span class="hs-identifier hs-var hs-var">tokenSeqOf</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([Text] -&gt; Parser st () -&gt; Parser st ())
+-&gt; Parser st () -&gt; [[Text]] -&gt; Parser st ()
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; [a] -&gt; b
+forall (t :: * -&gt; *) a b.
+Foldable t =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Parser st () -&gt; Parser st () -&gt; Parser st ()
+forall a. Parser st a -&gt; Parser st a -&gt; Parser st a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">(&lt;|&gt;)</span></span><span> </span><span class="annot"><span class="annottext">(Parser st () -&gt; Parser st () -&gt; Parser st ())
+-&gt; ([Text] -&gt; Parser st ())
+-&gt; [Text]
+-&gt; Parser st ()
+-&gt; Parser st ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; Parser st ()
+forall st. [Text] -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#tokenOf"><span class="hs-identifier hs-var">tokenOf</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Parser st ()
+forall a. Parser st a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a
+</span><span class="hs-identifier hs-var">empty</span></span><span>
+</span><span id="line-174"></span><span>
+</span><span id="line-175"></span><span class="hs-comment">-- | Case-insensitive version of @tokenOf@. All arguments are assumed to be in</span><span>
+</span><span id="line-176"></span><span class="hs-comment">-- folded case.</span><span>
+</span><span id="line-177"></span><span class="hs-pragma">{-# INLINE</span><span> </span><span class="annot"><a href="SAD.Parser.Primitives.html#tokenOf%27"><span class="hs-pragma hs-type">tokenOf'</span></a></span><span> </span><span class="hs-pragma">#-}</span><span>
+</span><span id="line-178"></span><span id="local-6989586621679241396"><span class="annot"><a href="SAD.Parser.Primitives.html#tokenOf%27"><span class="hs-identifier hs-type">tokenOf'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241396"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-179"></span><span id="tokenOf%27"><span class="annot"><span class="annottext">tokenOf' :: forall st. [Text] -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#tokenOf%27"><span class="hs-identifier hs-var hs-var">tokenOf'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parser st Text -&gt; Parser st ()
+forall (f :: * -&gt; *) a. Functor f =&gt; f a -&gt; f ()
+</span><span class="hs-identifier hs-var">void</span></span><span> </span><span class="annot"><span class="annottext">(Parser st Text -&gt; Parser st ())
+-&gt; ([Text] -&gt; Parser st Text) -&gt; [Text] -&gt; Parser st ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; Parser st Text
+forall st. [Text] -&gt; Parser st Text
+</span><a href="SAD.Parser.Primitives.html#getTokenOf%27"><span class="hs-identifier hs-var">getTokenOf'</span></a></span><span>
+</span><span id="line-180"></span><span>
+</span><span id="line-181"></span><span class="hs-comment">-- | Case-insensitive version of @tokenSeq@. All arguments are assumed to be</span><span>
+</span><span id="line-182"></span><span class="hs-comment">-- in folded case.</span><span>
+</span><span id="line-183"></span><span id="local-6989586621679241398"><span class="annot"><a href="SAD.Parser.Primitives.html#tokenSeq%27"><span class="hs-identifier hs-type">tokenSeq'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241398"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-184"></span><span id="tokenSeq%27"><span class="annot"><span class="annottext">tokenSeq' :: forall st. [Text] -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#tokenSeq%27"><span class="hs-identifier hs-var hs-var">tokenSeq'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Parser st ()) -&gt; [Text] -&gt; Parser st ()
+forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
+(Foldable t, Monad m) =&gt;
+(a -&gt; m b) -&gt; t a -&gt; m ()
+</span><span class="hs-identifier hs-var">mapM_</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser st ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier hs-var">token'</span></a></span><span>
+</span><span id="line-185"></span><span>
+</span><span id="line-186"></span><span class="hs-comment">-- | Case-insensitive version of @tokenSeqOf@. All arguments are assumed to be</span><span>
+</span><span id="line-187"></span><span class="hs-comment">-- in folded case.</span><span>
+</span><span id="line-188"></span><span id="local-6989586621679241401"><span class="annot"><a href="SAD.Parser.Primitives.html#tokenSeqOf%27"><span class="hs-identifier hs-type">tokenSeqOf'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">]</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241401"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-189"></span><span id="tokenSeqOf%27"><span class="annot"><span class="annottext">tokenSeqOf' :: forall st. [[Text]] -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#tokenSeqOf%27"><span class="hs-identifier hs-var hs-var">tokenSeqOf'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([Text] -&gt; Parser st () -&gt; Parser st ())
+-&gt; Parser st () -&gt; [[Text]] -&gt; Parser st ()
+forall a b. (a -&gt; b -&gt; b) -&gt; b -&gt; [a] -&gt; b
+forall (t :: * -&gt; *) a b.
+Foldable t =&gt;
+(a -&gt; b -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldr</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Parser st () -&gt; Parser st () -&gt; Parser st ()
+forall a. Parser st a -&gt; Parser st a -&gt; Parser st a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">(&lt;|&gt;)</span></span><span> </span><span class="annot"><span class="annottext">(Parser st () -&gt; Parser st () -&gt; Parser st ())
+-&gt; ([Text] -&gt; Parser st ())
+-&gt; [Text]
+-&gt; Parser st ()
+-&gt; Parser st ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Parser st ()) -&gt; [Text] -&gt; Parser st ()
+forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
+(Foldable t, Monad m) =&gt;
+(a -&gt; m b) -&gt; t a -&gt; m ()
+</span><span class="hs-identifier hs-var">mapM_</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser st ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier hs-var">token'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Parser st ()
+forall a. Parser st a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a
+</span><span class="hs-identifier hs-var">empty</span></span><span>
+</span><span id="line-190"></span><span>
+</span><span id="line-191"></span><span id="local-6989586621679241227"><span class="annot"><a href="SAD.Parser.Primitives.html#getToken"><span class="hs-identifier hs-type">getToken</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241227"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-192"></span><span id="getToken"><span class="annot"><span class="annottext">getToken :: forall st. Text -&gt; Parser st Text
+</span><a href="SAD.Parser.Primitives.html#getToken"><span class="hs-identifier hs-var hs-var">getToken</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Bool) -&gt; Parser st Text
+forall st. (Text -&gt; Bool) -&gt; Parser st Text
+</span><a href="SAD.Parser.Primitives.html#satisfy"><span class="hs-identifier hs-var">satisfy</span></a></span><span> </span><span class="annot"><span class="annottext">((Text -&gt; Bool) -&gt; Parser st Text)
+-&gt; (Text -&gt; Text -&gt; Bool) -&gt; Text -&gt; Parser st Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">(==)</span></span><span>
+</span><span id="line-193"></span><span>
+</span><span id="line-194"></span><span id="local-6989586621679241408"><span class="annot"><a href="SAD.Parser.Primitives.html#getToken%27"><span class="hs-identifier hs-type">getToken'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241408"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-195"></span><span id="getToken%27"><span class="annot"><span class="annottext">getToken' :: forall st. Text -&gt; Parser st Text
+</span><a href="SAD.Parser.Primitives.html#getToken%27"><span class="hs-identifier hs-var hs-var">getToken'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Bool) -&gt; Parser st Text
+forall st. (Text -&gt; Bool) -&gt; Parser st Text
+</span><a href="SAD.Parser.Primitives.html#satisfy"><span class="hs-identifier hs-var">satisfy</span></a></span><span> </span><span class="annot"><span class="annottext">((Text -&gt; Bool) -&gt; Parser st Text)
+-&gt; (Text -&gt; Text -&gt; Bool) -&gt; Text -&gt; Parser st Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">(==)</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Text -&gt; Bool) -&gt; (Text -&gt; Text) -&gt; Text -&gt; Text -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+</span><span class="hs-identifier hs-var">Text.toCaseFold</span></span><span>
+</span><span id="line-196"></span><span>
+</span><span id="line-197"></span><span class="hs-comment">-- | @tokenOf toks@ succeeds iff the current token is an element of @toks@.</span><span>
+</span><span id="line-198"></span><span class="hs-comment">-- Returns the parsed token.</span><span>
+</span><span id="line-199"></span><span id="local-6989586621679241209"><span class="annot"><a href="SAD.Parser.Primitives.html#getTokenOf"><span class="hs-identifier hs-type">getTokenOf</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241209"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-200"></span><span id="getTokenOf"><span class="annot"><span class="annottext">getTokenOf :: forall st. [Text] -&gt; Parser st Text
+</span><a href="SAD.Parser.Primitives.html#getTokenOf"><span class="hs-identifier hs-var hs-var">getTokenOf</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Bool) -&gt; Parser st Text
+forall st. (Text -&gt; Bool) -&gt; Parser st Text
+</span><a href="SAD.Parser.Primitives.html#satisfy"><span class="hs-identifier hs-var">satisfy</span></a></span><span> </span><span class="annot"><span class="annottext">((Text -&gt; Bool) -&gt; Parser st Text)
+-&gt; ([Text] -&gt; Text -&gt; Bool) -&gt; [Text] -&gt; Parser st Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; [Text] -&gt; Bool) -&gt; [Text] -&gt; Text -&gt; Bool
+forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Text] -&gt; Bool
+forall a. Eq a =&gt; a -&gt; [a] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">elem</span></span><span>
+</span><span id="line-201"></span><span>
+</span><span id="line-202"></span><span class="hs-comment">-- | Case-insensitive version of @getTokenOf@. All arguments are assumed to be</span><span>
+</span><span id="line-203"></span><span class="hs-comment">-- in folded case.</span><span>
+</span><span id="line-204"></span><span id="local-6989586621679241414"><span class="annot"><a href="SAD.Parser.Primitives.html#getTokenOf%27"><span class="hs-identifier hs-type">getTokenOf'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241414"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span></span><span>
+</span><span id="line-205"></span><span id="getTokenOf%27"><span class="annot"><span class="annottext">getTokenOf' :: forall st. [Text] -&gt; Parser st Text
+</span><a href="SAD.Parser.Primitives.html#getTokenOf%27"><span class="hs-identifier hs-var hs-var">getTokenOf'</span></a></span></span><span> </span><span id="local-6989586621679241417"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679241417"><span class="hs-identifier hs-var">toks</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Bool) -&gt; Parser st Text
+forall st. (Text -&gt; Bool) -&gt; Parser st Text
+</span><a href="SAD.Parser.Primitives.html#satisfy"><span class="hs-identifier hs-var">satisfy</span></a></span><span> </span><span class="annot"><span class="annottext">((Text -&gt; Bool) -&gt; Parser st Text)
+-&gt; (Text -&gt; Bool) -&gt; Parser st Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679241418"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241418"><span class="hs-identifier hs-var">tok</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+</span><span class="hs-identifier hs-var">Text.toCaseFold</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241418"><span class="hs-identifier hs-var">tok</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Text] -&gt; Bool
+forall a. Eq a =&gt; a -&gt; [a] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-operator hs-var">`elem`</span></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679241417"><span class="hs-identifier hs-var">toks</span></a></span><span>
+</span><span id="line-206"></span><span>
+</span><span id="line-207"></span><span class="hs-comment">-- | Check if the next tokens are the (case-sensitive) characters</span><span>
+</span><span id="line-208"></span><span class="hs-comment">-- of the input string. Useful for parsing symbols.</span><span>
+</span><span id="line-209"></span><span id="local-6989586621679241419"><span class="annot"><a href="SAD.Parser.Primitives.html#symbol"><span class="hs-identifier hs-type">symbol</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241419"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-210"></span><span id="symbol"><span class="annot"><span class="annottext">symbol :: forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#symbol"><span class="hs-identifier hs-var hs-var">symbol</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Parser st ()) -&gt; [Char] -&gt; Parser st ()
+forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
+(Foldable t, Monad m) =&gt;
+(a -&gt; m b) -&gt; t a -&gt; m ()
+</span><span class="hs-identifier hs-var">mapM_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Parser st ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token"><span class="hs-identifier hs-var">token</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Parser st ()) -&gt; (Char -&gt; Text) -&gt; Char -&gt; Parser st ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Text
+</span><span class="hs-identifier hs-var">Text.singleton</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Parser st ())
+-&gt; (Text -&gt; [Char]) -&gt; Text -&gt; Parser st ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Char]
+</span><span class="hs-identifier hs-var">Text.unpack</span></span><span>
+</span><span id="line-211"></span><span>
+</span><span id="line-212"></span><span class="hs-comment">-- | Same as 'symbol' but the token to be parsed must not be prepended by a</span><span>
+</span><span id="line-213"></span><span class="hs-comment">-- white token.</span><span>
+</span><span id="line-214"></span><span id="local-6989586621679241424"><span class="annot"><a href="SAD.Parser.Primitives.html#symbolNotAfterSpace"><span class="hs-identifier hs-type">symbolNotAfterSpace</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679241424"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-215"></span><span id="symbolNotAfterSpace"><span class="annot"><span class="annottext">symbolNotAfterSpace :: forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#symbolNotAfterSpace"><span class="hs-identifier hs-var hs-var">symbolNotAfterSpace</span></a></span></span><span> </span><span id="local-6989586621679241426"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241426"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-216"></span><span>  </span><span id="local-6989586621679241427"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679241427"><span class="hs-identifier hs-var">lastPos</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser st T
+forall st. Parser st T
+</span><a href="SAD.Parser.Base.html#getLastPos"><span class="hs-identifier hs-var">getLastPos</span></a></span><span>
+</span><span id="line-217"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679241431"><span class="annot"><span class="annottext">notAfterSpace :: Token -&gt; Bool
+</span><a href="#local-6989586621679241431"><span class="hs-identifier hs-var hs-var">notAfterSpace</span></a></span></span><span> </span><span id="local-6989586621679241432"><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241432"><span class="hs-identifier hs-var">tok</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">T -&gt; Maybe Int
+</span><a href="Isabelle.Position.html#offset_of"><span class="hs-identifier hs-var">Position.offset_of</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Token -&gt; T
+</span><a href="SAD.Parser.Token.html#tokenPos"><span class="hs-identifier hs-var">tokenPos</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679241432"><span class="hs-identifier hs-var">tok</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-218"></span><span>        </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679241434"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679241434"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">T -&gt; Maybe Int
+</span><a href="Isabelle.Position.html#end_offset_of"><span class="hs-identifier hs-var">Position.end_offset_of</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679241427"><span class="hs-identifier hs-var">lastPos</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-219"></span><span>          </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679241436"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679241436"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679241434"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679241436"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-220"></span><span>          </span><span class="annot"><span class="annottext">Maybe Int
+</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-221"></span><span>        </span><span class="annot"><span class="annottext">Maybe Int
+</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-222"></span><span>  </span><span class="annot"><span class="annottext">(Token -&gt; Bool) -&gt; Parser st () -&gt; Parser st ()
+forall st a. (Token -&gt; Bool) -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Primitives.html#tokenGuard"><span class="hs-identifier hs-var">tokenGuard</span></a></span><span> </span><span class="annot"><span class="annottext">Token -&gt; Bool
+</span><a href="#local-6989586621679241431"><span class="hs-identifier hs-var">notAfterSpace</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Parser st ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#symbol"><span class="hs-identifier hs-var">symbol</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679241426"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-223"></span></pre></body></html>

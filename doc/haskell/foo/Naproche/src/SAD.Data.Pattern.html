@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.Data.Pattern</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2019, Anton Lorenzen</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-5"></span><span class="hs-comment">--</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- TODO: Add description.</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.Data.Pattern</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Text</span></span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="annot"><a href="SAD.Data.Pattern.html#numHoles"><span class="hs-identifier hs-type">numHoles</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Pattern.html#Pattern"><span class="hs-identifier hs-type">Pattern</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-15"></span><span id="numHoles"><span class="annot"><span class="annottext">numHoles :: [Pattern] -&gt; Int
+</span><a href="SAD.Data.Pattern.html#numHoles"><span class="hs-identifier hs-var hs-var">numHoles</span></a></span></span><span> </span><span id="local-6989586621679232951"><span class="annot"><span class="annottext">[Pattern]
+</span><a href="#local-6989586621679232951"><span class="hs-identifier hs-var">ps</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Pattern] -&gt; Int
+forall a. [a] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Pattern -&gt; Bool) -&gt; [Pattern] -&gt; [Pattern]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Pattern -&gt; Pattern -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span class="annot"><span class="annottext">Pattern
+</span><a href="SAD.Data.Pattern.html#Vr"><span class="hs-identifier hs-var">Vr</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Pattern]
+</span><a href="#local-6989586621679232951"><span class="hs-identifier hs-var">ps</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">data</span><span> </span><span id="Pattern"><span class="annot"><a href="SAD.Data.Pattern.html#Pattern"><span class="hs-identifier hs-var">Pattern</span></a></span></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Word"><span class="annot"><a href="SAD.Data.Pattern.html#Word"><span class="hs-identifier hs-var">Word</span></a></span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">]</span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Symbol"><span class="annot"><a href="SAD.Data.Pattern.html#Symbol"><span class="hs-identifier hs-var">Symbol</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Vr"><span class="annot"><a href="SAD.Data.Pattern.html#Vr"><span class="hs-identifier hs-var">Vr</span></a></span></span><span>
+</span><span id="line-21"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="NamePattern"><span class="annot"><a href="SAD.Data.Pattern.html#NamePattern"><span class="hs-identifier hs-var">NamePattern</span></a></span></span><span>
+</span><span id="line-22"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679232958"><span id="local-6989586621679232964"><span class="annot"><span class="annottext">Pattern -&gt; Pattern -&gt; Bool
+(Pattern -&gt; Pattern -&gt; Bool)
+-&gt; (Pattern -&gt; Pattern -&gt; Bool) -&gt; Eq Pattern
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Pattern -&gt; Pattern -&gt; Bool
+== :: Pattern -&gt; Pattern -&gt; Bool
+$c/= :: Pattern -&gt; Pattern -&gt; Bool
+/= :: Pattern -&gt; Pattern -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679232971"><span id="local-6989586621679232977"><span id="local-6989586621679232981"><span id="local-6989586621679232984"><span id="local-6989586621679232987"><span id="local-6989586621679232990"><span id="local-6989586621679232993"><span class="annot"><span class="annottext">Eq Pattern
+Eq Pattern =&gt;
+(Pattern -&gt; Pattern -&gt; Ordering)
+-&gt; (Pattern -&gt; Pattern -&gt; Bool)
+-&gt; (Pattern -&gt; Pattern -&gt; Bool)
+-&gt; (Pattern -&gt; Pattern -&gt; Bool)
+-&gt; (Pattern -&gt; Pattern -&gt; Bool)
+-&gt; (Pattern -&gt; Pattern -&gt; Pattern)
+-&gt; (Pattern -&gt; Pattern -&gt; Pattern)
+-&gt; Ord Pattern
+Pattern -&gt; Pattern -&gt; Bool
+Pattern -&gt; Pattern -&gt; Ordering
+Pattern -&gt; Pattern -&gt; Pattern
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: Pattern -&gt; Pattern -&gt; Ordering
+compare :: Pattern -&gt; Pattern -&gt; Ordering
+$c&lt; :: Pattern -&gt; Pattern -&gt; Bool
+&lt; :: Pattern -&gt; Pattern -&gt; Bool
+$c&lt;= :: Pattern -&gt; Pattern -&gt; Bool
+&lt;= :: Pattern -&gt; Pattern -&gt; Bool
+$c&gt; :: Pattern -&gt; Pattern -&gt; Bool
+&gt; :: Pattern -&gt; Pattern -&gt; Bool
+$c&gt;= :: Pattern -&gt; Pattern -&gt; Bool
+&gt;= :: Pattern -&gt; Pattern -&gt; Bool
+$cmax :: Pattern -&gt; Pattern -&gt; Pattern
+max :: Pattern -&gt; Pattern -&gt; Pattern
+$cmin :: Pattern -&gt; Pattern -&gt; Pattern
+min :: Pattern -&gt; Pattern -&gt; Pattern
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679232998"><span id="local-6989586621679233007"><span id="local-6989586621679233011"><span class="annot"><span class="annottext">Int -&gt; Pattern -&gt; ShowS
+[Pattern] -&gt; ShowS
+Pattern -&gt; String
+(Int -&gt; Pattern -&gt; ShowS)
+-&gt; (Pattern -&gt; String) -&gt; ([Pattern] -&gt; ShowS) -&gt; Show Pattern
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Pattern -&gt; ShowS
+showsPrec :: Int -&gt; Pattern -&gt; ShowS
+$cshow :: Pattern -&gt; String
+show :: Pattern -&gt; String
+$cshowList :: [Pattern] -&gt; ShowS
+showList :: [Pattern] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="annot"><a href="SAD.Data.Pattern.html#wordPattern"><span class="hs-identifier hs-type">wordPattern</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Pattern.html#Pattern"><span class="hs-identifier hs-type">Pattern</span></a></span><span>
+</span><span id="line-25"></span><span id="wordPattern"><span class="annot"><span class="annottext">wordPattern :: Text -&gt; Pattern
+</span><a href="SAD.Data.Pattern.html#wordPattern"><span class="hs-identifier hs-var hs-var">wordPattern</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; Pattern
+</span><a href="SAD.Data.Pattern.html#Word"><span class="hs-identifier hs-var">Word</span></a></span><span> </span><span class="annot"><span class="annottext">([Text] -&gt; Pattern) -&gt; (Text -&gt; [Text]) -&gt; Text -&gt; Pattern
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Text]
+</span><span class="hs-identifier hs-var">Text.words</span></span><span>
+</span><span id="line-26"></span></pre></body></html>

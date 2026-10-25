@@ -1,0 +1,526 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.ForTheL.Instruction</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2001 - 2008, Andrei Paskevich,</span><span>
+</span><span id="line-4"></span><span class="hs-comment">--               (c) 2017 - 2018, Steffen Frerix,</span><span>
+</span><span id="line-5"></span><span class="hs-comment">--               (c) 2018, Makarius Wenzel</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-7"></span><span class="hs-comment">--</span><span>
+</span><span id="line-8"></span><span class="hs-comment">-- Syntax of ForThel Instructions.</span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.ForTheL.Instruction</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-14"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.Instruction.html#instr"><span class="hs-identifier">instr</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.Instruction.html#instrDrop"><span class="hs-identifier">instrDrop</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.Instruction.html#instrExit"><span class="hs-identifier">instrExit</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.Instruction.html#instrRead"><span class="hs-identifier">instrRead</span></a></span><span>
+</span><span id="line-18"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad</span></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Applicative</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-operator">(&lt;|&gt;)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Text</span></span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Instr.html"><span class="hs-identifier">SAD.Data.Instr</span></a></span><span>
+</span><span id="line-26"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html"><span class="hs-identifier">SAD.ForTheL.Base</span></a></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.Combinators.html"><span class="hs-identifier">SAD.Parser.Combinators</span></a></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.Primitives.html"><span class="hs-identifier">SAD.Parser.Primitives</span></a></span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.Reports.html"><span class="hs-identifier">SAD.ForTheL.Reports</span></a></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.Token.html"><span class="hs-identifier">SAD.Parser.Token</span></a></span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Value.html"><span class="hs-identifier">Isabelle.Value</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Value</span></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Position.html"><span class="hs-identifier">Isabelle.Position</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Position</span></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Library.html"><span class="hs-identifier">Isabelle.Library</span></a></span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Naproche.Param.html"><span class="hs-identifier">Naproche.Param</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Param</span></span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span id="local-6989586621679249983"><span class="annot"><a href="SAD.ForTheL.Instruction.html#instrPos"><span class="hs-identifier hs-type">instrPos</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679249983"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679249983"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span></span><span>
+</span><span id="line-40"></span><span id="instrPos"><span class="annot"><span class="annottext">instrPos :: forall a. (T -&gt; FTL ()) -&gt; FTL a -&gt; FTL (T, a)
+</span><a href="SAD.ForTheL.Instruction.html#instrPos"><span class="hs-identifier hs-var hs-var">instrPos</span></a></span></span><span> </span><span id="local-6989586621679250102"><span class="annot"><span class="annottext">T -&gt; FTL ()
+</span><a href="#local-6989586621679250102"><span class="hs-identifier hs-var">report</span></a></span></span><span> </span><span id="local-6989586621679250103"><span class="annot"><span class="annottext">FTL a
+</span><a href="#local-6989586621679250103"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-special">(</span><span class="hs-special">(</span><span id="local-6989586621679250104"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679250104"><span class="hs-identifier hs-var">pos1</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679250105"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679250105"><span class="hs-identifier hs-var">pos2</span></a></span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span id="local-6989586621679250106"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679250106"><span class="hs-identifier hs-var">x</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; FTL a -&gt; Parser FState (Range, a)
+forall st a. Text -&gt; Text -&gt; Parser st a -&gt; Parser st (Range, a)
+</span><a href="SAD.Parser.Combinators.html#enclosed"><span class="hs-identifier hs-var">enclosed</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250108"><span class="hs-identifier hs-var">begin</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250109"><span class="hs-identifier hs-var">end</span></a></span><span> </span><span class="annot"><span class="annottext">FTL a
+</span><a href="#local-6989586621679250103"><span class="hs-identifier hs-var">p</span></a></span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679250111"><span class="annot"><span class="annottext">pos :: T
+</span><a href="#local-6989586621679250111"><span class="hs-identifier hs-var hs-var">pos</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Range -&gt; T
+</span><a href="Isabelle.Position.html#range_position"><span class="hs-identifier hs-var">Position.range_position</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679250104"><span class="hs-identifier hs-var">pos1</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text -&gt; T -&gt; T
+forall a. BYTES a =&gt; a -&gt; T -&gt; T
+</span><a href="Isabelle.Position.html#symbol_explode"><span class="hs-identifier hs-var">Position.symbol_explode</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250109"><span class="hs-identifier hs-var">end</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679250105"><span class="hs-identifier hs-var">pos2</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span>  </span><span class="annot"><span class="annottext">T -&gt; FTL ()
+</span><a href="#local-6989586621679250102"><span class="hs-identifier hs-var">report</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679250111"><span class="hs-identifier hs-var">pos</span></a></span><span class="hs-special">;</span><span> </span><span class="annot"><span class="annottext">(T, a) -&gt; FTL (T, a)
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679250111"><span class="hs-identifier hs-var">pos</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679250106"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>  </span><span class="hs-keyword">where</span><span> </span><span id="local-6989586621679250108"><span class="annot"><span class="annottext">begin :: Text
+</span><a href="#local-6989586621679250108"><span class="hs-identifier hs-var hs-var">begin</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;[&quot;</span></span><span class="hs-special">;</span><span> </span><span id="local-6989586621679250109"><span class="annot"><span class="annottext">end :: Text
+</span><a href="#local-6989586621679250109"><span class="hs-identifier hs-var hs-var">end</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;]&quot;</span></span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="annot"><a href="SAD.ForTheL.Instruction.html#instr"><span class="hs-identifier hs-type">instr</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Data.Instr.html#Instr"><span class="hs-identifier hs-type">Instr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span id="instr"><span class="annot"><span class="annottext">instr :: FTL (T, Instr)
+</span><a href="SAD.ForTheL.Instruction.html#instr"><span class="hs-identifier hs-var hs-var">instr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-49"></span><span>  </span><span class="annot"><span class="annottext">(T -&gt; FTL ()) -&gt; FTL Instr -&gt; FTL (T, Instr)
+forall a. (T -&gt; FTL ()) -&gt; FTL a -&gt; FTL (T, a)
+</span><a href="SAD.ForTheL.Instruction.html#instrPos"><span class="hs-identifier hs-var">instrPos</span></a></span><span> </span><span class="annot"><span class="annottext">T -&gt; FTL ()
+</span><a href="SAD.ForTheL.Reports.html#addDropReport"><span class="hs-identifier hs-var">addDropReport</span></a></span><span> </span><span class="annot"><span class="annottext">(FTL Instr -&gt; FTL (T, Instr)) -&gt; FTL Instr -&gt; FTL (T, Instr)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">FTL Instr
+</span><a href="SAD.ForTheL.Instruction.html#readInstr"><span class="hs-identifier hs-var">readInstr</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Instr -&gt; (Instr -&gt; FTL Instr) -&gt; FTL Instr
+forall a b.
+Parser FState a -&gt; (a -&gt; Parser FState b) -&gt; Parser FState b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span>
+</span><span id="line-50"></span><span>    </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-51"></span><span>      </span><span class="annot"><a href="SAD.Data.Instr.html#GetRelativeFilePath"><span class="hs-identifier hs-type">GetRelativeFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; FTL Instr
+forall a. FilePath -&gt; Parser FState a
+forall (m :: * -&gt; *) a. MonadFail m =&gt; FilePath -&gt; m a
+</span><span class="hs-identifier hs-var">fail</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-string">&quot;'read' not allowed here&quot;</span></span><span>
+</span><span id="line-52"></span><span>      </span><span class="annot"><a href="SAD.Data.Instr.html#Command"><span class="hs-identifier hs-type">Command</span></a></span><span> </span><span class="annot"><span class="annottext">Command
+</span><a href="SAD.Data.Instr.html#Exit"><span class="hs-identifier hs-var">Exit</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; FTL Instr
+forall a. FilePath -&gt; Parser FState a
+forall (m :: * -&gt; *) a. MonadFail m =&gt; FilePath -&gt; m a
+</span><span class="hs-identifier hs-var">fail</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-string">&quot;'exit' and 'quit' not allowed here&quot;</span></span><span>
+</span><span id="line-53"></span><span>      </span><span id="local-6989586621679250121"><span class="annot"><span class="annottext">Instr
+</span><a href="#local-6989586621679250121"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Instr -&gt; FTL Instr
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Instr
+</span><a href="#local-6989586621679250121"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-54"></span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span class="annot"><a href="SAD.ForTheL.Instruction.html#instrRead"><span class="hs-identifier hs-type">instrRead</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Data.Instr.html#Instr"><span class="hs-identifier hs-type">Instr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-57"></span><span id="instrRead"><span class="annot"><span class="annottext">instrRead :: FTL (T, Instr)
+</span><a href="SAD.ForTheL.Instruction.html#instrRead"><span class="hs-identifier hs-var hs-var">instrRead</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-58"></span><span>  </span><span class="annot"><span class="annottext">(T -&gt; FTL ()) -&gt; FTL Instr -&gt; FTL (T, Instr)
+forall a. (T -&gt; FTL ()) -&gt; FTL a -&gt; FTL (T, a)
+</span><a href="SAD.ForTheL.Instruction.html#instrPos"><span class="hs-identifier hs-var">instrPos</span></a></span><span> </span><span class="annot"><span class="annottext">T -&gt; FTL ()
+</span><a href="SAD.ForTheL.Reports.html#addInstrReport"><span class="hs-identifier hs-var">addInstrReport</span></a></span><span> </span><span class="annot"><span class="annottext">(FTL Instr -&gt; FTL (T, Instr)) -&gt; FTL Instr -&gt; FTL (T, Instr)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">FTL Instr
+</span><a href="SAD.ForTheL.Instruction.html#readInstr"><span class="hs-identifier hs-var">readInstr</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Instr -&gt; (Instr -&gt; FTL Instr) -&gt; FTL Instr
+forall a b.
+Parser FState a -&gt; (a -&gt; Parser FState b) -&gt; Parser FState b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span>
+</span><span id="line-59"></span><span>    </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-60"></span><span>      </span><span id="local-6989586621679250123"><span class="annot"><span class="annottext">i :: Instr
+</span><a href="#local-6989586621679250123"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Instr.html#GetRelativeFilePath"><span class="hs-identifier hs-type">GetRelativeFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Instr -&gt; FTL Instr
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Instr
+</span><a href="#local-6989586621679250123"><span class="hs-identifier hs-var">i</span></a></span><span>
+</span><span id="line-61"></span><span>      </span><span id="local-6989586621679250124"><span class="annot"><span class="annottext">i :: Instr
+</span><a href="#local-6989586621679250124"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Instr.html#GetModule"><span class="hs-identifier hs-type">GetModule</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Instr -&gt; FTL Instr
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Instr
+</span><a href="#local-6989586621679250124"><span class="hs-identifier hs-var">i</span></a></span><span>
+</span><span id="line-62"></span><span>      </span><span class="annot"><span class="annottext">Instr
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">FTL Instr
+forall a. Parser FState a
+forall (m :: * -&gt; *) a. MonadPlus m =&gt; m a
+</span><span class="hs-identifier hs-var">mzero</span></span><span class="hs-special">)</span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span class="annot"><a href="SAD.ForTheL.Instruction.html#instrExit"><span class="hs-identifier hs-type">instrExit</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Data.Instr.html#Instr"><span class="hs-identifier hs-type">Instr</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-65"></span><span id="instrExit"><span class="annot"><span class="annottext">instrExit :: FTL (T, Instr)
+</span><a href="SAD.ForTheL.Instruction.html#instrExit"><span class="hs-identifier hs-var hs-var">instrExit</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-66"></span><span>  </span><span class="annot"><span class="annottext">(T -&gt; FTL ()) -&gt; FTL Instr -&gt; FTL (T, Instr)
+forall a. (T -&gt; FTL ()) -&gt; FTL a -&gt; FTL (T, a)
+</span><a href="SAD.ForTheL.Instruction.html#instrPos"><span class="hs-identifier hs-var">instrPos</span></a></span><span> </span><span class="annot"><span class="annottext">T -&gt; FTL ()
+</span><a href="SAD.ForTheL.Reports.html#addInstrReport"><span class="hs-identifier hs-var">addInstrReport</span></a></span><span> </span><span class="annot"><span class="annottext">(FTL Instr -&gt; FTL (T, Instr)) -&gt; FTL Instr -&gt; FTL (T, Instr)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">FTL Instr
+</span><a href="SAD.ForTheL.Instruction.html#readInstr"><span class="hs-identifier hs-var">readInstr</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Instr -&gt; (Instr -&gt; FTL Instr) -&gt; FTL Instr
+forall a b.
+Parser FState a -&gt; (a -&gt; Parser FState b) -&gt; Parser FState b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span>
+</span><span id="line-67"></span><span>    </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-glyph">case</span><span>
+</span><span id="line-68"></span><span>      </span><span id="local-6989586621679250127"><span class="annot"><span class="annottext">i :: Instr
+</span><a href="#local-6989586621679250127"><span class="hs-identifier hs-var">i</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Instr.html#Command"><span class="hs-identifier hs-type">Command</span></a></span><span> </span><span class="annot"><span class="annottext">Command
+</span><a href="SAD.Data.Instr.html#Exit"><span class="hs-identifier hs-var">Exit</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Instr -&gt; FTL Instr
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Instr
+</span><a href="#local-6989586621679250127"><span class="hs-identifier hs-var">i</span></a></span><span>
+</span><span id="line-69"></span><span>      </span><span class="annot"><span class="annottext">Instr
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">FTL Instr
+forall a. Parser FState a
+forall (m :: * -&gt; *) a. MonadPlus m =&gt; m a
+</span><span class="hs-identifier hs-var">mzero</span></span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>
+</span><span id="line-71"></span><span class="annot"><a href="SAD.ForTheL.Instruction.html#instrDrop"><span class="hs-identifier hs-type">instrDrop</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Data.Instr.html#Drop"><span class="hs-identifier hs-type">Drop</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-72"></span><span id="instrDrop"><span class="annot"><span class="annottext">instrDrop :: FTL (T, Drop)
+</span><a href="SAD.ForTheL.Instruction.html#instrDrop"><span class="hs-identifier hs-var hs-var">instrDrop</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(T -&gt; FTL ()) -&gt; FTL Drop -&gt; FTL (T, Drop)
+forall a. (T -&gt; FTL ()) -&gt; FTL a -&gt; FTL (T, a)
+</span><a href="SAD.ForTheL.Instruction.html#instrPos"><span class="hs-identifier hs-var">instrPos</span></a></span><span> </span><span class="annot"><span class="annottext">T -&gt; FTL ()
+</span><a href="SAD.ForTheL.Reports.html#addInstrReport"><span class="hs-identifier hs-var">addInstrReport</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; FTL ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier hs-var">token'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;/&quot;</span></span><span> </span><span class="annot"><span class="annottext">FTL () -&gt; FTL Drop -&gt; FTL Drop
+forall a b. Parser FState a -&gt; Parser FState b -&gt; Parser FState b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; m b -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">FTL Drop
+</span><a href="SAD.ForTheL.Instruction.html#readInstrDrop"><span class="hs-identifier hs-var">readInstrDrop</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span class="annot"><a href="SAD.ForTheL.Instruction.html#readInstr"><span class="hs-identifier hs-type">readInstr</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><a href="SAD.Data.Instr.html#Instr"><span class="hs-identifier hs-type">Instr</span></a></span><span>
+</span><span id="line-76"></span><span id="readInstr"><span class="annot"><span class="annottext">readInstr :: FTL Instr
+</span><a href="SAD.ForTheL.Instruction.html#readInstr"><span class="hs-identifier hs-var hs-var">readInstr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-77"></span><span>  </span><span class="annot"><span class="annottext">FTL Instr
+</span><a href="#local-6989586621679250130"><span class="hs-identifier hs-var">readInstrCommand</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Instr -&gt; FTL Instr -&gt; FTL Instr
+forall st a. Parser st a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#-%7C-"><span class="hs-operator hs-var">-|-</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Instr
+</span><a href="#local-6989586621679250132"><span class="hs-identifier hs-var">readInstrLimit</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Instr -&gt; FTL Instr -&gt; FTL Instr
+forall st a. Parser st a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#-%7C-"><span class="hs-operator hs-var">-|-</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Instr
+</span><a href="#local-6989586621679250133"><span class="hs-identifier hs-var">readInstrBool</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Instr -&gt; FTL Instr -&gt; FTL Instr
+forall st a. Parser st a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#-%7C-"><span class="hs-operator hs-var">-|-</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Instr
+</span><a href="#local-6989586621679250134"><span class="hs-identifier hs-var">readInstrText</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Instr -&gt; FTL Instr -&gt; FTL Instr
+forall st a. Parser st a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#-%7C-"><span class="hs-operator hs-var">-|-</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Instr
+</span><a href="#local-6989586621679250135"><span class="hs-identifier hs-var">readInstrSynonym</span></a></span><span>
+</span><span id="line-78"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-79"></span><span>    </span><span id="local-6989586621679250130"><span class="annot"><span class="annottext">readInstrCommand :: FTL Instr
+</span><a href="#local-6989586621679250130"><span class="hs-identifier hs-var hs-var">readInstrCommand</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Command -&gt; Instr) -&gt; Parser FState Command -&gt; FTL Instr
+forall a b. (a -&gt; b) -&gt; Parser FState a -&gt; Parser FState b
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">Command -&gt; Instr
+</span><a href="SAD.Data.Instr.html#Command"><span class="hs-identifier hs-var">Command</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(Command, Text)] -&gt; Parser FState Command
+forall a. [(a, Text)] -&gt; FTL a
+</span><a href="SAD.ForTheL.Instruction.html#readKeywords"><span class="hs-identifier hs-var">readKeywords</span></a></span><span> </span><span class="annot"><span class="annottext">[(Command, Text)]
+</span><a href="SAD.Data.Instr.html#keywordsCommand"><span class="hs-identifier hs-var">keywordsCommand</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-80"></span><span>    </span><span id="local-6989586621679250135"><span class="annot"><span class="annottext">readInstrSynonym :: FTL Instr
+</span><a href="#local-6989586621679250135"><span class="hs-identifier hs-var hs-var">readInstrSynonym</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parser FState ([Text] -&gt; Instr)
+-&gt; Parser FState [Text] -&gt; FTL Instr
+forall (m :: * -&gt; *) a b. Monad m =&gt; m (a -&gt; b) -&gt; m a -&gt; m b
+</span><span class="hs-identifier hs-var">ap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[([Text] -&gt; Instr, Text)] -&gt; Parser FState ([Text] -&gt; Instr)
+forall a. [(a, Text)] -&gt; FTL a
+</span><a href="SAD.ForTheL.Instruction.html#readKeywords"><span class="hs-identifier hs-var">readKeywords</span></a></span><span> </span><span class="annot"><span class="annottext">[([Text] -&gt; Instr, Text)]
+</span><a href="SAD.Data.Instr.html#keywordsSynonym"><span class="hs-identifier hs-var">keywordsSynonym</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Parser FState [Text]
+</span><a href="SAD.ForTheL.Instruction.html#readWords"><span class="hs-identifier hs-var">readWords</span></a></span><span>
+</span><span id="line-81"></span><span>    </span><span id="local-6989586621679250132"><span class="annot"><span class="annottext">readInstrLimit :: FTL Instr
+</span><a href="#local-6989586621679250132"><span class="hs-identifier hs-var hs-var">readInstrLimit</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parser FState (Int -&gt; Instr) -&gt; Parser FState Int -&gt; FTL Instr
+forall (m :: * -&gt; *) a b. Monad m =&gt; m (a -&gt; b) -&gt; m a -&gt; m b
+</span><span class="hs-identifier hs-var">ap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(Int -&gt; Instr, Text)] -&gt; Parser FState (Int -&gt; Instr)
+forall a. [(a, Text)] -&gt; FTL a
+</span><a href="SAD.ForTheL.Instruction.html#readKeywords"><span class="hs-identifier hs-var">readKeywords</span></a></span><span> </span><span class="annot"><span class="annottext">[(Int -&gt; Instr, Text)]
+</span><a href="SAD.Data.Instr.html#keywordsLimit"><span class="hs-identifier hs-var">keywordsLimit</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Parser FState Int
+</span><a href="SAD.ForTheL.Instruction.html#readInt"><span class="hs-identifier hs-var">readInt</span></a></span><span>
+</span><span id="line-82"></span><span>    </span><span id="local-6989586621679250133"><span class="annot"><span class="annottext">readInstrBool :: FTL Instr
+</span><a href="#local-6989586621679250133"><span class="hs-identifier hs-var hs-var">readInstrBool</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parser FState (Bool -&gt; Instr) -&gt; Parser FState Bool -&gt; FTL Instr
+forall (m :: * -&gt; *) a b. Monad m =&gt; m (a -&gt; b) -&gt; m a -&gt; m b
+</span><span class="hs-identifier hs-var">ap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(Bool -&gt; Instr, Text)] -&gt; Parser FState (Bool -&gt; Instr)
+forall a. [(a, Text)] -&gt; FTL a
+</span><a href="SAD.ForTheL.Instruction.html#readKeywords"><span class="hs-identifier hs-var">readKeywords</span></a></span><span> </span><span class="annot"><span class="annottext">[(Bool -&gt; Instr, Text)]
+</span><a href="SAD.Data.Instr.html#keywordsFlag"><span class="hs-identifier hs-var">keywordsFlag</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Parser FState Bool
+</span><a href="SAD.ForTheL.Instruction.html#readBool"><span class="hs-identifier hs-var">readBool</span></a></span><span>
+</span><span id="line-83"></span><span>    </span><span id="local-6989586621679250134"><span class="annot"><span class="annottext">readInstrText :: FTL Instr
+</span><a href="#local-6989586621679250134"><span class="hs-identifier hs-var hs-var">readInstrText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parser FState (Text -&gt; Instr) -&gt; Parser FState Text -&gt; FTL Instr
+forall (m :: * -&gt; *) a b. Monad m =&gt; m (a -&gt; b) -&gt; m a -&gt; m b
+</span><span class="hs-identifier hs-var">ap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(Text -&gt; Instr, Text)] -&gt; Parser FState (Text -&gt; Instr)
+forall a. [(a, Text)] -&gt; FTL a
+</span><a href="SAD.ForTheL.Instruction.html#readKeywords"><span class="hs-identifier hs-var">readKeywords</span></a></span><span> </span><span class="annot"><span class="annottext">[(Text -&gt; Instr, Text)]
+</span><a href="SAD.Data.Instr.html#keywordsArgument"><span class="hs-identifier hs-var">keywordsArgument</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Parser FState Text
+</span><a href="SAD.ForTheL.Instruction.html#readText"><span class="hs-identifier hs-var">readText</span></a></span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span class="annot"><a href="SAD.ForTheL.Instruction.html#readInt"><span class="hs-identifier hs-type">readInt</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-86"></span><span id="readInt"><span class="annot"><span class="annottext">readInt :: Parser FState Int
+</span><a href="SAD.ForTheL.Instruction.html#readInt"><span class="hs-identifier hs-var hs-var">readInt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parser FState Int -&gt; Parser FState Int
+forall st a. Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#try"><span class="hs-identifier hs-var">try</span></a></span><span> </span><span class="annot"><span class="annottext">(Parser FState Int -&gt; Parser FState Int)
+-&gt; Parser FState Int -&gt; Parser FState Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-87"></span><span>  </span><span id="local-6989586621679250153"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250153"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser FState Text
+</span><a href="SAD.ForTheL.Instruction.html#readText"><span class="hs-identifier hs-var">readText</span></a></span><span>
+</span><span id="line-88"></span><span>  </span><span class="annot"><span class="annottext">Parser FState Int
+-&gt; (Int -&gt; Parser FState Int) -&gt; Maybe Int -&gt; Parser FState Int
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="annot"><span class="annottext">Parser FState Int
+forall a. Parser FState a
+forall (m :: * -&gt; *) a. MonadPlus m =&gt; m a
+</span><span class="hs-identifier hs-var">mzero</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Parser FState Int
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes -&gt; Maybe Int
+</span><a href="Isabelle.Value.html#parse_nat"><span class="hs-identifier hs-var">Value.parse_nat</span></a></span><span> </span><span class="annot"><span class="annottext">(Bytes -&gt; Maybe Int) -&gt; Bytes -&gt; Maybe Int
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Bytes
+forall a. BYTES a =&gt; a -&gt; Bytes
+</span><a href="Isabelle.Library.html#make_bytes"><span class="hs-identifier hs-var">make_bytes</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250153"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-89"></span><span>
+</span><span id="line-90"></span><span class="annot"><a href="SAD.ForTheL.Instruction.html#readBool"><span class="hs-identifier hs-type">readBool</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-91"></span><span id="readBool"><span class="annot"><span class="annottext">readBool :: Parser FState Bool
+</span><a href="SAD.ForTheL.Instruction.html#readBool"><span class="hs-identifier hs-var hs-var">readBool</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parser FState Bool -&gt; Parser FState Bool
+forall st a. Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#try"><span class="hs-identifier hs-var">try</span></a></span><span> </span><span class="annot"><span class="annottext">(Parser FState Bool -&gt; Parser FState Bool)
+-&gt; Parser FState Bool -&gt; Parser FState Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-92"></span><span>  </span><span id="local-6989586621679250157"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250157"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser FState Text
+</span><a href="SAD.ForTheL.Instruction.html#readText"><span class="hs-identifier hs-var">readText</span></a></span><span>
+</span><span id="line-93"></span><span>  </span><span class="annot"><span class="annottext">Parser FState Bool
+-&gt; (Bool -&gt; Parser FState Bool) -&gt; Maybe Bool -&gt; Parser FState Bool
+forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
+</span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="annot"><span class="annottext">Parser FState Bool
+forall a. Parser FState a
+forall (m :: * -&gt; *) a. MonadPlus m =&gt; m a
+</span><span class="hs-identifier hs-var">mzero</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Parser FState Bool
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes -&gt; Maybe Bool
+</span><a href="Naproche.Param.html#parse_flag"><span class="hs-identifier hs-var">Param.parse_flag</span></a></span><span> </span><span class="annot"><span class="annottext">(Bytes -&gt; Maybe Bool) -&gt; Bytes -&gt; Maybe Bool
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Bytes
+forall a. BYTES a =&gt; a -&gt; Bytes
+</span><a href="Isabelle.Library.html#make_bytes"><span class="hs-identifier hs-var">make_bytes</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250157"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-94"></span><span>
+</span><span id="line-95"></span><span class="annot"><a href="SAD.ForTheL.Instruction.html#readText"><span class="hs-identifier hs-type">readText</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-96"></span><span id="readText"><span class="annot"><span class="annottext">readText :: Parser FState Text
+</span><a href="SAD.ForTheL.Instruction.html#readText"><span class="hs-identifier hs-var hs-var">readText</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([Text] -&gt; Text) -&gt; Parser FState [Text] -&gt; Parser FState Text
+forall a b. (a -&gt; b) -&gt; Parser FState a -&gt; Parser FState b
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; Text
+</span><span class="hs-identifier hs-var">Text.concat</span></span><span> </span><span class="annot"><span class="annottext">Parser FState [Text]
+</span><a href="SAD.ForTheL.Instruction.html#readTexts"><span class="hs-identifier hs-var">readTexts</span></a></span><span>
+</span><span id="line-97"></span><span>
+</span><span id="line-98"></span><span>
+</span><span id="line-99"></span><span class="annot"><a href="SAD.ForTheL.Instruction.html#readTexts"><span class="hs-identifier hs-type">readTexts</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">]</span><span>
+</span><span id="line-100"></span><span id="readTexts"><span class="annot"><span class="annottext">readTexts :: Parser FState [Text]
+</span><a href="SAD.ForTheL.Instruction.html#readTexts"><span class="hs-identifier hs-var hs-var">readTexts</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser FState [Text] -&gt; Parser FState [Text]
+forall st a. Text -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#texCommandWithArg"><span class="hs-identifier hs-var">texCommandWithArg</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;path&quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Parser FState Text -&gt; Parser FState [Text]
+forall st a. Parser st a -&gt; Parser st [a]
+</span><a href="SAD.Parser.Combinators.html#chainLL1"><span class="hs-identifier hs-var">chainLL1</span></a></span><span> </span><span class="annot"><span class="annottext">Parser FState Text
+forall {st}. Parser st Text
+</span><a href="#local-6989586621679250163"><span class="hs-identifier hs-var">notClosingBrc</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Parser FState [Text]
+-&gt; Parser FState [Text] -&gt; Parser FState [Text]
+forall a. Parser FState a -&gt; Parser FState a -&gt; Parser FState a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">&lt;|&gt;</span></span><span> </span><span class="annot"><span class="annottext">Parser FState Text -&gt; Parser FState [Text]
+forall st a. Parser st a -&gt; Parser st [a]
+</span><a href="SAD.Parser.Combinators.html#chainLL1"><span class="hs-identifier hs-var">chainLL1</span></a></span><span> </span><span class="annot"><span class="annottext">Parser FState Text
+forall {st}. Parser st Text
+</span><a href="#local-6989586621679250164"><span class="hs-identifier hs-var">notClosingBrk</span></a></span><span>
+</span><span id="line-101"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-102"></span><span>    </span><span id="local-6989586621679250164"><span class="annot"><span class="annottext">notClosingBrk :: Parser st Text
+</span><a href="#local-6989586621679250164"><span class="hs-identifier hs-var hs-var">notClosingBrk</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Token -&gt; Maybe Text) -&gt; Parser st Text
+forall a st. (Token -&gt; Maybe a) -&gt; Parser st a
+</span><a href="SAD.Parser.Primitives.html#tokenPrim"><span class="hs-identifier hs-var">tokenPrim</span></a></span><span> </span><span class="annot"><span class="annottext">((Token -&gt; Maybe Text) -&gt; Parser st Text)
+-&gt; (Token -&gt; Maybe Text) -&gt; Parser st Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Token -&gt; Maybe Text
+forall {m :: * -&gt; *}.
+(Monad m, Alternative m) =&gt;
+Text -&gt; Token -&gt; m Text
+</span><a href="#local-6989586621679250171"><span class="hs-identifier hs-var">notCl</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;]&quot;</span></span><span>
+</span><span id="line-103"></span><span>    </span><span id="local-6989586621679250163"><span class="annot"><span class="annottext">notClosingBrc :: Parser st Text
+</span><a href="#local-6989586621679250163"><span class="hs-identifier hs-var hs-var">notClosingBrc</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Token -&gt; Maybe Text) -&gt; Parser st Text
+forall a st. (Token -&gt; Maybe a) -&gt; Parser st a
+</span><a href="SAD.Parser.Primitives.html#tokenPrim"><span class="hs-identifier hs-var">tokenPrim</span></a></span><span> </span><span class="annot"><span class="annottext">((Token -&gt; Maybe Text) -&gt; Parser st Text)
+-&gt; (Token -&gt; Maybe Text) -&gt; Parser st Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Token -&gt; Maybe Text
+forall {m :: * -&gt; *}.
+(Monad m, Alternative m) =&gt;
+Text -&gt; Token -&gt; m Text
+</span><a href="#local-6989586621679250171"><span class="hs-identifier hs-var">notCl</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;}&quot;</span></span><span>
+</span><span id="line-104"></span><span>    </span><span id="local-6989586621679250171"><span class="annot"><span class="annottext">notCl :: Text -&gt; Token -&gt; m Text
+</span><a href="#local-6989586621679250171"><span class="hs-identifier hs-var hs-var">notCl</span></a></span></span><span> </span><span id="local-6989586621679250190"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250190"><span class="hs-identifier hs-var">str</span></a></span></span><span> </span><span id="local-6989586621679250191"><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679250191"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679250192"><span class="annot"><span class="annottext">tk :: Text
+</span><a href="#local-6989586621679250192"><span class="hs-identifier hs-var hs-var">tk</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Token -&gt; Text
+</span><a href="SAD.Parser.Token.html#showToken"><span class="hs-identifier hs-var">showToken</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+</span><a href="#local-6989586621679250191"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; m ()
+forall (f :: * -&gt; *). Alternative f =&gt; Bool -&gt; f ()
+</span><span class="hs-identifier hs-var">guard</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250192"><span class="hs-identifier hs-var">tk</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">/=</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250190"><span class="hs-identifier hs-var">str</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">m () -&gt; m Text -&gt; m Text
+forall a b. m a -&gt; m b -&gt; m b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; m b -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; m Text
+forall a. a -&gt; m a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250192"><span class="hs-identifier hs-var">tk</span></a></span><span>
+</span><span id="line-105"></span><span>
+</span><span id="line-106"></span><span>
+</span><span id="line-107"></span><span class="annot"><a href="SAD.ForTheL.Instruction.html#readWords"><span class="hs-identifier hs-type">readWords</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">]</span><span>
+</span><span id="line-108"></span><span id="readWords"><span class="annot"><span class="annottext">readWords :: Parser FState [Text]
+</span><a href="SAD.ForTheL.Instruction.html#readWords"><span class="hs-identifier hs-var hs-var">readWords</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parser FState [Text]
+forall {st}. Parser st [Text]
+</span><a href="#local-6989586621679250195"><span class="hs-identifier hs-var">shortHand</span></a></span><span> </span><span class="annot"><span class="annottext">Parser FState [Text]
+-&gt; Parser FState [Text] -&gt; Parser FState [Text]
+forall st a. Parser st a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#%3C%2F%3E"><span class="hs-operator hs-var">&lt;/&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">Parser FState Text -&gt; Parser FState [Text]
+forall st a. Parser st a -&gt; Parser st [a]
+</span><a href="SAD.Parser.Combinators.html#chainLL1"><span class="hs-identifier hs-var">chainLL1</span></a></span><span> </span><span class="annot"><span class="annottext">Parser FState Text
+forall {st}. Parser st Text
+</span><a href="SAD.Parser.Primitives.html#word"><span class="hs-identifier hs-var">word</span></a></span><span>
+</span><span id="line-109"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-110"></span><span>  </span><span id="local-6989586621679250195"><span class="annot"><span class="annottext">shortHand :: Parser st [Text]
+</span><a href="#local-6989586621679250195"><span class="hs-identifier hs-var hs-var">shortHand</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-111"></span><span>    </span><span id="local-6989586621679250206"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250206"><span class="hs-identifier hs-var">w</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser st Text
+forall {st}. Parser st Text
+</span><a href="SAD.Parser.Primitives.html#word"><span class="hs-identifier hs-var">word</span></a></span><span> </span><span class="hs-special">;</span><span> </span><span id="local-6989586621679250207"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250207"><span class="hs-identifier hs-var">root</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser st Text -&gt; Parser st Text
+forall a st. a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#optLL1"><span class="hs-identifier hs-var">optLL1</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250206"><span class="hs-identifier hs-var">w</span></a></span><span> </span><span class="annot"><span class="annottext">(Parser st Text -&gt; Parser st Text)
+-&gt; Parser st Text -&gt; Parser st Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser st Text
+forall {st}. Text -&gt; Parser st Text
+</span><a href="#local-6989586621679250209"><span class="hs-identifier hs-var">variant</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250206"><span class="hs-identifier hs-var">w</span></a></span><span class="hs-special">;</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser st ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token"><span class="hs-identifier hs-var">token</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;/&quot;</span></span><span>
+</span><span id="line-112"></span><span>    </span><span id="local-6989586621679250211"><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679250211"><span class="hs-identifier hs-var">syms</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Text -&gt; Text) -&gt; Parser st Text -&gt; Parser st Text
+forall a b. (a -&gt; b) -&gt; Parser st a -&gt; Parser st b
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text
+</span><span class="hs-identifier hs-var">Text.toCaseFold</span></span><span> </span><span class="annot"><span class="annottext">Parser st Text
+forall {st}. Parser st Text
+</span><a href="SAD.Parser.Primitives.html#word"><span class="hs-identifier hs-var">word</span></a></span><span> </span><span class="annot"><span class="annottext">Parser st Text -&gt; Parser st Text -&gt; Parser st Text
+forall st a. Parser st a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#-%7C-"><span class="hs-operator hs-var">-|-</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser st Text
+forall {st}. Text -&gt; Parser st Text
+</span><a href="#local-6989586621679250209"><span class="hs-identifier hs-var">variant</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250206"><span class="hs-identifier hs-var">w</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Parser st Text -&gt; Parser st () -&gt; Parser st [Text]
+forall st a sep. Parser st a -&gt; Parser st sep -&gt; Parser st [a]
+</span><a href="SAD.Parser.Combinators.html#sepByLL1"><span class="hs-operator hs-var">`sepByLL1`</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser st ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token"><span class="hs-identifier hs-var">token</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;/&quot;</span></span><span>
+</span><span id="line-113"></span><span>    </span><span class="annot"><span class="annottext">[Text] -&gt; Parser st [Text]
+forall a. a -&gt; Parser st a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">([Text] -&gt; Parser st [Text]) -&gt; [Text] -&gt; Parser st [Text]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250207"><span class="hs-identifier hs-var">root</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Text] -&gt; [Text]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">[Text]
+</span><a href="#local-6989586621679250211"><span class="hs-identifier hs-var">syms</span></a></span><span>
+</span><span id="line-114"></span><span>  </span><span id="local-6989586621679250209"><span class="annot"><span class="annottext">variant :: Text -&gt; Parser st Text
+</span><a href="#local-6989586621679250209"><span class="hs-identifier hs-var hs-var">variant</span></a></span></span><span> </span><span id="local-6989586621679250219"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250219"><span class="hs-identifier hs-var">w</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser st ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token"><span class="hs-identifier hs-var">token</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;-&quot;</span></span><span> </span><span class="annot"><span class="annottext">Parser st () -&gt; Parser st Text -&gt; Parser st Text
+forall a b. Parser st a -&gt; Parser st b -&gt; Parser st b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; m b -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Text) -&gt; Parser st Text -&gt; Parser st Text
+forall a b. (a -&gt; b) -&gt; Parser st a -&gt; Parser st b
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250219"><span class="hs-identifier hs-var">w</span></a></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Text
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Parser st Text
+forall {st}. Parser st Text
+</span><a href="SAD.Parser.Primitives.html#word"><span class="hs-identifier hs-var">word</span></a></span><span>
+</span><span id="line-115"></span><span>
+</span><span id="line-116"></span><span class="annot"><a href="SAD.ForTheL.Instruction.html#readInstrDrop"><span class="hs-identifier hs-type">readInstrDrop</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><a href="SAD.Data.Instr.html#Drop"><span class="hs-identifier hs-type">Drop</span></a></span><span>
+</span><span id="line-117"></span><span id="readInstrDrop"><span class="annot"><span class="annottext">readInstrDrop :: FTL Drop
+</span><a href="SAD.ForTheL.Instruction.html#readInstrDrop"><span class="hs-identifier hs-var hs-var">readInstrDrop</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FTL Drop
+</span><a href="#local-6989586621679250220"><span class="hs-identifier hs-var">readInstrLimit</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Drop -&gt; FTL Drop -&gt; FTL Drop
+forall st a. Parser st a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#-%7C-"><span class="hs-operator hs-var">-|-</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Drop
+</span><a href="#local-6989586621679250221"><span class="hs-identifier hs-var">readInstrBool</span></a></span><span>
+</span><span id="line-118"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-119"></span><span>    </span><span id="local-6989586621679250220"><span class="annot"><span class="annottext">readInstrLimit :: FTL Drop
+</span><a href="#local-6989586621679250220"><span class="hs-identifier hs-var hs-var">readInstrLimit</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Drop, Text)] -&gt; FTL Drop
+forall a. [(a, Text)] -&gt; FTL a
+</span><a href="SAD.ForTheL.Instruction.html#readKeywords"><span class="hs-identifier hs-var">readKeywords</span></a></span><span> </span><span class="annot"><span class="annottext">[(Drop, Text)]
+</span><a href="SAD.Data.Instr.html#keywordsDropLimit"><span class="hs-identifier hs-var">keywordsDropLimit</span></a></span><span>
+</span><span id="line-120"></span><span>    </span><span id="local-6989586621679250221"><span class="annot"><span class="annottext">readInstrBool :: FTL Drop
+</span><a href="#local-6989586621679250221"><span class="hs-identifier hs-var hs-var">readInstrBool</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Drop, Text)] -&gt; FTL Drop
+forall a. [(a, Text)] -&gt; FTL a
+</span><a href="SAD.ForTheL.Instruction.html#readKeywords"><span class="hs-identifier hs-var">readKeywords</span></a></span><span> </span><span class="annot"><span class="annottext">[(Drop, Text)]
+</span><a href="SAD.Data.Instr.html#keywordsDropFlag"><span class="hs-identifier hs-var">keywordsDropFlag</span></a></span><span>
+</span><span id="line-121"></span><span>
+</span><span id="line-122"></span><span class="hs-comment">-- | Try to parse the next token as one of the supplied keyword strings</span><span>
+</span><span id="line-123"></span><span class="hs-comment">-- and return the corresponding @a@ on success.</span><span>
+</span><span id="line-124"></span><span id="local-6989586621679250012"><span class="annot"><a href="SAD.ForTheL.Instruction.html#readKeywords"><span class="hs-identifier hs-type">readKeywords</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679250012"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679250012"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-125"></span><span id="readKeywords"><span class="annot"><span class="annottext">readKeywords :: forall a. [(a, Text)] -&gt; FTL a
+</span><a href="SAD.ForTheL.Instruction.html#readKeywords"><span class="hs-identifier hs-var hs-var">readKeywords</span></a></span></span><span> </span><span id="local-6989586621679250231"><span class="annot"><span class="annottext">[(a, Text)]
+</span><a href="#local-6989586621679250231"><span class="hs-identifier hs-var">keywords</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Parser FState a -&gt; Parser FState a
+forall st a. Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#try"><span class="hs-identifier hs-var">try</span></a></span><span> </span><span class="annot"><span class="annottext">(Parser FState a -&gt; Parser FState a)
+-&gt; Parser FState a -&gt; Parser FState a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-126"></span><span>  </span><span id="local-6989586621679250232"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250232"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser FState Text
+forall {st}. Parser st Text
+</span><a href="SAD.Parser.Primitives.html#anyToken"><span class="hs-identifier hs-var">anyToken</span></a></span><span>
+</span><span id="line-127"></span><span>  </span><span class="annot"><span class="annottext">[Parser FState a] -&gt; Parser FState a
+forall (t :: * -&gt; *) (m :: * -&gt; *) a.
+(Foldable t, MonadPlus m) =&gt;
+t (m a) -&gt; m a
+</span><span class="hs-identifier hs-var">msum</span></span><span> </span><span class="annot"><span class="annottext">([Parser FState a] -&gt; Parser FState a)
+-&gt; [Parser FState a] -&gt; Parser FState a
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">((a, Text) -&gt; Parser FState a) -&gt; [(a, Text)] -&gt; [Parser FState a]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; Parser FState a
+forall a. a -&gt; Parser FState a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">(a -&gt; Parser FState a)
+-&gt; ((a, Text) -&gt; a) -&gt; (a, Text) -&gt; Parser FState a
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(a, Text) -&gt; a
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([(a, Text)] -&gt; [Parser FState a])
+-&gt; [(a, Text)] -&gt; [Parser FState a]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">((a, Text) -&gt; Bool) -&gt; [(a, Text)] -&gt; [(a, Text)]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679250232"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Bool) -&gt; ((a, Text) -&gt; Text) -&gt; (a, Text) -&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(a, Text) -&gt; Text
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[(a, Text)]
+</span><a href="#local-6989586621679250231"><span class="hs-identifier hs-var">keywords</span></a></span><span>
+</span><span id="line-128"></span></pre></body></html>

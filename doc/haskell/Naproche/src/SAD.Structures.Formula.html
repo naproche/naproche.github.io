@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.Structures.Formula</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2020, Anton Lorenzen</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-5"></span><span class="hs-comment">--</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- TODO: Add description.</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.Structures.Formula</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">newtype</span><span> </span><span id="Document"><span class="annot"><a href="SAD.Structures.Formula.html#Document"><span class="hs-identifier hs-var">Document</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Document"><span class="annot"><a href="SAD.Structures.Formula.html#Document"><span class="hs-identifier hs-var">Document</span></a></span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Structures.Formula.html#Declaration"><span class="hs-identifier hs-type">Declaration</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679261938"><span id="local-6989586621679261945"><span id="local-6989586621679261949"><span class="annot"><span class="annottext">Int -&gt; Document -&gt; ShowS
+[Document] -&gt; ShowS
+Document -&gt; String
+(Int -&gt; Document -&gt; ShowS)
+-&gt; (Document -&gt; String) -&gt; ([Document] -&gt; ShowS) -&gt; Show Document
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Document -&gt; ShowS
+showsPrec :: Int -&gt; Document -&gt; ShowS
+$cshow :: Document -&gt; String
+show :: Document -&gt; String
+$cshowList :: [Document] -&gt; ShowS
+showList :: [Document] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">data</span><span> </span><span id="Declaration"><span class="annot"><a href="SAD.Structures.Formula.html#Declaration"><span class="hs-identifier hs-var">Declaration</span></a></span></span><span>
+</span><span id="line-17"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Hypothesis"><span class="annot"><a href="SAD.Structures.Formula.html#Hypothesis"><span class="hs-identifier hs-var">Hypothesis</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Structures.Formula.html#Assumption"><span class="hs-identifier hs-type">Assumption</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Conjecture"><span class="annot"><a href="SAD.Structures.Formula.html#Conjecture"><span class="hs-identifier hs-var">Conjecture</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Structures.Formula.html#Assumption"><span class="hs-identifier hs-type">Assumption</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Statement"><span class="hs-identifier hs-type">Statement</span></a></span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Inductive"><span class="annot"><a href="SAD.Structures.Formula.html#Inductive"><span class="hs-identifier hs-var">Inductive</span></a></span></span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Assumption"><span class="hs-identifier hs-type">Assumption</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><a href="SAD.Structures.Formula.html#Assumption"><span class="hs-identifier hs-type">Assumption</span></a></span><span class="hs-special">]</span><span class="hs-special">]</span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679261958"><span id="local-6989586621679261972"><span id="local-6989586621679261975"><span class="annot"><span class="annottext">Int -&gt; Declaration -&gt; ShowS
+[Declaration] -&gt; ShowS
+Declaration -&gt; String
+(Int -&gt; Declaration -&gt; ShowS)
+-&gt; (Declaration -&gt; String)
+-&gt; ([Declaration] -&gt; ShowS)
+-&gt; Show Declaration
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Declaration -&gt; ShowS
+showsPrec :: Int -&gt; Declaration -&gt; ShowS
+$cshow :: Declaration -&gt; String
+show :: Declaration -&gt; String
+$cshowList :: [Declaration] -&gt; ShowS
+showList :: [Declaration] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679261979"><span id="local-6989586621679261991"><span class="annot"><span class="annottext">Declaration -&gt; Declaration -&gt; Bool
+(Declaration -&gt; Declaration -&gt; Bool)
+-&gt; (Declaration -&gt; Declaration -&gt; Bool) -&gt; Eq Declaration
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Declaration -&gt; Declaration -&gt; Bool
+== :: Declaration -&gt; Declaration -&gt; Bool
+$c/= :: Declaration -&gt; Declaration -&gt; Bool
+/= :: Declaration -&gt; Declaration -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">type</span><span> </span><span id="Assumption"><span class="annot"><a href="SAD.Structures.Formula.html#Assumption"><span class="hs-identifier hs-var">Assumption</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">type</span><span> </span><span id="Statement"><span class="annot"><a href="SAD.Structures.Formula.html#Statement"><span class="hs-identifier hs-var">Statement</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">data</span><span> </span><span id="Formula"><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-var">Formula</span></a></span></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-glyph">=</span><span> </span><span id="Variable"><span class="annot"><a href="SAD.Structures.Formula.html#Variable"><span class="hs-identifier hs-var">Variable</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="All"><span class="annot"><a href="SAD.Structures.Formula.html#All"><span class="hs-identifier hs-var">All</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Exists"><span class="annot"><a href="SAD.Structures.Formula.html#Exists"><span class="hs-identifier hs-var">Exists</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Predicate"><span class="annot"><a href="SAD.Structures.Formula.html#Predicate"><span class="hs-identifier hs-var">Predicate</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TyPredicate"><span class="annot"><a href="SAD.Structures.Formula.html#TyPredicate"><span class="hs-identifier hs-var">TyPredicate</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Const"><span class="annot"><a href="SAD.Structures.Formula.html#Const"><span class="hs-identifier hs-var">Const</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span id="%3A%40"><span class="annot"><a href="SAD.Structures.Formula.html#%3A%40"><span class="hs-operator hs-var">:@</span></a></span></span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span id="%3A%2F%5C"><span class="annot"><a href="SAD.Structures.Formula.html#%3A%2F%5C"><span class="hs-operator hs-var">:/\</span></a></span></span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span id="%3A%5C%2F"><span class="annot"><a href="SAD.Structures.Formula.html#%3A%5C%2F"><span class="hs-operator hs-var">:\/</span></a></span></span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span id="%3A-%3E"><span class="annot"><a href="SAD.Structures.Formula.html#%3A-%3E"><span class="hs-operator hs-var">:-&gt;</span></a></span></span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span id="%3A%3C-%3E"><span class="annot"><a href="SAD.Structures.Formula.html#%3A%3C-%3E"><span class="hs-operator hs-var">:&lt;-&gt;</span></a></span></span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-37"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span id="%3A%3D%3D"><span class="annot"><a href="SAD.Structures.Formula.html#%3A%3D%3D"><span class="hs-operator hs-var">:==</span></a></span></span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-38"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Bot"><span class="annot"><a href="SAD.Structures.Formula.html#Bot"><span class="hs-identifier hs-var">Bot</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Top"><span class="annot"><a href="SAD.Structures.Formula.html#Top"><span class="hs-identifier hs-var">Top</span></a></span></span><span>
+</span><span id="line-39"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679262012"><span id="local-6989586621679262046"><span id="local-6989586621679262049"><span class="annot"><span class="annottext">Int -&gt; Assumption -&gt; ShowS
+[Assumption] -&gt; ShowS
+Assumption -&gt; String
+(Int -&gt; Assumption -&gt; ShowS)
+-&gt; (Assumption -&gt; String)
+-&gt; ([Assumption] -&gt; ShowS)
+-&gt; Show Assumption
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Assumption -&gt; ShowS
+showsPrec :: Int -&gt; Assumption -&gt; ShowS
+$cshow :: Assumption -&gt; String
+show :: Assumption -&gt; String
+$cshowList :: [Assumption] -&gt; ShowS
+showList :: [Assumption] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679262052"><span id="local-6989586621679262074"><span class="annot"><span class="annottext">Assumption -&gt; Assumption -&gt; Bool
+(Assumption -&gt; Assumption -&gt; Bool)
+-&gt; (Assumption -&gt; Assumption -&gt; Bool) -&gt; Eq Assumption
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Assumption -&gt; Assumption -&gt; Bool
+== :: Assumption -&gt; Assumption -&gt; Bool
+$c/= :: Assumption -&gt; Assumption -&gt; Bool
+/= :: Assumption -&gt; Assumption -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="hs-keyword">infixl</span><span> </span><span class="hs-number">6</span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#%3A%40"><span class="hs-operator hs-type">:@</span></a></span><span>
+</span><span id="line-42"></span><span class="hs-keyword">infixl</span><span> </span><span class="hs-number">5</span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#%3A%2F%5C"><span class="hs-operator hs-type">:/\</span></a></span><span>
+</span><span id="line-43"></span><span class="hs-keyword">infixl</span><span> </span><span class="hs-number">4</span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#%3A%3C-%3E"><span class="hs-operator hs-type">:&lt;-&gt;</span></a></span><span>
+</span><span id="line-44"></span><span class="hs-keyword">infixl</span><span> </span><span class="hs-number">4</span><span> </span><span class="annot"><a href="SAD.Structures.Formula.html#%3A-%3E"><span class="hs-operator hs-type">:-&gt;</span></a></span><span>
+</span><span id="line-45"></span></pre></body></html>

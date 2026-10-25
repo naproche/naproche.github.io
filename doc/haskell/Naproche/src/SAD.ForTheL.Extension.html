@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.ForTheL.Extension</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2001 - 2008, Andrei Paskevich,</span><span>
+</span><span id="line-4"></span><span class="hs-comment">--               (c) 2017 - 2018, Steffen Frerix</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-6"></span><span class="hs-comment">--</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Language extensions.</span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.ForTheL.Extension</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-13"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.Extension.html#funVars"><span class="hs-identifier">funVars</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.Extension.html#notionVars"><span class="hs-identifier">notionVars</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.Extension.html#prdVars"><span class="hs-identifier">prdVars</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.Extension.html#ignoreNames"><span class="hs-identifier">ignoreNames</span></a></span><span>
+</span><span id="line-17"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-20"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Text</span></span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Formula.html"><span class="hs-identifier">SAD.Data.Formula</span></a></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html"><span class="hs-identifier">SAD.ForTheL.Base</span></a></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Text.Decl.html"><span class="hs-identifier">SAD.Data.Text.Decl</span></a></span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- well-formedness check</span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span class="annot"><a href="SAD.ForTheL.Extension.html#funVars"><span class="hs-identifier hs-type">funVars</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.ForTheL.Extension.html#notionVars"><span class="hs-identifier hs-type">notionVars</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.ForTheL.Extension.html#prdVars"><span class="hs-identifier hs-type">prdVars</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span id="funVars"><span class="annot"><span class="annottext">funVars :: (Formula, Formula) -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Extension.html#funVars"><span class="hs-identifier hs-var hs-var">funVars</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679245077"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245077"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679245078"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245078"><span class="hs-identifier hs-var">d</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679245080"><span class="hs-identifier hs-var">ifq</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Formula, Formula) -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Extension.html#prdVars"><span class="hs-identifier hs-var">prdVars</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245077"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245078"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-32"></span><span>               </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679245081"><span class="hs-identifier hs-var">idq</span></a></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe Text
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Maybe Text) -&gt; Text -&gt; Maybe Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Text
+</span><span class="hs-identifier hs-var">Text.pack</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Text) -&gt; [Char] -&gt; Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;illegal function alias: &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; [Char] -&gt; [Char]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245078"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-33"></span><span>               </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Formula, Formula) -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Extension.html#prdVars"><span class="hs-identifier hs-var">prdVars</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245084"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="#local-6989586621679245086"><span class="hs-identifier hs-type">v</span></a></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span class="annot"><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679245084"><span class="hs-identifier hs-type">t</span></a></span><span class="hs-special">}</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245078"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-35"></span><span>    </span><span id="local-6989586621679245080"><span class="annot"><span class="annottext">ifq :: Bool
+</span><a href="#local-6989586621679245080"><span class="hs-identifier hs-var hs-var">ifq</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Bool
+</span><a href="SAD.Data.Formula.Kit.html#isTrm"><span class="hs-identifier hs-var">isTrm</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245077"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; TermName
+</span><a href="SAD.Data.Formula.Base.html#trmName"><span class="hs-identifier hs-var">trmName</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245077"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">TermName -&gt; TermName -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermEquality"><span class="hs-identifier hs-var">TermEquality</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Bool
+</span><a href="SAD.Data.Formula.Kit.html#isTrm"><span class="hs-identifier hs-var">isTrm</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245084"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-36"></span><span>    </span><span id="local-6989586621679245081"><span class="annot"><span class="annottext">idq :: Bool
+</span><a href="#local-6989586621679245081"><span class="hs-identifier hs-var hs-var">idq</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Bool
+</span><a href="SAD.Data.Formula.Kit.html#isTrm"><span class="hs-identifier hs-var">isTrm</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245078"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; TermName
+</span><a href="SAD.Data.Formula.Base.html#trmName"><span class="hs-identifier hs-var">trmName</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245078"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">TermName -&gt; TermName -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermEquality"><span class="hs-identifier hs-var">TermEquality</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245094"><span class="hs-identifier hs-var">u</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Bool
+</span><a href="SAD.Data.Formula.Base.html#occursIn"><span class="hs-operator hs-var">`occursIn`</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245096"><span class="hs-identifier hs-var">p</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-37"></span><span>    </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">trmName :: Formula -&gt; TermName
+</span><a href="SAD.Data.Formula.Base.html#trmName"><span class="hs-identifier hs-var">trmName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermEquality"><span class="hs-identifier hs-var">TermEquality</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">trmArgs :: Formula -&gt; [Formula]
+</span><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span id="local-6989586621679245086"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245086"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679245084"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245084"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">]</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245077"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-38"></span><span>    </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">trmName :: Formula -&gt; TermName
+</span><a href="SAD.Data.Formula.Base.html#trmName"><span class="hs-identifier hs-var">trmName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermEquality"><span class="hs-identifier hs-var">TermEquality</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">trmArgs :: Formula -&gt; [Formula]
+</span><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span id="local-6989586621679245094"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245094"><span class="hs-identifier hs-var">u</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679245096"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245096"><span class="hs-identifier hs-var">p</span></a></span></span><span class="hs-special">]</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245078"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span id="notionVars"><span class="annot"><span class="annottext">notionVars :: (Formula, Formula) -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Extension.html#notionVars"><span class="hs-identifier hs-var hs-var">notionVars</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679245098"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245098"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679245099"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245099"><span class="hs-identifier hs-var">d</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679245100"><span class="hs-identifier hs-var">isFunction</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Formula, Formula) -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Extension.html#prdVars"><span class="hs-identifier hs-var">prdVars</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245098"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245099"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span>               </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Formula, Formula) -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Extension.html#prdVars"><span class="hs-identifier hs-var">prdVars</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245101"><span class="hs-identifier hs-var">t</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="#local-6989586621679245102"><span class="hs-identifier hs-type">v</span></a></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span class="annot"><a href="#local-6989586621679245103"><span class="hs-identifier hs-type">vs</span></a></span><span class="hs-special">}</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245099"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-44"></span><span>    </span><span id="local-6989586621679245100"><span class="annot"><span class="annottext">isFunction :: Bool
+</span><a href="#local-6989586621679245100"><span class="hs-identifier hs-var hs-var">isFunction</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Bool
+</span><a href="SAD.Data.Formula.Kit.html#isTrm"><span class="hs-identifier hs-var">isTrm</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245098"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; TermName
+</span><a href="SAD.Data.Formula.Base.html#trmName"><span class="hs-identifier hs-var">trmName</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245098"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">TermName -&gt; TermName -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermEquality"><span class="hs-identifier hs-var">TermEquality</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Bool
+</span><a href="SAD.Data.Formula.Kit.html#isTrm"><span class="hs-identifier hs-var">isTrm</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245101"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-45"></span><span>    </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">trmName :: Formula -&gt; TermName
+</span><a href="SAD.Data.Formula.Base.html#trmName"><span class="hs-identifier hs-var">trmName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermEquality"><span class="hs-identifier hs-var">TermEquality</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">trmArgs :: Formula -&gt; [Formula]
+</span><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span>  </span><span class="hs-special">[</span><span id="local-6989586621679245102"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245102"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679245101"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245101"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">]</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245098"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-46"></span><span>    </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">trmArgs :: Formula -&gt; [Formula]
+</span><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679245103"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679245103"><span class="hs-identifier hs-var">vs</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245101"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span id="prdVars"><span class="annot"><span class="annottext">prdVars :: (Formula, Formula) -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Extension.html#prdVars"><span class="hs-identifier hs-var hs-var">prdVars</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679245105"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245105"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679245106"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245106"><span class="hs-identifier hs-var">d</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679245107"><span class="hs-identifier hs-var">flat</span></a></span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe Text
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Maybe Text) -&gt; Text -&gt; Maybe Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Text
+</span><span class="hs-identifier hs-var">Text.pack</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Text) -&gt; [Char] -&gt; Text
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;compound expression: &quot;</span></span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; [Char] -&gt; [Char]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Char]
+forall a. Show a =&gt; a -&gt; [Char]
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245105"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-50"></span><span>               </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set VariableName -&gt; Formula -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Base.html#freeOrOverlapping"><span class="hs-identifier hs-var">freeOrOverlapping</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">FV VariableName -&gt; Set VariableName
+forall a. Ord a =&gt; FV a -&gt; Set a
+</span><a href="SAD.Data.VarName.html#fvToVarSet"><span class="hs-identifier hs-var">fvToVarSet</span></a></span><span> </span><span class="annot"><span class="annottext">(FV VariableName -&gt; Set VariableName)
+-&gt; FV VariableName -&gt; Set VariableName
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; FV VariableName
+forall a. IsVar a =&gt; Formula -&gt; FV a
+</span><a href="SAD.Data.Formula.Kit.html#free"><span class="hs-identifier hs-var">free</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245105"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245106"><span class="hs-identifier hs-var">d</span></a></span><span>
+</span><span id="line-51"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-52"></span><span>    </span><span id="local-6989586621679245107"><span class="annot"><span class="annottext">flat :: Bool
+</span><a href="#local-6989586621679245107"><span class="hs-identifier hs-var hs-var">flat</span></a></span></span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Bool
+</span><a href="SAD.Data.Formula.Kit.html#isTrm"><span class="hs-identifier hs-var">isTrm</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245105"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">[Formula] -&gt; Bool
+</span><a href="SAD.ForTheL.Extension.html#allDistinctVars"><span class="hs-identifier hs-var">allDistinctVars</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; [Formula]
+</span><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245105"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span>
+</span><span id="line-55"></span><span class="annot"><a href="SAD.ForTheL.Extension.html#allDistinctVars"><span class="hs-identifier hs-type">allDistinctVars</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-56"></span><span id="allDistinctVars"><span class="annot"><span class="annottext">allDistinctVars :: [Formula] -&gt; Bool
+</span><a href="SAD.ForTheL.Extension.html#allDistinctVars"><span class="hs-identifier hs-var hs-var">allDistinctVars</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[VariableName] -&gt; [Formula] -&gt; Bool
+</span><a href="#local-6989586621679245112"><span class="hs-identifier hs-var">disVs</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><span id="line-57"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-58"></span><span>    </span><span id="local-6989586621679245112"><span class="annot"><span class="annottext">disVs :: [VariableName] -&gt; [Formula] -&gt; Bool
+</span><a href="#local-6989586621679245112"><span class="hs-identifier hs-var hs-var">disVs</span></a></span></span><span> </span><span id="local-6989586621679245119"><span class="annot"><span class="annottext">[VariableName]
+</span><a href="#local-6989586621679245119"><span class="hs-identifier hs-var">ls</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Var"><span class="hs-identifier hs-type">Var</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">varName :: Formula -&gt; VariableName
+</span><a href="SAD.Data.Formula.Base.html#varName"><span class="hs-identifier hs-var">varName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679245122"><span class="annot"><span class="annottext">v :: VariableName
+</span><a href="#local-6989586621679245122"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.VarName.html#VarHidden"><span class="hs-identifier hs-type">VarHidden</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span class="hs-special">}</span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span id="local-6989586621679245124"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679245124"><span class="hs-identifier hs-var">vs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; [VariableName] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">notElem</span></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679245122"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">[VariableName]
+</span><a href="#local-6989586621679245119"><span class="hs-identifier hs-var">ls</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">[VariableName] -&gt; [Formula] -&gt; Bool
+</span><a href="#local-6989586621679245112"><span class="hs-identifier hs-var">disVs</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679245122"><span class="hs-identifier hs-var">v</span></a></span><span class="annot"><span class="annottext">VariableName -&gt; [VariableName] -&gt; [VariableName]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[VariableName]
+</span><a href="#local-6989586621679245119"><span class="hs-identifier hs-var">ls</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679245124"><span class="hs-identifier hs-var">vs</span></a></span><span>
+</span><span id="line-59"></span><span>    </span><span class="annot"><a href="#local-6989586621679245112"><span class="hs-identifier hs-var">disVs</span></a></span><span> </span><span id="local-6989586621679245126"><span class="annot"><span class="annottext">[VariableName]
+</span><a href="#local-6989586621679245126"><span class="hs-identifier hs-var">ls</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Var"><span class="hs-identifier hs-type">Var</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">varName :: Formula -&gt; VariableName
+</span><a href="SAD.Data.Formula.Base.html#varName"><span class="hs-identifier hs-var">varName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679245127"><span class="annot"><span class="annottext">v :: VariableName
+</span><a href="#local-6989586621679245127"><span class="hs-identifier hs-var">v</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.VarName.html#VarConstant"><span class="hs-identifier hs-type">VarConstant</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span class="hs-special">}</span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span id="local-6989586621679245129"><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679245129"><span class="hs-identifier hs-var">vs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; [VariableName] -&gt; Bool
+forall (t :: * -&gt; *) a. (Foldable t, Eq a) =&gt; a -&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">notElem</span></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679245127"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">[VariableName]
+</span><a href="#local-6989586621679245126"><span class="hs-identifier hs-var">ls</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">[VariableName] -&gt; [Formula] -&gt; Bool
+</span><a href="#local-6989586621679245112"><span class="hs-identifier hs-var">disVs</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679245127"><span class="hs-identifier hs-var">v</span></a></span><span class="annot"><span class="annottext">VariableName -&gt; [VariableName] -&gt; [VariableName]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[VariableName]
+</span><a href="#local-6989586621679245126"><span class="hs-identifier hs-var">ls</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Formula]
+</span><a href="#local-6989586621679245129"><span class="hs-identifier hs-var">vs</span></a></span><span>
+</span><span id="line-60"></span><span>    </span><span class="annot"><a href="#local-6989586621679245112"><span class="hs-identifier hs-var">disVs</span></a></span><span> </span><span class="annot"><span class="annottext">[VariableName]
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-61"></span><span>    </span><span class="annot"><a href="#local-6989586621679245112"><span class="hs-identifier hs-var">disVs</span></a></span><span> </span><span class="annot"><span class="annottext">[VariableName]
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">[Formula]
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span class="annot"><a href="SAD.ForTheL.Extension.html#ignoreNames"><span class="hs-identifier hs-type">ignoreNames</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-64"></span><span id="ignoreNames"><span class="annot"><span class="annottext">ignoreNames :: Formula -&gt; Formula
+</span><a href="SAD.ForTheL.Extension.html#ignoreNames"><span class="hs-identifier hs-var hs-var">ignoreNames</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#All"><span class="hs-identifier hs-type">All</span></a></span><span> </span><span id="local-6989586621679245131"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679245131"><span class="hs-identifier hs-var">dcl</span></a></span></span><span> </span><span id="local-6989586621679245132"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245132"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Decl -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#All"><span class="hs-identifier hs-var">All</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679245131"><span class="hs-identifier hs-var">dcl</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><a href="SAD.Data.Text.Decl.html#declName"><span class="hs-identifier hs-var">declName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="SAD.Data.VarName.html#VarEmpty"><span class="hs-identifier hs-type">VarEmpty</span></a></span><span class="hs-special">}</span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.ForTheL.Extension.html#ignoreNames"><span class="hs-identifier hs-var">ignoreNames</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245132"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-65"></span><span class="annot"><a href="SAD.ForTheL.Extension.html#ignoreNames"><span class="hs-identifier hs-var">ignoreNames</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Exi"><span class="hs-identifier hs-type">Exi</span></a></span><span> </span><span id="local-6989586621679245136"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679245136"><span class="hs-identifier hs-var">dcl</span></a></span></span><span> </span><span id="local-6989586621679245137"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245137"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Decl -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Exi"><span class="hs-identifier hs-var">Exi</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679245136"><span class="hs-identifier hs-var">dcl</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><a href="SAD.Data.Text.Decl.html#declName"><span class="hs-identifier hs-var">declName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="SAD.Data.VarName.html#VarEmpty"><span class="hs-identifier hs-type">VarEmpty</span></a></span><span class="hs-special">}</span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.ForTheL.Extension.html#ignoreNames"><span class="hs-identifier hs-var">ignoreNames</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245137"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-66"></span><span class="annot"><a href="SAD.ForTheL.Extension.html#ignoreNames"><span class="hs-identifier hs-var">ignoreNames</span></a></span><span> </span><span id="local-6989586621679245138"><span class="annot"><span class="annottext">f :: Formula
+</span><a href="#local-6989586621679245138"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span class="hs-special">{</span><span class="hs-special">}</span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245138"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-67"></span><span class="annot"><a href="SAD.ForTheL.Extension.html#ignoreNames"><span class="hs-identifier hs-var">ignoreNames</span></a></span><span> </span><span id="local-6989586621679245139"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245139"><span class="hs-identifier hs-var">f</span></a></span></span><span>         </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#mapF"><span class="hs-identifier hs-var">mapF</span></a></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.ForTheL.Extension.html#ignoreNames"><span class="hs-identifier hs-var">ignoreNames</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679245139"><span class="hs-identifier hs-var">f</span></a></span><span>
+</span><span id="line-68"></span></pre></body></html>

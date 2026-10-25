@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.ForTheL.FTL.Base</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2025 Marcel Sch&#252;tz</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-5"></span><span class="hs-comment">--</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- ForTheL state (FTL).</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.ForTheL.FTL.Base</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-12"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.FTL.Base.html#addInits"><span class="hs-identifier">addInits</span></a></span><span>
+</span><span id="line-13"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">unionBy</span></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Formula.html"><span class="hs-identifier">SAD.Data.Formula</span></a></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html"><span class="hs-identifier">SAD.ForTheL.Base</span></a></span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="annot"><span class="hs-comment">-- | Add primitive expressions to the state.</span></span><span>
+</span><span id="line-22"></span><span class="annot"><a href="SAD.ForTheL.FTL.Base.html#addInits"><span class="hs-identifier hs-type">addInits</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FState"><span class="hs-identifier hs-type">FState</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FState"><span class="hs-identifier hs-type">FState</span></a></span><span>
+</span><span id="line-23"></span><span id="addInits"><span class="annot"><span class="annottext">addInits :: FState -&gt; FState
+</span><a href="SAD.ForTheL.FTL.Base.html#addInits"><span class="hs-identifier hs-var hs-var">addInits</span></a></span></span><span> </span><span id="local-6989586621679244999"><span class="annot"><span class="annottext">state :: FState
+</span><a href="#local-6989586621679244999"><span class="hs-identifier hs-var">state</span></a></span></span><span class="hs-glyph">@</span><span class="annot"><a href="SAD.ForTheL.Base.html#FState"><span class="hs-identifier hs-type">FState</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">symbNotionExpr :: FState -&gt; [Prim]
+</span><a href="SAD.ForTheL.Base.html#symbNotionExpr"><span class="hs-identifier hs-var">symbNotionExpr</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679245002"><span class="annot"><span class="annottext">[Prim]
+</span><a href="#local-6989586621679245002"><span class="hs-identifier hs-var">sn</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">cfnExpr :: FState -&gt; [Prim]
+</span><a href="SAD.ForTheL.Base.html#cfnExpr"><span class="hs-identifier hs-var">cfnExpr</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679245004"><span class="annot"><span class="annottext">[Prim]
+</span><a href="#local-6989586621679245004"><span class="hs-identifier hs-var">cfn</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">iprExpr :: FState -&gt; [Prim]
+</span><a href="SAD.ForTheL.Base.html#iprExpr"><span class="hs-identifier hs-var">iprExpr</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679245006"><span class="annot"><span class="annottext">[Prim]
+</span><a href="#local-6989586621679245006"><span class="hs-identifier hs-var">ipr</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FState
+</span><a href="#local-6989586621679244999"><span class="hs-identifier hs-var">state</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-24"></span><span>    </span><span class="annot"><a href="SAD.ForTheL.Base.html#symbNotionExpr"><span class="hs-identifier hs-var">symbNotionExpr</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">unionBy</span></span><span> </span><span class="annot"><a href="#local-6989586621679245007"><span class="hs-identifier hs-type">comparePatterns</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679245002"><span class="hs-identifier hs-type">sn</span></a></span><span> </span><span class="hs-special">[</span><span>
+</span><span id="line-25"></span><span>        </span><span class="annot"><a href="#local-6989586621679245008"><span class="hs-identifier hs-type">equalSymbNotion</span></a></span><span>
+</span><span id="line-26"></span><span>      </span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-27"></span><span>    </span><span class="annot"><a href="SAD.ForTheL.Base.html#cfnExpr"><span class="hs-identifier hs-var">cfnExpr</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">unionBy</span></span><span> </span><span class="annot"><a href="#local-6989586621679245007"><span class="hs-identifier hs-type">comparePatterns</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679245004"><span class="hs-identifier hs-type">cfn</span></a></span><span> </span><span class="hs-special">[</span><span>
+</span><span id="line-28"></span><span>        </span><span class="annot"><a href="#local-6989586621679245009"><span class="hs-identifier hs-type">domFunction</span></a></span><span>
+</span><span id="line-29"></span><span>      </span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><span id="line-30"></span><span>    </span><span class="annot"><a href="SAD.ForTheL.Base.html#iprExpr"><span class="hs-identifier hs-var">iprExpr</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">unionBy</span></span><span> </span><span class="annot"><a href="#local-6989586621679245007"><span class="hs-identifier hs-type">comparePatterns</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679245006"><span class="hs-identifier hs-type">ipr</span></a></span><span> </span><span class="hs-special">[</span><span>
+</span><span id="line-31"></span><span>        </span><span class="annot"><a href="#local-6989586621679245010"><span class="hs-identifier hs-type">equalityPredicate</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-32"></span><span>        </span><span class="annot"><a href="#local-6989586621679245011"><span class="hs-identifier hs-type">inequalityPredicate</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-33"></span><span>        </span><span class="annot"><a href="#local-6989586621679245012"><span class="hs-identifier hs-type">inductionPredicate</span></a></span><span>
+</span><span id="line-34"></span><span>      </span><span class="hs-special">]</span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-special">}</span><span>
+</span><span id="line-36"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-37"></span><span>    </span><span class="hs-comment">-- &quot;x = y&quot;</span><span>
+</span><span id="line-38"></span><span>    </span><span id="local-6989586621679245010"><span class="annot"><span class="annottext">equalityPredicate :: Prim
+</span><a href="#local-6989586621679245010"><span class="hs-identifier hs-var hs-var">equalityPredicate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text -&gt; Pattern
+</span><a href="SAD.ForTheL.Base.html#Symbol"><span class="hs-identifier hs-var">Symbol</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;=&quot;</span></span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">TermId -&gt; TermName -&gt; [Formula] -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkTrm"><span class="hs-identifier hs-var">mkTrm</span></a></span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="SAD.Data.Terms.html#EqualityId"><span class="hs-identifier hs-var">EqualityId</span></a></span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermEquality"><span class="hs-identifier hs-var">TermEquality</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span>    </span><span class="hs-comment">-- &quot;= x&quot;</span><span>
+</span><span id="line-40"></span><span>    </span><span id="local-6989586621679245008"><span class="annot"><span class="annottext">equalSymbNotion :: Prim
+</span><a href="#local-6989586621679245008"><span class="hs-identifier hs-var hs-var">equalSymbNotion</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text -&gt; Pattern
+</span><a href="SAD.ForTheL.Base.html#Symbol"><span class="hs-identifier hs-var">Symbol</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;=&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Pattern
+</span><a href="SAD.ForTheL.Base.html#Vr"><span class="hs-identifier hs-var">Vr</span></a></span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">TermId -&gt; TermName -&gt; [Formula] -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkTrm"><span class="hs-identifier hs-var">mkTrm</span></a></span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="SAD.Data.Terms.html#EqualityId"><span class="hs-identifier hs-var">EqualityId</span></a></span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermEquality"><span class="hs-identifier hs-var">TermEquality</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-41"></span><span>    </span><span class="hs-comment">-- &quot;x != y&quot;</span><span>
+</span><span id="line-42"></span><span>    </span><span id="local-6989586621679245011"><span class="annot"><span class="annottext">inequalityPredicate :: Prim
+</span><a href="#local-6989586621679245011"><span class="hs-identifier hs-var hs-var">inequalityPredicate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text -&gt; Pattern
+</span><a href="SAD.ForTheL.Base.html#Symbol"><span class="hs-identifier hs-var">Symbol</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;!&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Pattern
+</span><a href="SAD.ForTheL.Base.html#Symbol"><span class="hs-identifier hs-var">Symbol</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;=&quot;</span></span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Not"><span class="hs-identifier hs-var">Not</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula)
+-&gt; ([Formula] -&gt; Formula) -&gt; [Formula] -&gt; Formula
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">TermId -&gt; TermName -&gt; [Formula] -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkTrm"><span class="hs-identifier hs-var">mkTrm</span></a></span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="SAD.Data.Terms.html#EqualityId"><span class="hs-identifier hs-var">EqualityId</span></a></span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermEquality"><span class="hs-identifier hs-var">TermEquality</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span>    </span><span class="hs-comment">-- &quot;x -&lt;- y&quot;</span><span>
+</span><span id="line-44"></span><span>    </span><span id="local-6989586621679245012"><span class="annot"><span class="annottext">inductionPredicate :: Prim
+</span><a href="#local-6989586621679245012"><span class="hs-identifier hs-var hs-var">inductionPredicate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text -&gt; Pattern
+</span><a href="SAD.ForTheL.Base.html#Symbol"><span class="hs-identifier hs-var">Symbol</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;-&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Pattern
+</span><a href="SAD.ForTheL.Base.html#Symbol"><span class="hs-identifier hs-var">Symbol</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;&lt;&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Pattern
+</span><a href="SAD.ForTheL.Base.html#Symbol"><span class="hs-identifier hs-var">Symbol</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;-&quot;</span></span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">TermId -&gt; TermName -&gt; [Formula] -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkTrm"><span class="hs-identifier hs-var">mkTrm</span></a></span><span> </span><span class="annot"><span class="annottext">TermId
+</span><a href="SAD.Data.Terms.html#LessId"><span class="hs-identifier hs-var">LessId</span></a></span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermLess"><span class="hs-identifier hs-var">TermLess</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span>    </span><span class="hs-comment">-- &quot;Dom f&quot;</span><span>
+</span><span id="line-46"></span><span>    </span><span id="local-6989586621679245009"><span class="annot"><span class="annottext">domFunction :: Prim
+</span><a href="#local-6989586621679245009"><span class="hs-identifier hs-var hs-var">domFunction</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text -&gt; Pattern
+</span><a href="SAD.ForTheL.Base.html#Symbol"><span class="hs-identifier hs-var">Symbol</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;Dom&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Pattern
+</span><a href="SAD.ForTheL.Base.html#Vr"><span class="hs-identifier hs-var">Vr</span></a></span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkDom"><span class="hs-identifier hs-var">mkDom</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula)
+-&gt; ([Formula] -&gt; Formula) -&gt; [Formula] -&gt; Formula
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[Formula] -&gt; Formula
+forall a. HasCallStack =&gt; [a] -&gt; a
+</span><span class="hs-identifier hs-var">head</span></span><span class="hs-special">)</span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span>    </span><span class="hs-comment">-- Compare the pattern of two primitive expressions</span><span>
+</span><span id="line-49"></span><span>    </span><span id="local-6989586621679245007"><span class="annot"><span class="annottext">comparePatterns :: (a, b) -&gt; (a, b) -&gt; Bool
+</span><a href="#local-6989586621679245007"><span class="hs-identifier hs-var hs-var">comparePatterns</span></a></span></span><span> </span><span id="local-6989586621679245037"><span class="annot"><span class="annottext">(a, b)
+</span><a href="#local-6989586621679245037"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span id="local-6989586621679245038"><span class="annot"><span class="annottext">(a, b)
+</span><a href="#local-6989586621679245038"><span class="hs-identifier hs-var">p'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(a, b) -&gt; a
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">(a, b)
+</span><a href="#local-6989586621679245037"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">(a, b) -&gt; a
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">(a, b)
+</span><a href="#local-6989586621679245038"><span class="hs-identifier hs-var">p'</span></a></span></pre></body></html>

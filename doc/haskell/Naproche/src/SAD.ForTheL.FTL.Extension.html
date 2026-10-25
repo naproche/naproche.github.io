@@ -1,0 +1,848 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.ForTheL.FTL.Extension</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2001 - 2008, Andrei Paskevich,</span><span>
+</span><span id="line-4"></span><span class="hs-comment">--               (c) 2017 - 2018, Steffen Frerix</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-6"></span><span class="hs-comment">--</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- Language extensions (FTL).</span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.ForTheL.FTL.Extension</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-13"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#defExtend"><span class="hs-identifier">defExtend</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#sigExtend"><span class="hs-identifier">sigExtend</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#structSigExtend"><span class="hs-identifier">structSigExtend</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#newPredicat"><span class="hs-identifier">newPredicat</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#newNotion"><span class="hs-identifier">newNotion</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#introduceMacro"><span class="hs-identifier">introduceMacro</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>  </span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#pretypeVariable"><span class="hs-identifier">pretypeVariable</span></a></span><span>
+</span><span id="line-20"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad</span></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Applicative</span></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.State.Class</span></span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Formula.html"><span class="hs-identifier">SAD.Data.Formula</span></a></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html"><span class="hs-identifier">SAD.Data.Text.Block</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier">ProofText</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html"><span class="hs-identifier">SAD.ForTheL.Base</span></a></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.Extension.html"><span class="hs-identifier">SAD.ForTheL.Extension</span></a></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.Statement.html"><span class="hs-identifier">SAD.ForTheL.Statement</span></a></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.Reports.html"><span class="hs-identifier">SAD.ForTheL.Reports</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Reports</span></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.Base.html"><span class="hs-identifier">SAD.Parser.Base</span></a></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.Pattern.html"><span class="hs-identifier">SAD.ForTheL.Pattern</span></a></span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.FTL.Pattern.html"><span class="hs-identifier">SAD.ForTheL.FTL.Pattern</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">FTL</span></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.ForTheL.FTL.Statement.html"><span class="hs-identifier">SAD.ForTheL.FTL.Statement</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">FTL</span></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.Primitives.html"><span class="hs-identifier">SAD.Parser.Primitives</span></a></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Parser.Combinators.html"><span class="hs-identifier">SAD.Parser.Combinators</span></a></span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Position.html"><span class="hs-identifier">Isabelle.Position</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Position</span></span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#defExtend"><span class="hs-identifier hs-type">defExtend</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-44"></span><span id="defExtend"><span class="annot"><span class="annottext">defExtend :: FTL Formula
+</span><a href="SAD.ForTheL.FTL.Extension.html#defExtend"><span class="hs-identifier hs-var hs-var">defExtend</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FTL Formula
+</span><a href="SAD.ForTheL.FTL.Extension.html#defPredicat"><span class="hs-identifier hs-var">defPredicat</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Formula -&gt; FTL Formula -&gt; FTL Formula
+forall st a. Parser st a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#-%7C-"><span class="hs-operator hs-var">-|-</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Formula
+</span><a href="SAD.ForTheL.FTL.Extension.html#defNotion"><span class="hs-identifier hs-var">defNotion</span></a></span><span>
+</span><span id="line-45"></span><span>
+</span><span id="line-46"></span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#sigExtend"><span class="hs-identifier hs-type">sigExtend</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-47"></span><span id="sigExtend"><span class="annot"><span class="annottext">sigExtend :: FTL Formula
+</span><a href="SAD.ForTheL.FTL.Extension.html#sigExtend"><span class="hs-identifier hs-var hs-var">sigExtend</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FTL Formula
+</span><a href="SAD.ForTheL.FTL.Extension.html#sigPredicat"><span class="hs-identifier hs-var">sigPredicat</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Formula -&gt; FTL Formula -&gt; FTL Formula
+forall st a. Parser st a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#-%7C-"><span class="hs-operator hs-var">-|-</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Formula
+</span><a href="SAD.ForTheL.FTL.Extension.html#sigNotion"><span class="hs-identifier hs-var">sigNotion</span></a></span><span>
+</span><span id="line-48"></span><span>
+</span><span id="line-49"></span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#structSigExtend"><span class="hs-identifier hs-type">structSigExtend</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-50"></span><span id="structSigExtend"><span class="annot"><span class="annottext">structSigExtend :: FTL (Formula, Formula)
+</span><a href="SAD.ForTheL.FTL.Extension.html#structSigExtend"><span class="hs-identifier hs-var hs-var">structSigExtend</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FTL (Formula, Formula)
+</span><a href="SAD.ForTheL.FTL.Extension.html#sigStructure"><span class="hs-identifier hs-var">sigStructure</span></a></span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#defPredicat"><span class="hs-identifier hs-type">defPredicat</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-53"></span><span id="defPredicat"><span class="annot"><span class="annottext">defPredicat :: FTL Formula
+</span><a href="SAD.ForTheL.FTL.Extension.html#defPredicat"><span class="hs-identifier hs-var hs-var">defPredicat</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-special">(</span><span id="local-6989586621679251662"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251662"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251663"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251663"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">((Formula, Formula) -&gt; Maybe Text)
+-&gt; FTL (Formula, Formula) -&gt; FTL (Formula, Formula)
+forall a st. (a -&gt; Maybe Text) -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#wellFormedCheck"><span class="hs-identifier hs-var">wellFormedCheck</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula, Formula) -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Extension.html#prdVars"><span class="hs-identifier hs-var">prdVars</span></a></span><span> </span><span class="annot"><span class="annottext">FTL (Formula, Formula)
+</span><a href="#local-6989586621679251666"><span class="hs-identifier hs-var">defn</span></a></span><span>
+</span><span id="line-55"></span><span>  </span><span class="annot"><span class="annottext">Formula -&gt; FTL Formula
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; FTL Formula) -&gt; Formula -&gt; FTL Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Iff"><span class="hs-identifier hs-var">Iff</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Tag -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-var">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#HeadTerm"><span class="hs-identifier hs-var">HeadTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251662"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251663"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-57"></span><span>    </span><span id="local-6989586621679251666"><span class="annot"><span class="annottext">defn :: FTL (Formula, Formula)
+</span><a href="#local-6989586621679251666"><span class="hs-identifier hs-var hs-var">defn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span> </span><span id="local-6989586621679251674"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251674"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL Formula
+</span><a href="SAD.ForTheL.FTL.Extension.html#newPredicat"><span class="hs-identifier hs-var">newPredicat</span></a></span><span class="hs-special">;</span><span> </span><span class="annot"><span class="annottext">Parser FState ()
+</span><a href="#local-6989586621679251675"><span class="hs-identifier hs-var">equiv</span></a></span><span class="hs-special">;</span><span> </span><span id="local-6989586621679251676"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251676"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL Formula
+</span><a href="SAD.ForTheL.FTL.Statement.html#statement"><span class="hs-identifier hs-var">FTL.statement</span></a></span><span class="hs-special">;</span><span> </span><span class="annot"><span class="annottext">(Formula, Formula) -&gt; FTL (Formula, Formula)
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251674"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251676"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span>    </span><span id="local-6989586621679251675"><span class="annot"><span class="annottext">equiv :: Parser FState ()
+</span><a href="#local-6989586621679251675"><span class="hs-identifier hs-var hs-var">equiv</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">T -&gt; [[Text]] -&gt; Parser FState ()
+</span><a href="SAD.ForTheL.Reports.html#markupTokenSeqOf"><span class="hs-identifier hs-var">Reports.markupTokenSeqOf</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="SAD.ForTheL.Reports.html#defIff"><span class="hs-identifier hs-var">Reports.defIff</span></a></span><span> </span><span class="annot"><span class="annottext">[[Text]]
+</span><a href="SAD.ForTheL.Base.html#iffPhrases"><span class="hs-identifier hs-var">iffPhrases</span></a></span><span> </span><span class="annot"><span class="annottext">Parser FState () -&gt; Parser FState () -&gt; Parser FState ()
+forall a. Parser FState a -&gt; Parser FState a -&gt; Parser FState a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">&lt;|&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser FState ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#symbol"><span class="hs-identifier hs-var">symbol</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;&lt;=&gt;&quot;</span></span><span>
+</span><span id="line-59"></span><span>
+</span><span id="line-60"></span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#defNotion"><span class="hs-identifier hs-type">defNotion</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-61"></span><span id="defNotion"><span class="annot"><span class="annottext">defNotion :: FTL Formula
+</span><a href="SAD.ForTheL.FTL.Extension.html#defNotion"><span class="hs-identifier hs-var hs-var">defNotion</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-62"></span><span>  </span><span class="hs-special">(</span><span class="hs-special">(</span><span id="local-6989586621679251686"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251686"><span class="hs-identifier hs-var">n</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679251687"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251687"><span class="hs-identifier hs-var">h</span></a></span></span><span class="hs-special">)</span><span class="hs-special">,</span><span id="local-6989586621679251688"><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251688"><span class="hs-identifier hs-var">u</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(((Formula, Formula), PosVar) -&gt; Maybe Text)
+-&gt; Parser FState ((Formula, Formula), PosVar)
+-&gt; Parser FState ((Formula, Formula), PosVar)
+forall a st. (a -&gt; Maybe Text) -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#wellFormedCheck"><span class="hs-identifier hs-var">wellFormedCheck</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Formula, Formula) -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Extension.html#notionVars"><span class="hs-identifier hs-var">notionVars</span></a></span><span> </span><span class="annot"><span class="annottext">((Formula, Formula) -&gt; Maybe Text)
+-&gt; (((Formula, Formula), PosVar) -&gt; (Formula, Formula))
+-&gt; ((Formula, Formula), PosVar)
+-&gt; Maybe Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">((Formula, Formula), PosVar) -&gt; (Formula, Formula)
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Parser FState ((Formula, Formula), PosVar)
+</span><a href="#local-6989586621679251692"><span class="hs-identifier hs-var">defn</span></a></span><span class="hs-special">;</span><span> </span><span id="local-6989586621679251693"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679251693"><span class="hs-identifier hs-var">uDecl</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">PosVar -&gt; FTL Decl
+</span><a href="SAD.ForTheL.Base.html#makeDecl"><span class="hs-identifier hs-var">makeDecl</span></a></span><span> </span><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251688"><span class="hs-identifier hs-var">u</span></a></span><span>
+</span><span id="line-63"></span><span>  </span><span class="annot"><span class="annottext">Formula -&gt; FTL Formula
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; FTL Formula) -&gt; Formula -&gt; FTL Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Decl -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#dAll"><span class="hs-identifier hs-var">dAll</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679251693"><span class="hs-identifier hs-var">uDecl</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Iff"><span class="hs-identifier hs-var">Iff</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Tag -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-var">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#HeadTerm"><span class="hs-identifier hs-var">HeadTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251686"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251687"><span class="hs-identifier hs-var">h</span></a></span><span>
+</span><span id="line-64"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-65"></span><span>    </span><span id="local-6989586621679251692"><span class="annot"><span class="annottext">defn :: Parser FState ((Formula, Formula), PosVar)
+</span><a href="#local-6989586621679251692"><span class="hs-identifier hs-var hs-var">defn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-66"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679251702"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251702"><span class="hs-identifier hs-var">n</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251703"><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251703"><span class="hs-identifier hs-var">u</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL (Formula, PosVar)
+</span><a href="SAD.ForTheL.FTL.Extension.html#newNotion"><span class="hs-identifier hs-var">newNotion</span></a></span><span class="hs-special">;</span><span> </span><span class="annot"><span class="annottext">Parser FState ()
+forall {st}. Parser st ()
+</span><a href="#local-6989586621679251704"><span class="hs-identifier hs-var">isOrEq</span></a></span><span class="hs-special">;</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679251705"><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679251705"><span class="hs-identifier hs-var">q</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251706"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251706"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL (Formula -&gt; Formula, Formula)
+</span><a href="SAD.ForTheL.FTL.Statement.html#anotion"><span class="hs-identifier hs-var">FTL.anotion</span></a></span><span>
+</span><span id="line-67"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679251708"><span class="annot"><span class="annottext">v :: Formula
+</span><a href="#local-6989586621679251708"><span class="hs-identifier hs-var hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PosVar -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#pVar"><span class="hs-identifier hs-var">pVar</span></a></span><span> </span><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251703"><span class="hs-identifier hs-var">u</span></a></span><span class="hs-special">;</span><span> </span><span id="local-6989586621679251710"><span class="annot"><span class="annottext">fn :: Formula -&gt; Formula
+</span><a href="#local-6989586621679251710"><span class="hs-identifier hs-var hs-var">fn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#replace"><span class="hs-identifier hs-var">replace</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251708"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679251712"><span class="hs-identifier hs-var">trm</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251702"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-68"></span><span>      </span><span id="local-6989586621679251713"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251713"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679251710"><span class="hs-identifier hs-var">fn</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; (Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679251705"><span class="hs-identifier hs-var">q</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; FTL Formula -&gt; FTL Formula
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Formula] -&gt; FTL Formula
+</span><a href="SAD.ForTheL.Statement.html#dig"><span class="hs-identifier hs-var">dig</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251706"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251708"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-69"></span><span>      </span><span class="annot"><span class="annottext">((Formula, Formula), PosVar)
+-&gt; Parser FState ((Formula, Formula), PosVar)
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251702"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251713"><span class="hs-identifier hs-var">h</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251703"><span class="hs-identifier hs-var">u</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-70"></span><span>
+</span><span id="line-71"></span><span>    </span><span id="local-6989586621679251704"><span class="annot"><span class="annottext">isOrEq :: Parser st ()
+</span><a href="#local-6989586621679251704"><span class="hs-identifier hs-var hs-var">isOrEq</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser st ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier hs-var">token'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;=&quot;</span></span><span> </span><span class="annot"><span class="annottext">Parser st () -&gt; Parser st () -&gt; Parser st ()
+forall a. Parser st a -&gt; Parser st a -&gt; Parser st a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">&lt;|&gt;</span></span><span> </span><span class="annot"><span class="annottext">Parser st ()
+forall {st}. Parser st ()
+</span><a href="#local-6989586621679251719"><span class="hs-identifier hs-var">isEq</span></a></span><span>
+</span><span id="line-72"></span><span>    </span><span id="local-6989586621679251719"><span class="annot"><span class="annottext">isEq :: Parser st ()
+</span><a href="#local-6989586621679251719"><span class="hs-identifier hs-var hs-var">isEq</span></a></span></span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser st ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier hs-var">token'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;is&quot;</span></span><span> </span><span class="annot"><span class="annottext">Parser st () -&gt; Parser st () -&gt; Parser st ()
+forall a b. Parser st a -&gt; Parser st b -&gt; Parser st b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; m b -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">() -&gt; Parser st () -&gt; Parser st ()
+forall a st. a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#optLL1"><span class="hs-identifier hs-var">optLL1</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Parser st ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier hs-var">token'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;equal&quot;</span></span><span> </span><span class="annot"><span class="annottext">Parser st () -&gt; Parser st () -&gt; Parser st ()
+forall a b. Parser st a -&gt; Parser st b -&gt; Parser st b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; m b -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser st ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier hs-var">token'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;to&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-73"></span><span>    </span><span id="local-6989586621679251712"><span class="annot"><span class="annottext">trm :: Formula -&gt; Formula
+</span><a href="#local-6989586621679251712"><span class="hs-identifier hs-var hs-var">trm</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">trmName :: Formula -&gt; TermName
+</span><a href="SAD.Data.Formula.Base.html#trmName"><span class="hs-identifier hs-var">trmName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermEquality"><span class="hs-identifier hs-var">TermEquality</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">trmArgs :: Formula -&gt; [Formula]
+</span><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span id="local-6989586621679251730"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251730"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">]</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251730"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">;</span><span> </span><span class="annot"><a href="#local-6989586621679251712"><span class="hs-identifier hs-var">trm</span></a></span><span> </span><span id="local-6989586621679251731"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251731"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251731"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-74"></span><span>
+</span><span id="line-75"></span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#sigPredicat"><span class="hs-identifier hs-type">sigPredicat</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-76"></span><span id="sigPredicat"><span class="annot"><span class="annottext">sigPredicat :: FTL Formula
+</span><a href="SAD.ForTheL.FTL.Extension.html#sigPredicat"><span class="hs-identifier hs-var hs-var">sigPredicat</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-77"></span><span>  </span><span class="hs-special">(</span><span id="local-6989586621679251732"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251732"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679251733"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251733"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">((Formula, Formula) -&gt; Maybe Text)
+-&gt; FTL (Formula, Formula) -&gt; FTL (Formula, Formula)
+forall a st. (a -&gt; Maybe Text) -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#wellFormedCheck"><span class="hs-identifier hs-var">wellFormedCheck</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula, Formula) -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Extension.html#prdVars"><span class="hs-identifier hs-var">prdVars</span></a></span><span> </span><span class="annot"><span class="annottext">FTL (Formula, Formula)
+</span><a href="#local-6989586621679251734"><span class="hs-identifier hs-var">sig</span></a></span><span>
+</span><span id="line-78"></span><span>  </span><span class="annot"><span class="annottext">Formula -&gt; FTL Formula
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; FTL Formula) -&gt; Formula -&gt; FTL Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Imp"><span class="hs-identifier hs-var">Imp</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Tag -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-var">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#HeadTerm"><span class="hs-identifier hs-var">HeadTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251732"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251733"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span id="line-79"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-80"></span><span>    </span><span id="local-6989586621679251734"><span class="annot"><span class="annottext">sig :: FTL (Formula, Formula)
+</span><a href="#local-6989586621679251734"><span class="hs-identifier hs-var hs-var">sig</span></a></span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span> </span><span id="local-6989586621679251740"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251740"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL Formula
+</span><a href="SAD.ForTheL.FTL.Extension.html#newPredicat"><span class="hs-identifier hs-var">newPredicat</span></a></span><span class="hs-special">;</span><span> </span><span class="annot"><span class="annottext">Parser FState ()
+</span><a href="#local-6989586621679251741"><span class="hs-identifier hs-var">imp</span></a></span><span class="hs-special">;</span><span> </span><span id="local-6989586621679251742"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251742"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL Formula
+</span><a href="SAD.ForTheL.FTL.Statement.html#statement"><span class="hs-identifier hs-var">FTL.statement</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Formula -&gt; FTL Formula -&gt; FTL Formula
+forall st a. Parser st a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#%3C%2F%3E"><span class="hs-operator hs-var">&lt;/&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">FTL Formula
+forall {st}. Parser st Formula
+</span><a href="#local-6989586621679251744"><span class="hs-identifier hs-var">noInfo</span></a></span><span class="hs-special">;</span><span> </span><span class="annot"><span class="annottext">(Formula, Formula) -&gt; FTL (Formula, Formula)
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251740"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251742"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-81"></span><span>    </span><span id="local-6989586621679251741"><span class="annot"><span class="annottext">imp :: Parser FState ()
+</span><a href="#local-6989586621679251741"><span class="hs-identifier hs-var hs-var">imp</span></a></span></span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser FState ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier hs-var">token'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;is&quot;</span></span><span> </span><span class="annot"><span class="annottext">Parser FState () -&gt; Parser FState () -&gt; Parser FState ()
+forall a. Parser FState a -&gt; Parser FState a -&gt; Parser FState a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">&lt;|&gt;</span></span><span> </span><span class="annot"><span class="annottext">T -&gt; Text -&gt; Parser FState ()
+</span><a href="SAD.ForTheL.Reports.html#markupToken"><span class="hs-identifier hs-var">Reports.markupToken</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="SAD.ForTheL.Reports.html#sigImp"><span class="hs-identifier hs-var">Reports.sigImp</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;implies&quot;</span></span><span> </span><span class="annot"><span class="annottext">Parser FState () -&gt; Parser FState () -&gt; Parser FState ()
+forall a. Parser FState a -&gt; Parser FState a -&gt; Parser FState a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">&lt;|&gt;</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Parser FState ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#symbol"><span class="hs-identifier hs-var">symbol</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;=&gt;&quot;</span></span><span>
+</span><span id="line-82"></span><span>    </span><span id="local-6989586621679251744"><span class="annot"><span class="annottext">noInfo :: Parser st Formula
+</span><a href="#local-6989586621679251744"><span class="hs-identifier hs-var hs-var">noInfo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Parser st ()
+forall st. [Text] -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#tokenSeq%27"><span class="hs-identifier hs-var">tokenSeq'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;an&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;atom&quot;</span></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">Parser st () -&gt; Parser st () -&gt; Parser st ()
+forall st a. Parser st a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#%3C%2F%3E"><span class="hs-operator hs-var">&lt;/&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; Parser st ()
+forall st. [Text] -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#tokenSeq%27"><span class="hs-identifier hs-var">tokenSeq'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;a&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;relation&quot;</span></span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Parser st () -&gt; Parser st Formula -&gt; Parser st Formula
+forall a b. Parser st a -&gt; Parser st b -&gt; Parser st b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; m b -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Parser st Formula
+forall a. a -&gt; Parser st a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Data.Formula.Base.html#Top"><span class="hs-identifier hs-var">Top</span></a></span><span>
+</span><span id="line-83"></span><span>
+</span><span id="line-84"></span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#sigNotion"><span class="hs-identifier hs-type">sigNotion</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-85"></span><span id="sigNotion"><span class="annot"><span class="annottext">sigNotion :: FTL Formula
+</span><a href="SAD.ForTheL.FTL.Extension.html#sigNotion"><span class="hs-identifier hs-var hs-var">sigNotion</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-86"></span><span>  </span><span class="hs-special">(</span><span class="hs-special">(</span><span id="local-6989586621679251760"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251760"><span class="hs-identifier hs-var">n</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679251761"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251761"><span class="hs-identifier hs-var">h</span></a></span></span><span class="hs-special">)</span><span class="hs-special">,</span><span id="local-6989586621679251762"><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251762"><span class="hs-identifier hs-var">u</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(((Formula, Formula), PosVar) -&gt; Maybe Text)
+-&gt; Parser FState ((Formula, Formula), PosVar)
+-&gt; Parser FState ((Formula, Formula), PosVar)
+forall a st. (a -&gt; Maybe Text) -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#wellFormedCheck"><span class="hs-identifier hs-var">wellFormedCheck</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Formula, Formula) -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Extension.html#notionVars"><span class="hs-identifier hs-var">notionVars</span></a></span><span> </span><span class="annot"><span class="annottext">((Formula, Formula) -&gt; Maybe Text)
+-&gt; (((Formula, Formula), PosVar) -&gt; (Formula, Formula))
+-&gt; ((Formula, Formula), PosVar)
+-&gt; Maybe Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">((Formula, Formula), PosVar) -&gt; (Formula, Formula)
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Parser FState ((Formula, Formula), PosVar)
+</span><a href="#local-6989586621679251763"><span class="hs-identifier hs-var">sig</span></a></span><span>
+</span><span id="line-87"></span><span>  </span><span id="local-6989586621679251764"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679251764"><span class="hs-identifier hs-var">uDecl</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">PosVar -&gt; FTL Decl
+</span><a href="SAD.ForTheL.Base.html#makeDecl"><span class="hs-identifier hs-var">makeDecl</span></a></span><span> </span><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251762"><span class="hs-identifier hs-var">u</span></a></span><span>
+</span><span id="line-88"></span><span>  </span><span class="annot"><span class="annottext">Formula -&gt; FTL Formula
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; FTL Formula) -&gt; Formula -&gt; FTL Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Decl -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#dAll"><span class="hs-identifier hs-var">dAll</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679251764"><span class="hs-identifier hs-var">uDecl</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Imp"><span class="hs-identifier hs-var">Imp</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Tag -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-var">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#HeadTerm"><span class="hs-identifier hs-var">HeadTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251760"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251761"><span class="hs-identifier hs-var">h</span></a></span><span>
+</span><span id="line-89"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-90"></span><span>    </span><span id="local-6989586621679251763"><span class="annot"><span class="annottext">sig :: Parser FState ((Formula, Formula), PosVar)
+</span><a href="#local-6989586621679251763"><span class="hs-identifier hs-var hs-var">sig</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-91"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679251772"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251772"><span class="hs-identifier hs-var">n</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251773"><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251773"><span class="hs-identifier hs-var">u</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL (Formula, PosVar)
+</span><a href="SAD.ForTheL.FTL.Extension.html#newNotion"><span class="hs-identifier hs-var">newNotion</span></a></span><span>
+</span><span id="line-92"></span><span>      </span><span class="annot"><span class="annottext">Text -&gt; Parser FState ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier hs-var">token'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;is&quot;</span></span><span>
+</span><span id="line-93"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679251774"><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679251774"><span class="hs-identifier hs-var">q</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251775"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251775"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL (Formula -&gt; Formula, Formula)
+</span><a href="SAD.ForTheL.FTL.Statement.html#anotion"><span class="hs-identifier hs-var">FTL.anotion</span></a></span><span> </span><span class="annot"><span class="annottext">FTL (Formula -&gt; Formula, Formula)
+-&gt; FTL (Formula -&gt; Formula, Formula)
+-&gt; FTL (Formula -&gt; Formula, Formula)
+forall st a. Parser st a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#-%7C-"><span class="hs-operator hs-var">-|-</span></a></span><span> </span><span class="annot"><span class="annottext">FTL (Formula -&gt; Formula, Formula)
+forall {st} {a}. Parser st (a -&gt; a, Formula)
+</span><a href="#local-6989586621679251776"><span class="hs-identifier hs-var">noInfo</span></a></span><span>
+</span><span id="line-94"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679251777"><span class="annot"><span class="annottext">v :: Formula
+</span><a href="#local-6989586621679251777"><span class="hs-identifier hs-var hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PosVar -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#pVar"><span class="hs-identifier hs-var">pVar</span></a></span><span> </span><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251773"><span class="hs-identifier hs-var">u</span></a></span><span>
+</span><span id="line-95"></span><span>      </span><span id="local-6989586621679251778"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251778"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#replace"><span class="hs-identifier hs-var">replace</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251777"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679251779"><span class="hs-identifier hs-var">trm</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251772"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; (Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679251774"><span class="hs-identifier hs-var">q</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; FTL Formula -&gt; FTL Formula
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Formula] -&gt; FTL Formula
+</span><a href="SAD.ForTheL.Statement.html#dig"><span class="hs-identifier hs-var">dig</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251775"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251777"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-96"></span><span>      </span><span class="annot"><span class="annottext">((Formula, Formula), PosVar)
+-&gt; Parser FState ((Formula, Formula), PosVar)
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251772"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251778"><span class="hs-identifier hs-var">h</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251773"><span class="hs-identifier hs-var">u</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-97"></span><span>
+</span><span id="line-98"></span><span>    </span><span id="local-6989586621679251776"><span class="annot"><span class="annottext">noInfo :: Parser st (a -&gt; a, Formula)
+</span><a href="#local-6989586621679251776"><span class="hs-identifier hs-var hs-var">noInfo</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-99"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Text] -&gt; Parser st ()
+forall st. [Text] -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#tokenSeq%27"><span class="hs-identifier hs-var">tokenSeq'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;a&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;notion&quot;</span></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">Parser st () -&gt; Parser st () -&gt; Parser st ()
+forall st a. Parser st a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#%3C%2F%3E"><span class="hs-operator hs-var">&lt;/&gt;</span></a></span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; Parser st ()
+forall st. [Text] -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#tokenSeq%27"><span class="hs-identifier hs-var">tokenSeq'</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;a&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;constant&quot;</span></span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Parser st ()
+-&gt; Parser st (a -&gt; a, Formula) -&gt; Parser st (a -&gt; a, Formula)
+forall a b. Parser st a -&gt; Parser st b -&gt; Parser st b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; m b -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">(a -&gt; a, Formula) -&gt; Parser st (a -&gt; a, Formula)
+forall a. a -&gt; Parser st a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; a
+forall a. a -&gt; a
+</span><span class="hs-identifier hs-var">id</span></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Data.Formula.Base.html#Top"><span class="hs-identifier hs-var">Top</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-100"></span><span>    </span><span id="local-6989586621679251779"><span class="annot"><span class="annottext">trm :: Formula -&gt; Formula
+</span><a href="#local-6989586621679251779"><span class="hs-identifier hs-var hs-var">trm</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">trmName :: Formula -&gt; TermName
+</span><a href="SAD.Data.Formula.Base.html#trmName"><span class="hs-identifier hs-var">trmName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermEquality"><span class="hs-identifier hs-var">TermEquality</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">trmArgs :: Formula -&gt; [Formula]
+</span><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span id="local-6989586621679251787"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251787"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">]</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251787"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">;</span><span> </span><span class="annot"><a href="#local-6989586621679251779"><span class="hs-identifier hs-var">trm</span></a></span><span> </span><span id="local-6989586621679251788"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251788"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251788"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-101"></span><span>
+</span><span id="line-102"></span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#sigStructure"><span class="hs-identifier hs-type">sigStructure</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-103"></span><span id="sigStructure"><span class="annot"><span class="annottext">sigStructure :: FTL (Formula, Formula)
+</span><a href="SAD.ForTheL.FTL.Extension.html#sigStructure"><span class="hs-identifier hs-var hs-var">sigStructure</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-104"></span><span>  </span><span class="hs-special">(</span><span class="hs-special">(</span><span id="local-6989586621679251789"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251789"><span class="hs-identifier hs-var">n</span></a></span></span><span class="hs-special">,</span><span id="local-6989586621679251790"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251790"><span class="hs-identifier hs-var">h</span></a></span></span><span class="hs-special">)</span><span class="hs-special">,</span><span id="local-6989586621679251791"><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251791"><span class="hs-identifier hs-var">u</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(((Formula, Formula), PosVar) -&gt; Maybe Text)
+-&gt; Parser FState ((Formula, Formula), PosVar)
+-&gt; Parser FState ((Formula, Formula), PosVar)
+forall a st. (a -&gt; Maybe Text) -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#wellFormedCheck"><span class="hs-identifier hs-var">wellFormedCheck</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Formula, Formula) -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Extension.html#notionVars"><span class="hs-identifier hs-var">notionVars</span></a></span><span> </span><span class="annot"><span class="annottext">((Formula, Formula) -&gt; Maybe Text)
+-&gt; (((Formula, Formula), PosVar) -&gt; (Formula, Formula))
+-&gt; ((Formula, Formula), PosVar)
+-&gt; Maybe Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">((Formula, Formula), PosVar) -&gt; (Formula, Formula)
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Parser FState ((Formula, Formula), PosVar)
+</span><a href="#local-6989586621679251792"><span class="hs-identifier hs-var">sig</span></a></span><span>
+</span><span id="line-105"></span><span>  </span><span id="local-6989586621679251793"><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679251793"><span class="hs-identifier hs-var">uDecl</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">PosVar -&gt; FTL Decl
+</span><a href="SAD.ForTheL.Base.html#makeDecl"><span class="hs-identifier hs-var">makeDecl</span></a></span><span> </span><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251791"><span class="hs-identifier hs-var">u</span></a></span><span>
+</span><span id="line-106"></span><span>  </span><span class="annot"><span class="annottext">(Formula, Formula) -&gt; FTL (Formula, Formula)
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251789"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Decl -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#dAll"><span class="hs-identifier hs-var">dAll</span></a></span><span> </span><span class="annot"><span class="annottext">Decl
+</span><a href="#local-6989586621679251793"><span class="hs-identifier hs-var">uDecl</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; Formula -&gt; Formula
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Imp"><span class="hs-identifier hs-var">Imp</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Tag -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#Tag"><span class="hs-identifier hs-var">Tag</span></a></span><span> </span><span class="annot"><span class="annottext">Tag
+</span><a href="SAD.Data.Tag.html#HeadTerm"><span class="hs-identifier hs-var">HeadTerm</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251789"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251790"><span class="hs-identifier hs-var">h</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-107"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-108"></span><span>    </span><span id="local-6989586621679251792"><span class="annot"><span class="annottext">sig :: Parser FState ((Formula, Formula), PosVar)
+</span><a href="#local-6989586621679251792"><span class="hs-identifier hs-var hs-var">sig</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-109"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679251804"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251804"><span class="hs-identifier hs-var">n</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251805"><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251805"><span class="hs-identifier hs-var">u</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL (Formula, PosVar)
+</span><a href="SAD.ForTheL.FTL.Extension.html#newNotion"><span class="hs-identifier hs-var">newNotion</span></a></span><span>
+</span><span id="line-110"></span><span>      </span><span class="annot"><span class="annottext">Text -&gt; Parser FState ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier hs-var">token'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;is&quot;</span></span><span>
+</span><span id="line-111"></span><span>      </span><span class="annot"><span class="annottext">Text -&gt; Parser FState ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier hs-var">token'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;a&quot;</span></span><span>
+</span><span id="line-112"></span><span>      </span><span class="annot"><span class="annottext">Text -&gt; Parser FState ()
+forall st. Text -&gt; Parser st ()
+</span><a href="SAD.Parser.Primitives.html#token%27"><span class="hs-identifier hs-var">token'</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;structure&quot;</span></span><span>
+</span><span id="line-113"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679251806"><span class="annot"><span class="annottext">v :: Formula
+</span><a href="#local-6989586621679251806"><span class="hs-identifier hs-var hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">PosVar -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#pVar"><span class="hs-identifier hs-var">pVar</span></a></span><span> </span><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251805"><span class="hs-identifier hs-var">u</span></a></span><span>
+</span><span id="line-114"></span><span>      </span><span id="local-6989586621679251807"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251807"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Formula -&gt; Formula
+</span><a href="SAD.Data.Formula.Base.html#replace"><span class="hs-identifier hs-var">replace</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251806"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679251808"><span class="hs-identifier hs-var">trm</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251804"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; FTL Formula -&gt; FTL Formula
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Formula] -&gt; FTL Formula
+</span><a href="SAD.ForTheL.Statement.html#dig"><span class="hs-identifier hs-var">dig</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="SAD.Data.Formula.Base.html#Top"><span class="hs-identifier hs-var">Top</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251806"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-115"></span><span>      </span><span class="annot"><span class="annottext">((Formula, Formula), PosVar)
+-&gt; Parser FState ((Formula, Formula), PosVar)
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251804"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">,</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251807"><span class="hs-identifier hs-var">h</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251805"><span class="hs-identifier hs-var">u</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-116"></span><span>    </span><span id="local-6989586621679251808"><span class="annot"><span class="annottext">trm :: Formula -&gt; Formula
+</span><a href="#local-6989586621679251808"><span class="hs-identifier hs-var hs-var">trm</span></a></span></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Trm"><span class="hs-identifier hs-type">Trm</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">trmName :: Formula -&gt; TermName
+</span><a href="SAD.Data.Formula.Base.html#trmName"><span class="hs-identifier hs-var">trmName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">TermName
+</span><a href="SAD.Data.Terms.html#TermEquality"><span class="hs-identifier hs-var">TermEquality</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">trmArgs :: Formula -&gt; [Formula]
+</span><a href="SAD.Data.Formula.Base.html#trmArgs"><span class="hs-identifier hs-var">trmArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Formula
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span id="local-6989586621679251809"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251809"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">]</span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251809"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">;</span><span> </span><span class="annot"><a href="#local-6989586621679251808"><span class="hs-identifier hs-var">trm</span></a></span><span> </span><span id="local-6989586621679251810"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251810"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251810"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-117"></span><span>
+</span><span id="line-118"></span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#newPredicat"><span class="hs-identifier hs-type">newPredicat</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>
+</span><span id="line-119"></span><span id="newPredicat"><span class="annot"><span class="annottext">newPredicat :: FTL Formula
+</span><a href="SAD.ForTheL.FTL.Extension.html#newPredicat"><span class="hs-identifier hs-var hs-var">newPredicat</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span> </span><span id="local-6989586621679251811"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251811"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL PosVar -&gt; FTL Formula
+</span><a href="SAD.ForTheL.FTL.Pattern.html#newPrdPattern"><span class="hs-identifier hs-var">FTL.newPrdPattern</span></a></span><span> </span><span class="annot"><span class="annottext">FTL PosVar
+</span><a href="SAD.ForTheL.Pattern.html#knownVariable"><span class="hs-identifier hs-var">knownVariable</span></a></span><span class="hs-special">;</span><span> </span><span class="annot"><span class="annottext">Parser FState FState
+forall s (m :: * -&gt; *). MonadState s m =&gt; m s
+</span><span class="hs-identifier hs-var">get</span></span><span> </span><span class="annot"><span class="annottext">Parser FState FState -&gt; (FState -&gt; FTL Formula) -&gt; FTL Formula
+forall a b.
+Parser FState a -&gt; (a -&gt; Parser FState b) -&gt; Parser FState b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Bool -&gt; FState -&gt; FTL Formula
+</span><a href="SAD.ForTheL.Pattern.html#addExpr"><span class="hs-identifier hs-var">addExpr</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251811"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251811"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-120"></span><span>
+</span><span id="line-121"></span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#newNotion"><span class="hs-identifier hs-type">newNotion</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Data.VarName.html#PosVar"><span class="hs-identifier hs-type">PosVar</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-122"></span><span id="newNotion"><span class="annot"><span class="annottext">newNotion :: FTL (Formula, PosVar)
+</span><a href="SAD.ForTheL.FTL.Extension.html#newNotion"><span class="hs-identifier hs-var hs-var">newNotion</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-123"></span><span>  </span><span class="hs-special">(</span><span id="local-6989586621679251816"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251816"><span class="hs-identifier hs-var">n</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251817"><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251817"><span class="hs-identifier hs-var">u</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL PosVar -&gt; FTL (Formula, PosVar)
+</span><a href="SAD.ForTheL.FTL.Pattern.html#newNotionPattern"><span class="hs-identifier hs-var">FTL.newNotionPattern</span></a></span><span> </span><span class="annot"><span class="annottext">FTL PosVar
+</span><a href="SAD.ForTheL.Pattern.html#knownVariable"><span class="hs-identifier hs-var">knownVariable</span></a></span><span class="hs-special">;</span><span>
+</span><span id="line-124"></span><span>  </span><span id="local-6989586621679251819"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251819"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser FState FState
+forall s (m :: * -&gt; *). MonadState s m =&gt; m s
+</span><span class="hs-identifier hs-var">get</span></span><span> </span><span class="annot"><span class="annottext">Parser FState FState -&gt; (FState -&gt; FTL Formula) -&gt; FTL Formula
+forall a b.
+Parser FState a -&gt; (a -&gt; Parser FState b) -&gt; Parser FState b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Bool -&gt; FState -&gt; FTL Formula
+</span><a href="SAD.ForTheL.Pattern.html#addExpr"><span class="hs-identifier hs-var">addExpr</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251816"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251816"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span>
+</span><span id="line-125"></span><span>  </span><span class="annot"><span class="annottext">(Formula, PosVar) -&gt; FTL (Formula, PosVar)
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251819"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251817"><span class="hs-identifier hs-var">u</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-126"></span><span>
+</span><span id="line-127"></span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#introduceMacro"><span class="hs-identifier hs-type">introduceMacro</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span><span>
+</span><span id="line-128"></span><span id="introduceMacro"><span class="annot"><span class="annottext">introduceMacro :: FTL ProofText
+</span><a href="SAD.ForTheL.FTL.Extension.html#introduceMacro"><span class="hs-identifier hs-var hs-var">introduceMacro</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-129"></span><span>  </span><span id="local-6989586621679251820"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251820"><span class="hs-identifier hs-var">pos1</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser FState T
+forall st. Parser st T
+</span><a href="SAD.Parser.Base.html#getPos"><span class="hs-identifier hs-var">getPos</span></a></span><span>
+</span><span id="line-130"></span><span>  </span><span class="annot"><span class="annottext">T -&gt; Text -&gt; Parser FState ()
+</span><a href="SAD.ForTheL.Reports.html#markupToken"><span class="hs-identifier hs-var">Reports.markupToken</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="SAD.ForTheL.Reports.html#macroLet"><span class="hs-identifier hs-var">Reports.macroLet</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;let&quot;</span></span><span>
+</span><span id="line-131"></span><span>  </span><span class="hs-special">(</span><span id="local-6989586621679251823"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251823"><span class="hs-identifier hs-var">pos2</span></a></span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679251824"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251824"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251825"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251825"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser FState (T, (Formula, Formula))
+-&gt; Parser FState (T, (Formula, Formula))
+forall b st a. Show b =&gt; Parser st (a, b) -&gt; Parser st (a, b)
+</span><a href="SAD.Parser.Combinators.html#narrow2"><span class="hs-identifier hs-var">narrow2</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Parser FState (T, (Formula, Formula))
+</span><a href="#local-6989586621679251827"><span class="hs-identifier hs-var">prd</span></a></span><span> </span><span class="annot"><span class="annottext">Parser FState (T, (Formula, Formula))
+-&gt; Parser FState (T, (Formula, Formula))
+-&gt; Parser FState (T, (Formula, Formula))
+forall st a. Parser st a -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#-%7C-"><span class="hs-operator hs-var">-|-</span></a></span><span> </span><span class="annot"><span class="annottext">Parser FState (T, (Formula, Formula))
+</span><a href="#local-6989586621679251828"><span class="hs-identifier hs-var">notion</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-132"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679251829"><span class="annot"><span class="annottext">pos :: T
+</span><a href="#local-6989586621679251829"><span class="hs-identifier hs-var hs-var">pos</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Range -&gt; T
+</span><a href="Isabelle.Position.html#range_position"><span class="hs-identifier hs-var">Position.range_position</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251820"><span class="hs-identifier hs-var">pos1</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251823"><span class="hs-identifier hs-var">pos2</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-133"></span><span>  </span><span class="annot"><span class="annottext">T -&gt; Parser FState ()
+</span><a href="SAD.ForTheL.Reports.html#addMacroReport"><span class="hs-identifier hs-var">Reports.addMacroReport</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251829"><span class="hs-identifier hs-var">pos</span></a></span><span>
+</span><span id="line-134"></span><span>  </span><span id="local-6989586621679251832"><span class="annot"><span class="annottext">FState
+</span><a href="#local-6989586621679251832"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser FState FState
+forall s (m :: * -&gt; *). MonadState s m =&gt; m s
+</span><span class="hs-identifier hs-var">get</span></span><span>
+</span><span id="line-135"></span><span>  </span><span class="annot"><span class="annottext">Formula -&gt; Formula -&gt; Bool -&gt; FState -&gt; FTL Formula
+</span><a href="SAD.ForTheL.Pattern.html#addExpr"><span class="hs-identifier hs-var">addExpr</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251824"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.ForTheL.Extension.html#ignoreNames"><span class="hs-identifier hs-var">ignoreNames</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251825"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">FState
+</span><a href="#local-6989586621679251832"><span class="hs-identifier hs-var">st</span></a></span><span>
+</span><span id="line-136"></span><span>  </span><span class="annot"><span class="annottext">ProofText -&gt; FTL ProofText
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(ProofText -&gt; FTL ProofText) -&gt; ProofText -&gt; FTL ProofText
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">T -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextMacro"><span class="hs-identifier hs-var">ProofTextMacro</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251829"><span class="hs-identifier hs-var">pos</span></a></span><span>
+</span><span id="line-137"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-138"></span><span>    </span><span class="annot"><a href="#local-6989586621679251827"><span class="hs-identifier hs-type">prd</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679251828"><span class="hs-identifier hs-type">notion</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-139"></span><span>    </span><span id="local-6989586621679251827"><span class="annot"><span class="annottext">prd :: Parser FState (T, (Formula, Formula))
+</span><a href="#local-6989586621679251827"><span class="hs-identifier hs-var hs-var">prd</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">((T, (Formula, Formula)) -&gt; Maybe Text)
+-&gt; Parser FState (T, (Formula, Formula))
+-&gt; Parser FState (T, (Formula, Formula))
+forall a st. (a -&gt; Maybe Text) -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#wellFormedCheck"><span class="hs-identifier hs-var">wellFormedCheck</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Formula, Formula) -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Extension.html#prdVars"><span class="hs-identifier hs-var">prdVars</span></a></span><span> </span><span class="annot"><span class="annottext">((Formula, Formula) -&gt; Maybe Text)
+-&gt; ((T, (Formula, Formula)) -&gt; (Formula, Formula))
+-&gt; (T, (Formula, Formula))
+-&gt; Maybe Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(T, (Formula, Formula)) -&gt; (Formula, Formula)
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Parser FState (T, (Formula, Formula))
+ -&gt; Parser FState (T, (Formula, Formula)))
+-&gt; Parser FState (T, (Formula, Formula))
+-&gt; Parser FState (T, (Formula, Formula))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-140"></span><span>      </span><span id="local-6989586621679251836"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251836"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL PosVar -&gt; FTL Formula
+</span><a href="SAD.ForTheL.FTL.Pattern.html#newPrdPattern"><span class="hs-identifier hs-var">FTL.newPrdPattern</span></a></span><span> </span><span class="annot"><span class="annottext">FTL PosVar
+</span><a href="SAD.ForTheL.Pattern.html#singleLetterVariable"><span class="hs-identifier hs-var">singleLetterVariable</span></a></span><span>
+</span><span id="line-141"></span><span>      </span><span class="annot"><span class="annottext">T -&gt; [[Text]] -&gt; Parser FState ()
+</span><a href="SAD.ForTheL.Reports.html#markupTokenSeqOf"><span class="hs-identifier hs-var">Reports.markupTokenSeqOf</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="SAD.ForTheL.Reports.html#macroLet"><span class="hs-identifier hs-var">Reports.macroLet</span></a></span><span> </span><span class="annot"><span class="annottext">[[Text]]
+</span><a href="SAD.ForTheL.Base.html#standForPhrases"><span class="hs-identifier hs-var">standForPhrases</span></a></span><span>
+</span><span id="line-142"></span><span>      </span><span id="local-6989586621679251839"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251839"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL Formula
+</span><a href="SAD.ForTheL.FTL.Statement.html#statement"><span class="hs-identifier hs-var">FTL.statement</span></a></span><span>
+</span><span id="line-143"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251840"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251840"><span class="hs-identifier hs-var">pos2</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser FState Range
+forall st. Parser st Range
+</span><a href="SAD.Parser.Combinators.html#dot"><span class="hs-identifier hs-var">dot</span></a></span><span>
+</span><span id="line-144"></span><span>      </span><span class="annot"><span class="annottext">(T, (Formula, Formula)) -&gt; Parser FState (T, (Formula, Formula))
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251840"><span class="hs-identifier hs-var">pos2</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251836"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251839"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-145"></span><span>    </span><span id="local-6989586621679251828"><span class="annot"><span class="annottext">notion :: Parser FState (T, (Formula, Formula))
+</span><a href="#local-6989586621679251828"><span class="hs-identifier hs-var hs-var">notion</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">((T, (Formula, Formula)) -&gt; Maybe Text)
+-&gt; Parser FState (T, (Formula, Formula))
+-&gt; Parser FState (T, (Formula, Formula))
+forall a st. (a -&gt; Maybe Text) -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#wellFormedCheck"><span class="hs-identifier hs-var">wellFormedCheck</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Formula, Formula) -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Extension.html#funVars"><span class="hs-identifier hs-var">funVars</span></a></span><span> </span><span class="annot"><span class="annottext">((Formula, Formula) -&gt; Maybe Text)
+-&gt; ((T, (Formula, Formula)) -&gt; (Formula, Formula))
+-&gt; (T, (Formula, Formula))
+-&gt; Maybe Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(T, (Formula, Formula)) -&gt; (Formula, Formula)
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Parser FState (T, (Formula, Formula))
+ -&gt; Parser FState (T, (Formula, Formula)))
+-&gt; Parser FState (T, (Formula, Formula))
+-&gt; Parser FState (T, (Formula, Formula))
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-146"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679251843"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251843"><span class="hs-identifier hs-var">n</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251844"><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251844"><span class="hs-identifier hs-var">u</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL PosVar -&gt; FTL (Formula, PosVar)
+</span><a href="SAD.ForTheL.FTL.Pattern.html#unnamedNotion"><span class="hs-identifier hs-var">FTL.unnamedNotion</span></a></span><span> </span><span class="annot"><span class="annottext">FTL PosVar
+</span><a href="SAD.ForTheL.Pattern.html#singleLetterVariable"><span class="hs-identifier hs-var">singleLetterVariable</span></a></span><span>
+</span><span id="line-147"></span><span>      </span><span class="annot"><span class="annottext">T -&gt; [[Text]] -&gt; Parser FState ()
+</span><a href="SAD.ForTheL.Reports.html#markupTokenSeqOf"><span class="hs-identifier hs-var">Reports.markupTokenSeqOf</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="SAD.ForTheL.Reports.html#macroLet"><span class="hs-identifier hs-var">Reports.macroLet</span></a></span><span> </span><span class="annot"><span class="annottext">[[Text]]
+</span><a href="SAD.ForTheL.Base.html#standForPhrases"><span class="hs-identifier hs-var">standForPhrases</span></a></span><span>
+</span><span id="line-148"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679251846"><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679251846"><span class="hs-identifier hs-var">q</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251847"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251847"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL (Formula -&gt; Formula, Formula)
+</span><a href="SAD.ForTheL.FTL.Statement.html#anotion"><span class="hs-identifier hs-var">FTL.anotion</span></a></span><span>
+</span><span id="line-149"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251848"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251848"><span class="hs-identifier hs-var">pos2</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser FState Range
+forall st. Parser st Range
+</span><a href="SAD.Parser.Combinators.html#dot"><span class="hs-identifier hs-var">dot</span></a></span><span>
+</span><span id="line-150"></span><span>      </span><span id="local-6989586621679251849"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251849"><span class="hs-identifier hs-var">h</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679251846"><span class="hs-identifier hs-var">q</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; FTL Formula -&gt; FTL Formula
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Formula] -&gt; FTL Formula
+</span><a href="SAD.ForTheL.Statement.html#dig"><span class="hs-identifier hs-var">dig</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251847"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">PosVar -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#pVar"><span class="hs-identifier hs-var">pVar</span></a></span><span> </span><span class="annot"><span class="annottext">PosVar
+</span><a href="#local-6989586621679251844"><span class="hs-identifier hs-var">u</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-151"></span><span>      </span><span class="annot"><span class="annottext">(T, (Formula, Formula)) -&gt; Parser FState (T, (Formula, Formula))
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251848"><span class="hs-identifier hs-var">pos2</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251843"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251849"><span class="hs-identifier hs-var">h</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-152"></span><span>
+</span><span id="line-153"></span><span class="annot"><a href="SAD.ForTheL.FTL.Extension.html#pretypeVariable"><span class="hs-identifier hs-type">pretypeVariable</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#FTL"><span class="hs-identifier hs-type">FTL</span></a></span><span> </span><span class="annot"><a href="SAD.Data.Text.Block.html#ProofText"><span class="hs-identifier hs-type">ProofText</span></a></span><span>
+</span><span id="line-154"></span><span id="pretypeVariable"><span class="annot"><span class="annottext">pretypeVariable :: FTL ProofText
+</span><a href="SAD.ForTheL.FTL.Extension.html#pretypeVariable"><span class="hs-identifier hs-var hs-var">pretypeVariable</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-155"></span><span>  </span><span class="hs-special">(</span><span id="local-6989586621679251850"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251850"><span class="hs-identifier hs-var">pos</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251851"><span class="annot"><span class="annottext">(Set PosVar, Formula)
+</span><a href="#local-6989586621679251851"><span class="hs-identifier hs-var">tv</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser FState (T, (Set PosVar, Formula))
+-&gt; Parser FState (T, (Set PosVar, Formula))
+forall b st a. Show b =&gt; Parser st (a, b) -&gt; Parser st (a, b)
+</span><a href="SAD.Parser.Combinators.html#narrow2"><span class="hs-identifier hs-var">narrow2</span></a></span><span> </span><span class="annot"><span class="annottext">Parser FState (T, (Set PosVar, Formula))
+</span><a href="#local-6989586621679251852"><span class="hs-identifier hs-var">typeVar</span></a></span><span>
+</span><span id="line-156"></span><span>  </span><span class="annot"><span class="annottext">(FState -&gt; FState) -&gt; Parser FState ()
+forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
+</span><span class="hs-identifier hs-var">modify</span></span><span> </span><span class="annot"><span class="annottext">((FState -&gt; FState) -&gt; Parser FState ())
+-&gt; (FState -&gt; FState) -&gt; Parser FState ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Set PosVar, Formula) -&gt; FState -&gt; FState
+</span><a href="#local-6989586621679251854"><span class="hs-identifier hs-var">upd</span></a></span><span> </span><span class="annot"><span class="annottext">(Set PosVar, Formula)
+</span><a href="#local-6989586621679251851"><span class="hs-identifier hs-var">tv</span></a></span><span>
+</span><span id="line-157"></span><span>  </span><span class="annot"><span class="annottext">ProofText -&gt; FTL ProofText
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(ProofText -&gt; FTL ProofText) -&gt; ProofText -&gt; FTL ProofText
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">T -&gt; Set PosVar -&gt; ProofText
+</span><a href="SAD.Data.Text.Block.html#ProofTextPretyping"><span class="hs-identifier hs-var">ProofTextPretyping</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251850"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Set PosVar, Formula) -&gt; Set PosVar
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">(Set PosVar, Formula)
+</span><a href="#local-6989586621679251851"><span class="hs-identifier hs-var">tv</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-158"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-159"></span><span>    </span><span id="local-6989586621679251852"><span class="annot"><span class="annottext">typeVar :: Parser FState (T, (Set PosVar, Formula))
+</span><a href="#local-6989586621679251852"><span class="hs-identifier hs-var hs-var">typeVar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-160"></span><span>      </span><span id="local-6989586621679251877"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251877"><span class="hs-identifier hs-var">pos1</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser FState T
+forall st. Parser st T
+</span><a href="SAD.Parser.Base.html#getPos"><span class="hs-identifier hs-var">getPos</span></a></span><span class="hs-special">;</span><span> </span><span class="annot"><span class="annottext">T -&gt; Text -&gt; Parser FState ()
+</span><a href="SAD.ForTheL.Reports.html#markupToken"><span class="hs-identifier hs-var">Reports.markupToken</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="SAD.ForTheL.Reports.html#synonymLet"><span class="hs-identifier hs-var">Reports.synonymLet</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;let&quot;</span></span><span class="hs-special">;</span><span> </span><span id="local-6989586621679251879"><span class="annot"><span class="annottext">Set PosVar
+</span><a href="#local-6989586621679251879"><span class="hs-identifier hs-var">vs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL (Set PosVar)
+</span><a href="SAD.ForTheL.Base.html#varList"><span class="hs-identifier hs-var">varList</span></a></span><span class="hs-special">;</span><span> </span><span class="annot"><span class="annottext">T -&gt; [[Text]] -&gt; Parser FState ()
+</span><a href="SAD.ForTheL.Reports.html#markupTokenSeqOf"><span class="hs-identifier hs-var">Reports.markupTokenSeqOf</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="SAD.ForTheL.Reports.html#synonymLet"><span class="hs-identifier hs-var">Reports.synonymLet</span></a></span><span> </span><span class="annot"><span class="annottext">[[Text]]
+</span><a href="SAD.ForTheL.Base.html#standForPhrases"><span class="hs-identifier hs-var">standForPhrases</span></a></span><span>
+</span><span id="line-161"></span><span>      </span><span class="annot"><span class="annottext">Bool -&gt; Parser FState () -&gt; Parser FState ()
+forall (f :: * -&gt; *). Applicative f =&gt; Bool -&gt; f () -&gt; f ()
+</span><span class="hs-identifier hs-var">when</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set PosVar -&gt; Int
+forall a. Set a -&gt; Int
+</span><span class="hs-identifier hs-var">Set.size</span></span><span> </span><span class="annot"><span class="annottext">Set PosVar
+</span><a href="#local-6989586621679251879"><span class="hs-identifier hs-var">vs</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Int
+</span><span class="hs-number">0</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Parser FState () -&gt; Parser FState ())
+-&gt; Parser FState () -&gt; Parser FState ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Parser FState ()
+forall a. String -&gt; Parser FState a
+forall (m :: * -&gt; *) a. MonadFail m =&gt; String -&gt; m a
+</span><span class="hs-identifier hs-var">fail</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;empty variable list in let binding&quot;</span></span><span>
+</span><span id="line-162"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679251883"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251883"><span class="hs-identifier hs-var">g</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251884"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251884"><span class="hs-identifier hs-var">pos2</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">((Formula, T) -&gt; Maybe Text)
+-&gt; Parser FState (Formula, T) -&gt; Parser FState (Formula, T)
+forall a st. (a -&gt; Maybe Text) -&gt; Parser st a -&gt; Parser st a
+</span><a href="SAD.Parser.Combinators.html#wellFormedCheck"><span class="hs-identifier hs-var">wellFormedCheck</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set VariableName -&gt; Formula -&gt; Maybe Text
+</span><a href="SAD.ForTheL.Base.html#freeOrOverlapping"><span class="hs-identifier hs-var">freeOrOverlapping</span></a></span><span> </span><span class="annot"><span class="annottext">Set VariableName
+forall a. Monoid a =&gt; a
+</span><span class="hs-identifier hs-var">mempty</span></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Maybe Text)
+-&gt; ((Formula, T) -&gt; Formula) -&gt; (Formula, T) -&gt; Maybe Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Formula, T) -&gt; Formula
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Parser FState (Formula, T)
+</span><a href="#local-6989586621679251886"><span class="hs-identifier hs-var">holedNotion</span></a></span><span>
+</span><span id="line-163"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679251887"><span class="annot"><span class="annottext">pos :: T
+</span><a href="#local-6989586621679251887"><span class="hs-identifier hs-var hs-var">pos</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Range -&gt; T
+</span><a href="Isabelle.Position.html#range_position"><span class="hs-identifier hs-var">Position.range_position</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251877"><span class="hs-identifier hs-var">pos1</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251884"><span class="hs-identifier hs-var">pos2</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-164"></span><span>      </span><span class="annot"><span class="annottext">T -&gt; [T] -&gt; Parser FState ()
+</span><a href="SAD.ForTheL.Reports.html#addPretypingReport"><span class="hs-identifier hs-var">Reports.addPretypingReport</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251887"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="annot"><span class="annottext">([T] -&gt; Parser FState ()) -&gt; [T] -&gt; Parser FState ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(PosVar -&gt; T) -&gt; [PosVar] -&gt; [T]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">PosVar -&gt; T
+</span><a href="SAD.Data.VarName.html#posVarPosition"><span class="hs-identifier hs-var">posVarPosition</span></a></span><span> </span><span class="annot"><span class="annottext">([PosVar] -&gt; [T]) -&gt; [PosVar] -&gt; [T]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Set PosVar -&gt; [PosVar]
+forall a. Set a -&gt; [a]
+</span><span class="hs-identifier hs-var">Set.toList</span></span><span> </span><span class="annot"><span class="annottext">Set PosVar
+</span><a href="#local-6989586621679251879"><span class="hs-identifier hs-var">vs</span></a></span><span class="hs-special">;</span><span>
+</span><span id="line-165"></span><span>      </span><span class="annot"><span class="annottext">(T, (Set PosVar, Formula))
+-&gt; Parser FState (T, (Set PosVar, Formula))
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251887"><span class="hs-identifier hs-var">pos</span></a></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set PosVar
+</span><a href="#local-6989586621679251879"><span class="hs-identifier hs-var">vs</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="SAD.ForTheL.Extension.html#ignoreNames"><span class="hs-identifier hs-var">ignoreNames</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251883"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-166"></span><span>
+</span><span id="line-167"></span><span>    </span><span id="local-6989586621679251886"><span class="annot"><span class="annottext">holedNotion :: Parser FState (Formula, T)
+</span><a href="#local-6989586621679251886"><span class="hs-identifier hs-var hs-var">holedNotion</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-168"></span><span>      </span><span class="hs-special">(</span><span id="local-6989586621679251897"><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679251897"><span class="hs-identifier hs-var">q</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251898"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251898"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FTL (Formula -&gt; Formula, Formula)
+</span><a href="SAD.ForTheL.FTL.Statement.html#anotion"><span class="hs-identifier hs-var">FTL.anotion</span></a></span><span>
+</span><span id="line-169"></span><span>      </span><span id="local-6989586621679251899"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251899"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Formula
+</span><a href="#local-6989586621679251897"><span class="hs-identifier hs-var">q</span></a></span><span> </span><span class="annot"><span class="annottext">(Formula -&gt; Formula) -&gt; FTL Formula -&gt; FTL Formula
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Formula -&gt; [Formula] -&gt; FTL Formula
+</span><a href="SAD.ForTheL.Statement.html#dig"><span class="hs-identifier hs-var">dig</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251898"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">VariableName -&gt; Formula
+</span><a href="SAD.Data.Formula.Kit.html#mkVar"><span class="hs-identifier hs-var">mkVar</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; VariableName
+</span><a href="SAD.Data.VarName.html#VarHole"><span class="hs-identifier hs-var">VarHole</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-string">&quot;&quot;</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-170"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251902"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251902"><span class="hs-identifier hs-var">pos2</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser FState Range
+forall st. Parser st Range
+</span><a href="SAD.Parser.Combinators.html#dot"><span class="hs-identifier hs-var">dot</span></a></span><span>
+</span><span id="line-171"></span><span>      </span><span class="annot"><span class="annottext">(Formula, T) -&gt; Parser FState (Formula, T)
+forall a. a -&gt; Parser FState a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251899"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679251902"><span class="hs-identifier hs-var">pos2</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-172"></span><span>
+</span><span id="line-173"></span><span>    </span><span id="local-6989586621679251854"><span class="annot"><span class="annottext">upd :: (Set PosVar, Formula) -&gt; FState -&gt; FState
+</span><a href="#local-6989586621679251854"><span class="hs-identifier hs-var hs-var">upd</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679251904"><span class="annot"><span class="annottext">Set PosVar
+</span><a href="#local-6989586621679251904"><span class="hs-identifier hs-var">vs</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679251905"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679251905"><span class="hs-identifier hs-var">notion</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679251906"><span class="annot"><span class="annottext">FState
+</span><a href="#local-6989586621679251906"><span class="hs-identifier hs-var">st</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FState
+</span><a href="#local-6989586621679251906"><span class="hs-identifier hs-var">st</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#tvrExpr"><span class="hs-identifier hs-var">tvrExpr</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Set.map</span></span><span> </span><span class="annot"><a href="SAD.Data.VarName.html#posVarName"><span class="hs-identifier hs-var">posVarName</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679251904"><span class="hs-identifier hs-type">vs</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679251905"><span class="hs-identifier hs-type">notion</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span class="annot"><a href="SAD.ForTheL.Base.html#tvrExpr"><span class="hs-identifier hs-var">tvrExpr</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679251906"><span class="hs-identifier hs-type">st</span></a></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-174"></span></pre></body></html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.Data.Text.Decl</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2018, Steffen Frerix</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-5"></span><span class="hs-comment">--</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Variable declarations.</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.Data.Text.Decl</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-10"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Decl.html#Decl"><span class="hs-identifier">Decl</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-11"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Decl.html#Serial"><span class="hs-identifier">Serial</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-12"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Decl.html#newDecl"><span class="hs-identifier">newDecl</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-13"></span><span>  </span><span class="annot"><a href="SAD.Data.Text.Decl.html#positionedDecl"><span class="hs-identifier">positionedDecl</span></a></span><span>
+</span><span id="line-14"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.VarName.html"><span class="hs-identifier">SAD.Data.VarName</span></a></span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Position.html"><span class="hs-identifier">Isabelle.Position</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Position</span></span><span>
+</span><span id="line-19"></span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="annot"><span class="hs-comment">-- | &gt;0, with 0 as undefined</span></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">type</span><span> </span><span id="Serial"><span class="annot"><a href="SAD.Data.Text.Decl.html#Serial"><span class="hs-identifier hs-var">Serial</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="annot"><span class="hs-comment">-- | A variable declaration.</span></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">data</span><span> </span><span id="Decl"><span class="annot"><a href="SAD.Data.Text.Decl.html#Decl"><span class="hs-identifier hs-var">Decl</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Decl"><span class="annot"><a href="SAD.Data.Text.Decl.html#Decl"><span class="hs-identifier hs-var">Decl</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-26"></span><span>  </span><span id="declName"><span class="annot"><span class="annottext">Decl -&gt; VariableName
+</span><a href="SAD.Data.Text.Decl.html#declName"><span class="hs-identifier hs-var hs-var">declName</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.VarName.html#VariableName"><span class="hs-identifier hs-type">VariableName</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-27"></span><span>  </span><span id="declPosition"><span class="annot"><span class="annottext">Decl -&gt; T
+</span><a href="SAD.Data.Text.Decl.html#declPosition"><span class="hs-identifier hs-var hs-var">declPosition</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-28"></span><span>  </span><span id="declSerial"><span class="annot"><span class="annottext">Decl -&gt; Serial
+</span><a href="SAD.Data.Text.Decl.html#declSerial"><span class="hs-identifier hs-var hs-var">declSerial</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Text.Decl.html#Serial"><span class="hs-identifier hs-type">Serial</span></a></span><span>
+</span><span id="line-29"></span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679233477"><span id="local-6989586621679233485"><span class="annot"><span class="annottext">Decl -&gt; Decl -&gt; Bool
+(Decl -&gt; Decl -&gt; Bool) -&gt; (Decl -&gt; Decl -&gt; Bool) -&gt; Eq Decl
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Decl -&gt; Decl -&gt; Bool
+== :: Decl -&gt; Decl -&gt; Bool
+$c/= :: Decl -&gt; Decl -&gt; Bool
+/= :: Decl -&gt; Decl -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679233492"><span id="local-6989586621679233500"><span id="local-6989586621679233505"><span id="local-6989586621679233509"><span id="local-6989586621679233512"><span id="local-6989586621679233515"><span id="local-6989586621679233518"><span class="annot"><span class="annottext">Eq Decl
+Eq Decl =&gt;
+(Decl -&gt; Decl -&gt; Ordering)
+-&gt; (Decl -&gt; Decl -&gt; Bool)
+-&gt; (Decl -&gt; Decl -&gt; Bool)
+-&gt; (Decl -&gt; Decl -&gt; Bool)
+-&gt; (Decl -&gt; Decl -&gt; Bool)
+-&gt; (Decl -&gt; Decl -&gt; Decl)
+-&gt; (Decl -&gt; Decl -&gt; Decl)
+-&gt; Ord Decl
+Decl -&gt; Decl -&gt; Bool
+Decl -&gt; Decl -&gt; Ordering
+Decl -&gt; Decl -&gt; Decl
+forall a.
+Eq a =&gt;
+(a -&gt; a -&gt; Ordering)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; Bool)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; (a -&gt; a -&gt; a)
+-&gt; Ord a
+$ccompare :: Decl -&gt; Decl -&gt; Ordering
+compare :: Decl -&gt; Decl -&gt; Ordering
+$c&lt; :: Decl -&gt; Decl -&gt; Bool
+&lt; :: Decl -&gt; Decl -&gt; Bool
+$c&lt;= :: Decl -&gt; Decl -&gt; Bool
+&lt;= :: Decl -&gt; Decl -&gt; Bool
+$c&gt; :: Decl -&gt; Decl -&gt; Bool
+&gt; :: Decl -&gt; Decl -&gt; Bool
+$c&gt;= :: Decl -&gt; Decl -&gt; Bool
+&gt;= :: Decl -&gt; Decl -&gt; Bool
+$cmax :: Decl -&gt; Decl -&gt; Decl
+max :: Decl -&gt; Decl -&gt; Decl
+$cmin :: Decl -&gt; Decl -&gt; Decl
+min :: Decl -&gt; Decl -&gt; Decl
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679233522"><span id="local-6989586621679233527"><span class="annot"><span class="hs-identifier hs-type">Show</span></span><span> </span><span class="annot"><a href="SAD.Data.Text.Decl.html#Decl"><span class="hs-identifier hs-type">Decl</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-32"></span><span>  </span><span id="local-6989586621679233532"><span class="annot"><span class="annottext">show :: Decl -&gt; String
+</span><a href="#local-6989586621679233532"><span class="hs-identifier hs-var hs-var hs-var hs-var">show</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; String
+forall a. Show a =&gt; a -&gt; String
+</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">(VariableName -&gt; String)
+-&gt; (Decl -&gt; VariableName) -&gt; Decl -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Decl -&gt; VariableName
+</span><a href="SAD.Data.Text.Decl.html#declName"><span class="hs-identifier hs-var">declName</span></a></span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="hs-comment">{- a declaration that has no representation in the input text -}</span><span>
+</span><span id="line-35"></span><span class="annot"><a href="SAD.Data.Text.Decl.html#newDecl"><span class="hs-identifier hs-type">newDecl</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.VarName.html#VariableName"><span class="hs-identifier hs-type">VariableName</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Text.Decl.html#Decl"><span class="hs-identifier hs-type">Decl</span></a></span><span>
+</span><span id="line-36"></span><span id="newDecl"><span class="annot"><span class="annottext">newDecl :: VariableName -&gt; Decl
+</span><a href="SAD.Data.Text.Decl.html#newDecl"><span class="hs-identifier hs-var hs-var">newDecl</span></a></span></span><span> </span><span id="local-6989586621679233535"><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679233535"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; T -&gt; Serial -&gt; Decl
+</span><a href="SAD.Data.Text.Decl.html#Decl"><span class="hs-identifier hs-var">Decl</span></a></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679233535"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="Isabelle.Position.html#none"><span class="hs-identifier hs-var">Position.none</span></a></span><span> </span><span class="annot"><span class="annottext">Serial
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="hs-comment">{- a declaration that has a representation in the input text but has not been
+generated during parsing -}</span><span>
+</span><span id="line-40"></span><span class="annot"><a href="SAD.Data.Text.Decl.html#positionedDecl"><span class="hs-identifier hs-type">positionedDecl</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.VarName.html#PosVar"><span class="hs-identifier hs-type">PosVar</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Text.Decl.html#Decl"><span class="hs-identifier hs-type">Decl</span></a></span><span>
+</span><span id="line-41"></span><span id="positionedDecl"><span class="annot"><span class="annottext">positionedDecl :: PosVar -&gt; Decl
+</span><a href="SAD.Data.Text.Decl.html#positionedDecl"><span class="hs-identifier hs-var hs-var">positionedDecl</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.VarName.html#PosVar"><span class="hs-identifier hs-type">PosVar</span></a></span><span> </span><span id="local-6989586621679233538"><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679233538"><span class="hs-identifier hs-var">nm</span></a></span></span><span> </span><span id="local-6989586621679233539"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679233539"><span class="hs-identifier hs-var">pos</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">VariableName -&gt; T -&gt; Serial -&gt; Decl
+</span><a href="SAD.Data.Text.Decl.html#Decl"><span class="hs-identifier hs-var">Decl</span></a></span><span> </span><span class="annot"><span class="annottext">VariableName
+</span><a href="#local-6989586621679233538"><span class="hs-identifier hs-var">nm</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679233539"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="annot"><span class="annottext">Serial
+</span><span class="hs-number">0</span></span><span>
+</span><span id="line-42"></span></pre></body></html>

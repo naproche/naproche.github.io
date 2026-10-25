@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Main</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.List</span></span><span>
+</span><span id="line-4"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">System.Process</span></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">System.Exit</span></span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">System.IO</span></span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.IORef</span></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad</span></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text.Lazy.IO</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">TIO</span></span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="annot"><a href="Main.html#compileFile"><span class="hs-identifier hs-type">compileFile</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Handle</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Handle</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ProcessHandle</span></span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span id="compileFile"><span class="annot"><span class="annottext">compileFile :: [String] -&gt; String -&gt; IO (Handle, Handle, ProcessHandle)
+</span><a href="Main.html#compileFile"><span class="hs-identifier hs-var hs-var">compileFile</span></a></span></span><span> </span><span id="local-6989586621679039279"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679039279"><span class="hs-identifier hs-var">flags</span></a></span></span><span> </span><span id="local-6989586621679039280"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679039280"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-14"></span><span>  </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Maybe Handle
+</span><span class="hs-identifier">_</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679039281"><span class="annot"><span class="annottext">Handle
+</span><a href="#local-6989586621679039281"><span class="hs-identifier hs-var">hout</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679039282"><span class="annot"><span class="annottext">Handle
+</span><a href="#local-6989586621679039282"><span class="hs-identifier hs-var">herr</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679039283"><span class="annot"><span class="annottext">ProcessHandle
+</span><a href="#local-6989586621679039283"><span class="hs-identifier hs-var">ph</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">CreateProcess
+-&gt; IO (Maybe Handle, Maybe Handle, Maybe Handle, ProcessHandle)
+</span><span class="hs-identifier hs-var">createProcess</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; [String] -&gt; CreateProcess
+</span><span class="hs-identifier hs-var">proc</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;stack&quot;</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;exec&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Naproche-SAD&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;--&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679039280"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; [String] -&gt; [String]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679039279"><span class="hs-identifier hs-var">flags</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span>    </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="hs-identifier hs-var">std_out</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CreatePipe</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-var">std_err</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">CreatePipe</span></span><span> </span><span class="hs-special">}</span><span>
+</span><span id="line-16"></span><span>  </span><span class="annot"><span class="annottext">(Handle, Handle, ProcessHandle)
+-&gt; IO (Handle, Handle, ProcessHandle)
+forall a. a -&gt; IO a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Handle
+</span><a href="#local-6989586621679039281"><span class="hs-identifier hs-var">hout</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Handle
+</span><a href="#local-6989586621679039282"><span class="hs-identifier hs-var">herr</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ProcessHandle
+</span><a href="#local-6989586621679039283"><span class="hs-identifier hs-var">ph</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="annot"><a href="Main.html#gather"><span class="hs-identifier hs-type">gather</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Handle</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Handle</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">ProcessHandle</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">ExitCode</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span id="gather"><span class="annot"><span class="annottext">gather :: (Handle, Handle, ProcessHandle) -&gt; IO (ExitCode, Text)
+</span><a href="Main.html#gather"><span class="hs-identifier hs-var hs-var">gather</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679039290"><span class="annot"><span class="annottext">Handle
+</span><a href="#local-6989586621679039290"><span class="hs-identifier hs-var">hout</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679039291"><span class="annot"><span class="annottext">Handle
+</span><a href="#local-6989586621679039291"><span class="hs-identifier hs-var">herr</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679039292"><span class="annot"><span class="annottext">ProcessHandle
+</span><a href="#local-6989586621679039292"><span class="hs-identifier hs-var">ph</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-20"></span><span>  </span><span id="local-6989586621679039293"><span class="annot"><span class="annottext">ExitCode
+</span><a href="#local-6989586621679039293"><span class="hs-identifier hs-var">code</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ProcessHandle -&gt; IO ExitCode
+</span><span class="hs-identifier hs-var">waitForProcess</span></span><span> </span><span class="annot"><span class="annottext">ProcessHandle
+</span><a href="#local-6989586621679039292"><span class="hs-identifier hs-var">ph</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span id="local-6989586621679039295"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679039295"><span class="hs-identifier hs-var">cont</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Handle -&gt; IO Text
+</span><span class="hs-identifier hs-var">TIO.hGetContents</span></span><span> </span><span class="annot"><span class="annottext">Handle
+</span><a href="#local-6989586621679039290"><span class="hs-identifier hs-var">hout</span></a></span><span>
+</span><span id="line-22"></span><span>  </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Handle -&gt; IO Text
+</span><span class="hs-identifier hs-var">TIO.hGetContents</span></span><span> </span><span class="annot"><span class="annottext">Handle
+</span><a href="#local-6989586621679039291"><span class="hs-identifier hs-var">herr</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="annot"><span class="annottext">(ExitCode, Text) -&gt; IO (ExitCode, Text)
+forall a. a -&gt; IO a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ExitCode
+</span><a href="#local-6989586621679039293"><span class="hs-identifier hs-var">code</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679039295"><span class="hs-identifier hs-var">cont</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span>
+</span><span id="line-25"></span><span class="annot"><a href="Main.html#files"><span class="hs-identifier hs-type">files</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span class="hs-special">]</span><span>
+</span><span id="line-26"></span><span id="files"><span class="annot"><span class="annottext">files :: [String]
+</span><a href="Main.html#files"><span class="hs-identifier hs-var hs-var">files</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; [String] -&gt; [String]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;examples/&quot;</span></span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;chinese.ftl&quot;</span></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;maximum_modulus.ftl&quot;</span></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;newman.ftl&quot;</span></span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;cantor.ftl&quot;</span></span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;prime_no_square.ftl&quot;</span></span><span>
+</span><span id="line-32"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;tarski.ftl&quot;</span></span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; [String] -&gt; [String]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="hs-special">[</span><span>
+</span><span id="line-34"></span><span>   </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;test/examples/read_test.ftl&quot;</span></span><span>
+</span><span id="line-35"></span><span>  </span><span class="hs-special">]</span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="annot"><a href="Main.html#texFiles"><span class="hs-identifier hs-type">texFiles</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span class="hs-special">]</span><span>
+</span><span id="line-38"></span><span id="texFiles"><span class="annot"><span class="annottext">texFiles :: [String]
+</span><a href="Main.html#texFiles"><span class="hs-identifier hs-var hs-var">texFiles</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; [String] -&gt; [String]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;examples/&quot;</span></span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">)</span><span>
+</span><span id="line-39"></span><span>  </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;checkerboard.ftl.tex&quot;</span></span><span>
+</span><span id="line-40"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;chinese.ftl.tex&quot;</span></span><span>
+</span><span id="line-41"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;fuerstenberg.ftl.tex&quot;</span></span><span>
+</span><span id="line-42"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;maximum_modulus.ftl.tex&quot;</span></span><span>
+</span><span id="line-43"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;newman.ftl.tex&quot;</span></span><span>
+</span><span id="line-44"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;cantor.ftl.tex&quot;</span></span><span>
+</span><span id="line-45"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;prime_no_square.ftl.tex&quot;</span></span><span>
+</span><span id="line-46"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;tarski.ftl.tex&quot;</span></span><span>
+</span><span id="line-47"></span><span>  </span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; [String] -&gt; [String]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; [String] -&gt; [String]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;text/examples/&quot;</span></span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span class="hs-special">)</span><span>
+</span><span id="line-48"></span><span>  </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;read_test.ftl.tex&quot;</span></span><span>
+</span><span id="line-49"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;text.ftl.tex&quot;</span></span><span>
+</span><span id="line-50"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;varprime.ftl.tex&quot;</span></span><span>
+</span><span id="line-51"></span><span>  </span><span class="hs-special">]</span><span>
+</span><span id="line-52"></span><span>
+</span><span id="line-53"></span><span class="annot"><a href="Main.html#output"><span class="hs-identifier hs-type">output</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">ExitCode</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">ExitCode</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-54"></span><span id="output"><span class="annot"><span class="annottext">output :: [(String, (ExitCode, Text))] -&gt; IO [(ExitCode, String)]
+</span><a href="Main.html#output"><span class="hs-identifier hs-var hs-var">output</span></a></span></span><span> </span><span id="local-6989586621679039300"><span class="annot"><span class="annottext">[(String, (ExitCode, Text))]
+</span><a href="#local-6989586621679039300"><span class="hs-identifier hs-var">xs</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-55"></span><span>  </span><span class="annot"><span class="annottext">((String, (ExitCode, Text)) -&gt; IO ())
+-&gt; [(String, (ExitCode, Text))] -&gt; IO ()
+forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
+(Foldable t, Monad m) =&gt;
+(a -&gt; m b) -&gt; t a -&gt; m ()
+</span><span class="hs-identifier hs-var">mapM_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; IO ()
+</span><span class="hs-identifier hs-var">TIO.putStrLn</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; IO ())
+-&gt; ((String, (ExitCode, Text)) -&gt; Text)
+-&gt; (String, (ExitCode, Text))
+-&gt; IO ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(ExitCode, Text) -&gt; Text
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span> </span><span class="annot"><span class="annottext">((ExitCode, Text) -&gt; Text)
+-&gt; ((String, (ExitCode, Text)) -&gt; (ExitCode, Text))
+-&gt; (String, (ExitCode, Text))
+-&gt; Text
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(String, (ExitCode, Text)) -&gt; (ExitCode, Text)
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[(String, (ExitCode, Text))]
+</span><a href="#local-6989586621679039300"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679039307"><span class="annot"><span class="annottext">failed :: [(ExitCode, String)]
+</span><a href="#local-6989586621679039307"><span class="hs-identifier hs-var hs-var">failed</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">((String, (ExitCode, Text)) -&gt; (ExitCode, String))
+-&gt; [(String, (ExitCode, Text))] -&gt; [(ExitCode, String)]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679039308"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679039308"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679039309"><span class="annot"><span class="annottext">ExitCode
+</span><a href="#local-6989586621679039309"><span class="hs-identifier hs-var">c</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ExitCode
+</span><a href="#local-6989586621679039309"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679039308"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([(String, (ExitCode, Text))] -&gt; [(ExitCode, String)])
+-&gt; [(String, (ExitCode, Text))] -&gt; [(ExitCode, String)]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">((String, (ExitCode, Text)) -&gt; Bool)
+-&gt; [(String, (ExitCode, Text))] -&gt; [(String, (ExitCode, Text))]
+forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">ExitCode -&gt; ExitCode -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">/=</span></span><span class="annot"><span class="annottext">ExitCode
+</span><span class="hs-identifier hs-var">ExitSuccess</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(ExitCode -&gt; Bool)
+-&gt; ((String, (ExitCode, Text)) -&gt; ExitCode)
+-&gt; (String, (ExitCode, Text))
+-&gt; Bool
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(ExitCode, Text) -&gt; ExitCode
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">((ExitCode, Text) -&gt; ExitCode)
+-&gt; ((String, (ExitCode, Text)) -&gt; (ExitCode, Text))
+-&gt; (String, (ExitCode, Text))
+-&gt; ExitCode
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(String, (ExitCode, Text)) -&gt; (ExitCode, Text)
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[(String, (ExitCode, Text))]
+</span><a href="#local-6989586621679039300"><span class="hs-identifier hs-var">xs</span></a></span><span>
+</span><span id="line-57"></span><span>  </span><span class="annot"><span class="annottext">[(ExitCode, String)] -&gt; IO [(ExitCode, String)]
+forall a. a -&gt; IO a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">[(ExitCode, String)]
+</span><a href="#local-6989586621679039307"><span class="hs-identifier hs-var">failed</span></a></span><span>
+</span><span id="line-58"></span><span>
+</span><span id="line-59"></span><span class="annot"><a href="Main.html#main"><span class="hs-identifier hs-type">main</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-60"></span><span id="main"><span class="annot"><span class="annottext">IO ()
+</span><a href="Main.html#main"><span class="hs-identifier hs-var hs-var hs-var">main</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-61"></span><span>  </span><span id="local-6989586621679039314"><span class="annot"><span class="annottext">[(ExitCode, Text)]
+</span><a href="#local-6989586621679039314"><span class="hs-identifier hs-var">compiled</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(String -&gt; IO (ExitCode, Text))
+-&gt; [String] -&gt; IO [(ExitCode, Text)]
+forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
+(Traversable t, Monad m) =&gt;
+(a -&gt; m b) -&gt; t a -&gt; m (t b)
+forall (m :: * -&gt; *) a b. Monad m =&gt; (a -&gt; m b) -&gt; [a] -&gt; m [b]
+</span><span class="hs-identifier hs-var">mapM</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679039316"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679039316"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Handle, Handle, ProcessHandle) -&gt; IO (ExitCode, Text)
+</span><a href="Main.html#gather"><span class="hs-identifier hs-var">gather</span></a></span><span> </span><span class="annot"><span class="annottext">((Handle, Handle, ProcessHandle) -&gt; IO (ExitCode, Text))
+-&gt; IO (Handle, Handle, ProcessHandle) -&gt; IO (ExitCode, Text)
+forall (m :: * -&gt; *) a b. Monad m =&gt; (a -&gt; m b) -&gt; m a -&gt; m b
+</span><span class="hs-operator hs-var">=&lt;&lt;</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String -&gt; IO (Handle, Handle, ProcessHandle)
+</span><a href="Main.html#compileFile"><span class="hs-identifier hs-var">compileFile</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;--tex=off&quot;</span></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679039316"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="Main.html#files"><span class="hs-identifier hs-var">files</span></a></span><span>
+</span><span id="line-62"></span><span>  </span><span id="local-6989586621679039318"><span class="annot"><span class="annottext">[(ExitCode, Text)]
+</span><a href="#local-6989586621679039318"><span class="hs-identifier hs-var">compiledTex</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(String -&gt; IO (ExitCode, Text))
+-&gt; [String] -&gt; IO [(ExitCode, Text)]
+forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
+(Traversable t, Monad m) =&gt;
+(a -&gt; m b) -&gt; t a -&gt; m (t b)
+forall (m :: * -&gt; *) a b. Monad m =&gt; (a -&gt; m b) -&gt; [a] -&gt; m [b]
+</span><span class="hs-identifier hs-var">mapM</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679039319"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679039319"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Handle, Handle, ProcessHandle) -&gt; IO (ExitCode, Text)
+</span><a href="Main.html#gather"><span class="hs-identifier hs-var">gather</span></a></span><span> </span><span class="annot"><span class="annottext">((Handle, Handle, ProcessHandle) -&gt; IO (ExitCode, Text))
+-&gt; IO (Handle, Handle, ProcessHandle) -&gt; IO (ExitCode, Text)
+forall (m :: * -&gt; *) a b. Monad m =&gt; (a -&gt; m b) -&gt; m a -&gt; m b
+</span><span class="hs-operator hs-var">=&lt;&lt;</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String -&gt; IO (Handle, Handle, ProcessHandle)
+</span><a href="Main.html#compileFile"><span class="hs-identifier hs-var">compileFile</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;--tex=on&quot;</span></span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679039319"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="Main.html#texFiles"><span class="hs-identifier hs-var">texFiles</span></a></span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span>  </span><span id="local-6989586621679039320"><span class="annot"><span class="annottext">[(ExitCode, String)]
+</span><a href="#local-6989586621679039320"><span class="hs-identifier hs-var">failed</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[(String, (ExitCode, Text))] -&gt; IO [(ExitCode, String)]
+</span><a href="Main.html#output"><span class="hs-identifier hs-var">output</span></a></span><span> </span><span class="annot"><span class="annottext">([(String, (ExitCode, Text))] -&gt; IO [(ExitCode, String)])
+-&gt; ([(ExitCode, Text)] -&gt; [(String, (ExitCode, Text))])
+-&gt; [(ExitCode, Text)]
+-&gt; IO [(ExitCode, String)]
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; [(ExitCode, Text)] -&gt; [(String, (ExitCode, Text))]
+forall a b. [a] -&gt; [b] -&gt; [(a, b)]
+</span><span class="hs-identifier hs-var">zip</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[String]
+</span><a href="Main.html#files"><span class="hs-identifier hs-var">files</span></a></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; [String] -&gt; [String]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="Main.html#texFiles"><span class="hs-identifier hs-var">texFiles</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([(ExitCode, Text)] -&gt; IO [(ExitCode, String)])
+-&gt; [(ExitCode, Text)] -&gt; IO [(ExitCode, String)]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(ExitCode, Text)]
+</span><a href="#local-6989586621679039314"><span class="hs-identifier hs-var">compiled</span></a></span><span> </span><span class="annot"><span class="annottext">[(ExitCode, Text)] -&gt; [(ExitCode, Text)] -&gt; [(ExitCode, Text)]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[(ExitCode, Text)]
+</span><a href="#local-6989586621679039318"><span class="hs-identifier hs-var">compiledTex</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-65"></span><span>  </span><span id="local-6989586621679039321"><span class="annot"><span class="annottext">IORef ExitCode
+</span><a href="#local-6989586621679039321"><span class="hs-identifier hs-var">code</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ExitCode -&gt; IO (IORef ExitCode)
+forall a. a -&gt; IO (IORef a)
+</span><span class="hs-identifier hs-var">newIORef</span></span><span> </span><span class="annot"><span class="annottext">ExitCode
+</span><span class="hs-identifier hs-var">ExitSuccess</span></span><span>
+</span><span id="line-66"></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; IO () -&gt; IO ()
+forall (f :: * -&gt; *). Applicative f =&gt; Bool -&gt; f () -&gt; f ()
+</span><span class="hs-identifier hs-var">unless</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[(ExitCode, String)] -&gt; Bool
+forall a. [a] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">null</span></span><span> </span><span class="annot"><span class="annottext">[(ExitCode, String)]
+</span><a href="#local-6989586621679039320"><span class="hs-identifier hs-var">failed</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(IO () -&gt; IO ()) -&gt; IO () -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-67"></span><span>    </span><span class="annot"><span class="annottext">String -&gt; IO ()
+</span><span class="hs-identifier hs-var">putStrLn</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; IO ()) -&gt; String -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;Failed to compile: &quot;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
+</span><span class="hs-identifier hs-var">unwords</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">((ExitCode, String) -&gt; String) -&gt; [(ExitCode, String)] -&gt; [String]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">(ExitCode, String) -&gt; String
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span> </span><span class="annot"><span class="annottext">[(ExitCode, String)]
+</span><a href="#local-6989586621679039320"><span class="hs-identifier hs-var">failed</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-68"></span><span>    </span><span class="annot"><span class="annottext">IORef ExitCode -&gt; ExitCode -&gt; IO ()
+forall a. IORef a -&gt; a -&gt; IO ()
+</span><span class="hs-identifier hs-var">writeIORef</span></span><span> </span><span class="annot"><span class="annottext">IORef ExitCode
+</span><a href="#local-6989586621679039321"><span class="hs-identifier hs-var">code</span></a></span><span> </span><span class="annot"><span class="annottext">(ExitCode -&gt; IO ()) -&gt; ExitCode -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(ExitCode -&gt; ExitCode -&gt; ExitCode)
+-&gt; ExitCode -&gt; [ExitCode] -&gt; ExitCode
+forall b a. (b -&gt; a -&gt; b) -&gt; b -&gt; [a] -&gt; b
+forall (t :: * -&gt; *) b a.
+Foldable t =&gt;
+(b -&gt; a -&gt; b) -&gt; b -&gt; t a -&gt; b
+</span><span class="hs-identifier hs-var">foldl'</span></span><span> </span><span class="annot"><span class="annottext">ExitCode -&gt; ExitCode -&gt; ExitCode
+forall a. Ord a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-identifier hs-var">max</span></span><span> </span><span class="annot"><span class="annottext">ExitCode
+</span><span class="hs-identifier hs-var">ExitSuccess</span></span><span> </span><span class="annot"><span class="annottext">([ExitCode] -&gt; ExitCode) -&gt; [ExitCode] -&gt; ExitCode
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">((ExitCode, String) -&gt; ExitCode)
+-&gt; [(ExitCode, String)] -&gt; [ExitCode]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">(ExitCode, String) -&gt; ExitCode
+forall a b. (a, b) -&gt; a
+</span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">[(ExitCode, String)]
+</span><a href="#local-6989586621679039320"><span class="hs-identifier hs-var">failed</span></a></span><span>
+</span><span id="line-69"></span><span>  </span><span class="annot"><span class="annottext">IORef ExitCode -&gt; IO ExitCode
+forall a. IORef a -&gt; IO a
+</span><span class="hs-identifier hs-var">readIORef</span></span><span> </span><span class="annot"><span class="annottext">IORef ExitCode
+</span><a href="#local-6989586621679039321"><span class="hs-identifier hs-var">code</span></a></span><span> </span><span class="annot"><span class="annottext">IO ExitCode -&gt; (ExitCode -&gt; IO ()) -&gt; IO ()
+forall a b. IO a -&gt; (a -&gt; IO b) -&gt; IO b
+forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="annot"><span class="annottext">ExitCode -&gt; IO ()
+forall a. ExitCode -&gt; IO a
+</span><span class="hs-identifier hs-var">exitWith</span></span><span>
+</span><span id="line-70"></span></pre></body></html>

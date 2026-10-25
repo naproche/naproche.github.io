@@ -1,0 +1,528 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.Core.Message</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2018, 2021, Makarius Wenzel</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-5"></span><span class="hs-comment">--</span><span>
+</span><span id="line-6"></span><span class="hs-comment">-- Formal output messages, with PIDE (Prover IDE) support.</span><span>
+</span><span id="line-7"></span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-pragma">{-# LANGUAGE OverloadedStrings #-}</span><span>
+</span><span id="line-10"></span><span class="hs-pragma">{-# LANGUAGE TupleSections #-}</span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.Core.Message</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-13"></span><span>  </span><span class="annot"><a href="SAD.Core.Message.html#reports_text"><span class="hs-identifier">reports_text</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#report_text"><span class="hs-identifier">report_text</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#reports"><span class="hs-identifier">reports</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#report"><span class="hs-identifier">report</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>  </span><span class="annot"><a href="SAD.Core.Message.html#console_position"><span class="hs-identifier">console_position</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#show_position"><span class="hs-identifier">show_position</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>  </span><span class="annot"><a href="SAD.Core.Message.html#origin_main"><span class="hs-identifier">origin_main</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#origin_export"><span class="hs-identifier">origin_export</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#origin_forthel"><span class="hs-identifier">origin_forthel</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#origin_parser"><span class="hs-identifier">origin_parser</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>  </span><span class="annot"><a href="SAD.Core.Message.html#origin_reasoner"><span class="hs-identifier">origin_reasoner</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#origin_simplifier"><span class="hs-identifier">origin_simplifier</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#origin_thesis"><span class="hs-identifier">origin_thesis</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#origin_translate"><span class="hs-identifier">origin_translate</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#origin_reader"><span class="hs-identifier">origin_reader</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>  </span><span class="annot"><a href="SAD.Core.Message.html#Kind"><span class="hs-identifier">Kind</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#output"><span class="hs-identifier">output</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#error"><span class="hs-identifier">error</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>  </span><span class="annot"><a href="SAD.Core.Message.html#outputMain"><span class="hs-identifier">outputMain</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#outputExport"><span class="hs-identifier">outputExport</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#outputForTheL"><span class="hs-identifier">outputForTheL</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#outputParser"><span class="hs-identifier">outputParser</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#outputReasoner"><span class="hs-identifier">outputReasoner</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-19"></span><span>  </span><span class="annot"><a href="SAD.Core.Message.html#outputThesis"><span class="hs-identifier">outputThesis</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#outputSimplifier"><span class="hs-identifier">outputSimplifier</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#outputTranslate"><span class="hs-identifier">outputTranslate</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#outputTokenizer"><span class="hs-identifier">outputTokenizer</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-20"></span><span>  </span><span class="annot"><a href="SAD.Core.Message.html#errorExport"><span class="hs-identifier">errorExport</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#errorParser"><span class="hs-identifier">errorParser</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#errorLexer"><span class="hs-identifier">errorLexer</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#errorTokenizer"><span class="hs-identifier">errorTokenizer</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#errorReader"><span class="hs-identifier">errorReader</span></a></span><span>
+</span><span id="line-21"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Prelude</span></span><span> </span><span class="hs-keyword">hiding</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">error</span></span><span class="hs-special">)</span><span>
+</span><span id="line-24"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">when</span></span><span class="hs-special">)</span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">catMaybes</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">mapMaybe</span></span><span class="hs-special">)</span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html"><span class="hs-identifier">Isabelle.Bytes</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Bytes</span></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html"><span class="hs-identifier">Isabelle.Bytes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier">Bytes</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-29"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Position.html"><span class="hs-identifier">Isabelle.Position</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Position</span></span><span>
+</span><span id="line-30"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Value.html"><span class="hs-identifier">Isabelle.Value</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Value</span></span><span>
+</span><span id="line-31"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Markup.html"><span class="hs-identifier">Isabelle.Markup</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Markup</span></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.XML.html"><span class="hs-identifier">Isabelle.XML</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">XML</span></span><span>
+</span><span id="line-33"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.YXML.html"><span class="hs-identifier">Isabelle.YXML</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">YXML</span></span><span>
+</span><span id="line-34"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Naproche.html"><span class="hs-identifier">Isabelle.Naproche</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Naproche</span></span><span>
+</span><span id="line-35"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Isabelle.Library.html"><span class="hs-identifier">Isabelle.Library</span></a></span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Naproche.Program.html"><span class="hs-identifier">Naproche.Program</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Program</span></span><span>
+</span><span id="line-38"></span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span class="hs-comment">-- PIDE markup reports</span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="annot"><a href="SAD.Core.Message.html#reports_text"><span class="hs-identifier hs-type">reports_text</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Isabelle.Position.html#Report_Text"><span class="hs-identifier hs-type">Position.Report_Text</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span id="reports_text"><span class="annot"><span class="annottext">reports_text :: [Report_Text] -&gt; IO ()
+</span><a href="SAD.Core.Message.html#reports_text"><span class="hs-identifier hs-var hs-var">reports_text</span></a></span></span><span> </span><span id="local-6989586621679232219"><span class="annot"><span class="annottext">[Report_Text]
+</span><a href="#local-6989586621679232219"><span class="hs-identifier hs-var">args</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-44"></span><span>  </span><span id="local-6989586621679232220"><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679232220"><span class="hs-identifier hs-var">context</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO Context
+</span><a href="Naproche.Program.html#thread_context"><span class="hs-identifier hs-var">Program.thread_context</span></a></span><span>
+</span><span id="line-45"></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; IO () -&gt; IO ()
+forall (f :: * -&gt; *). Applicative f =&gt; Bool -&gt; f () -&gt; f ()
+</span><span class="hs-identifier hs-var">when</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Context -&gt; Bool
+</span><a href="Naproche.Program.html#is_pide"><span class="hs-identifier hs-var">Program.is_pide</span></a></span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679232220"><span class="hs-identifier hs-var">context</span></a></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool -&gt; Bool
+</span><span class="hs-operator hs-var">&amp;&amp;</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Bool
+</span><span class="hs-identifier hs-var">not</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Report_Text] -&gt; Bool
+forall a. [a] -&gt; Bool
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Bool
+</span><span class="hs-identifier hs-var">null</span></span><span> </span><span class="annot"><span class="annottext">[Report_Text]
+</span><a href="#local-6989586621679232219"><span class="hs-identifier hs-var">args</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(IO () -&gt; IO ()) -&gt; IO () -&gt; IO ()
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-46"></span><span>    </span><span class="annot"><span class="annottext">Context -&gt; [Bytes] -&gt; IO ()
+</span><a href="Naproche.Program.html#exchange_message0"><span class="hs-identifier hs-var">Program.exchange_message0</span></a></span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679232220"><span class="hs-identifier hs-var">context</span></a></span><span>
+</span><span id="line-47"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes
+</span><a href="Isabelle.Naproche.html#output_report_command"><span class="hs-identifier hs-var">Naproche.output_report_command</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; [Bytes] -&gt; [Bytes]
+forall a. a -&gt; [a] -&gt; [a]
+</span><span class="hs-glyph hs-var">:</span></span><span>
+</span><span id="line-48"></span><span>        </span><span class="annot"><span class="annottext">(Report_Text -&gt; Bytes) -&gt; [Report_Text] -&gt; [Bytes]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-special">(</span><span class="hs-special">(</span><span id="local-6989586621679232228"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232228"><span class="hs-identifier hs-var">pos</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679232229"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232229"><span class="hs-identifier hs-var">markup</span></a></span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span id="local-6989586621679232230"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232230"><span class="hs-identifier hs-var">txt</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-49"></span><span>          </span><span class="hs-keyword">let</span><span>
+</span><span id="line-50"></span><span>            </span><span id="local-6989586621679232231"><span class="annot"><span class="annottext">pos' :: T
+</span><a href="#local-6989586621679232231"><span class="hs-identifier hs-var hs-var">pos'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Context -&gt; T -&gt; T
+</span><a href="Naproche.Program.html#adjust_position"><span class="hs-identifier hs-var">Program.adjust_position</span></a></span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679232220"><span class="hs-identifier hs-var">context</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232228"><span class="hs-identifier hs-var">pos</span></a></span><span>
+</span><span id="line-51"></span><span>            </span><span id="local-6989586621679232233"><span class="annot"><span class="annottext">markup' :: T
+</span><a href="#local-6989586621679232233"><span class="hs-identifier hs-var hs-var">markup'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">T -&gt; T -&gt; T
+</span><a href="Isabelle.Markup.html#properties"><span class="hs-identifier hs-var">Markup.properties</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T -&gt; T
+</span><a href="Isabelle.Position.html#properties_of"><span class="hs-identifier hs-var">Position.properties_of</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232231"><span class="hs-identifier hs-var">pos'</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232229"><span class="hs-identifier hs-var">markup</span></a></span><span>
+</span><span id="line-52"></span><span>            </span><span id="local-6989586621679232236"><span class="annot"><span class="annottext">body :: [Tree]
+</span><a href="#local-6989586621679232236"><span class="hs-identifier hs-var hs-var">body</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bool
+</span><a href="Isabelle.Bytes.html#null"><span class="hs-identifier hs-var">Bytes.null</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232230"><span class="hs-identifier hs-var">txt</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-keyword">else</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes -&gt; Tree
+</span><a href="Isabelle.XML.html#Text"><span class="hs-identifier hs-var">XML.Text</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232230"><span class="hs-identifier hs-var">txt</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-53"></span><span>          </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Tree -&gt; Bytes
+</span><a href="Isabelle.YXML.html#string_of"><span class="hs-identifier hs-var">YXML.string_of</span></a></span><span> </span><span class="annot"><span class="annottext">(Tree -&gt; Bytes) -&gt; Tree -&gt; Bytes
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(T, [Tree]) -&gt; Tree
+</span><a href="Isabelle.XML.html#Elem"><span class="hs-identifier hs-var">XML.Elem</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232233"><span class="hs-identifier hs-var">markup'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[Tree]
+</span><a href="#local-6989586621679232236"><span class="hs-identifier hs-var">body</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Report_Text]
+</span><a href="#local-6989586621679232219"><span class="hs-identifier hs-var">args</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-54"></span><span>
+</span><span id="line-55"></span><span class="annot"><a href="SAD.Core.Message.html#report_text"><span class="hs-identifier hs-type">report_text</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Markup.html#T"><span class="hs-identifier hs-type">Markup.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-56"></span><span id="report_text"><span class="annot"><span class="annottext">report_text :: T -&gt; T -&gt; Bytes -&gt; IO ()
+</span><a href="SAD.Core.Message.html#report_text"><span class="hs-identifier hs-var hs-var">report_text</span></a></span></span><span> </span><span id="local-6989586621679232241"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232241"><span class="hs-identifier hs-var">pos</span></a></span></span><span> </span><span id="local-6989586621679232242"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232242"><span class="hs-identifier hs-var">markup</span></a></span></span><span> </span><span id="local-6989586621679232243"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232243"><span class="hs-identifier hs-var">txt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Report_Text] -&gt; IO ()
+</span><a href="SAD.Core.Message.html#reports_text"><span class="hs-identifier hs-var">reports_text</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232241"><span class="hs-identifier hs-var">pos</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232242"><span class="hs-identifier hs-var">markup</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232243"><span class="hs-identifier hs-var">txt</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-57"></span><span>
+</span><span id="line-58"></span><span class="annot"><a href="SAD.Core.Message.html#reports"><span class="hs-identifier hs-type">reports</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Isabelle.Position.html#Report"><span class="hs-identifier hs-type">Position.Report</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-59"></span><span id="reports"><span class="annot"><span class="annottext">reports :: [(T, T)] -&gt; IO ()
+</span><a href="SAD.Core.Message.html#reports"><span class="hs-identifier hs-var hs-var">reports</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Report_Text] -&gt; IO ()
+</span><a href="SAD.Core.Message.html#reports_text"><span class="hs-identifier hs-var">reports_text</span></a></span><span> </span><span class="annot"><span class="annottext">([Report_Text] -&gt; IO ())
+-&gt; ([(T, T)] -&gt; [Report_Text]) -&gt; [(T, T)] -&gt; IO ()
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">((T, T) -&gt; Report_Text) -&gt; [(T, T)] -&gt; [Report_Text]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="Isabelle.Bytes.html#empty"><span class="hs-identifier hs-var">Bytes.empty</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-60"></span><span>
+</span><span id="line-61"></span><span class="annot"><a href="SAD.Core.Message.html#report"><span class="hs-identifier hs-type">report</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Markup.html#T"><span class="hs-identifier hs-type">Markup.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-62"></span><span id="report"><span class="annot"><span class="annottext">report :: T -&gt; T -&gt; IO ()
+</span><a href="SAD.Core.Message.html#report"><span class="hs-identifier hs-var hs-var">report</span></a></span></span><span> </span><span id="local-6989586621679232247"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232247"><span class="hs-identifier hs-var">pos</span></a></span></span><span> </span><span id="local-6989586621679232248"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232248"><span class="hs-identifier hs-var">markup</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(T, T)] -&gt; IO ()
+</span><a href="SAD.Core.Message.html#reports"><span class="hs-identifier hs-var">reports</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232247"><span class="hs-identifier hs-var">pos</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232248"><span class="hs-identifier hs-var">markup</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-63"></span><span>
+</span><span id="line-64"></span><span>
+</span><span id="line-65"></span><span class="hs-comment">-- message origin</span><span>
+</span><span id="line-66"></span><span>
+</span><span id="line-67"></span><span class="annot"><a href="SAD.Core.Message.html#origin_main"><span class="hs-identifier hs-type">origin_main</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#origin_export"><span class="hs-identifier hs-type">origin_export</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#origin_forthel"><span class="hs-identifier hs-type">origin_forthel</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#origin_parser"><span class="hs-identifier hs-type">origin_parser</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-68"></span><span>  </span><span class="annot"><a href="SAD.Core.Message.html#origin_reasoner"><span class="hs-identifier hs-type">origin_reasoner</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#origin_simplifier"><span class="hs-identifier hs-type">origin_simplifier</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#origin_thesis"><span class="hs-identifier hs-type">origin_thesis</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#origin_translate"><span class="hs-identifier hs-type">origin_translate</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-69"></span><span>  </span><span class="annot"><a href="SAD.Core.Message.html#origin_lexer"><span class="hs-identifier hs-type">origin_lexer</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#origin_tokenizer"><span class="hs-identifier hs-type">origin_tokenizer</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#origin_reader"><span class="hs-identifier hs-type">origin_reader</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span>
+</span><span id="line-70"></span><span id="origin_main"><span class="annot"><span class="annottext">origin_main :: Bytes
+</span><a href="SAD.Core.Message.html#origin_main"><span class="hs-identifier hs-var hs-var">origin_main</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Main&quot;</span></span><span>
+</span><span id="line-71"></span><span id="origin_export"><span class="annot"><span class="annottext">origin_export :: Bytes
+</span><a href="SAD.Core.Message.html#origin_export"><span class="hs-identifier hs-var hs-var">origin_export</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Export&quot;</span></span><span>
+</span><span id="line-72"></span><span id="origin_forthel"><span class="annot"><span class="annottext">origin_forthel :: Bytes
+</span><a href="SAD.Core.Message.html#origin_forthel"><span class="hs-identifier hs-var hs-var">origin_forthel</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;ForTheL&quot;</span></span><span>
+</span><span id="line-73"></span><span id="origin_parser"><span class="annot"><span class="annottext">origin_parser :: Bytes
+</span><a href="SAD.Core.Message.html#origin_parser"><span class="hs-identifier hs-var hs-var">origin_parser</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Parser&quot;</span></span><span>
+</span><span id="line-74"></span><span id="origin_reasoner"><span class="annot"><span class="annottext">origin_reasoner :: Bytes
+</span><a href="SAD.Core.Message.html#origin_reasoner"><span class="hs-identifier hs-var hs-var">origin_reasoner</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Reasoner&quot;</span></span><span>
+</span><span id="line-75"></span><span id="origin_simplifier"><span class="annot"><span class="annottext">origin_simplifier :: Bytes
+</span><a href="SAD.Core.Message.html#origin_simplifier"><span class="hs-identifier hs-var hs-var">origin_simplifier</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Simplifier&quot;</span></span><span>
+</span><span id="line-76"></span><span id="origin_thesis"><span class="annot"><span class="annottext">origin_thesis :: Bytes
+</span><a href="SAD.Core.Message.html#origin_thesis"><span class="hs-identifier hs-var hs-var">origin_thesis</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Thesis&quot;</span></span><span>
+</span><span id="line-77"></span><span id="origin_translate"><span class="annot"><span class="annottext">origin_translate :: Bytes
+</span><a href="SAD.Core.Message.html#origin_translate"><span class="hs-identifier hs-var hs-var">origin_translate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Translation&quot;</span></span><span>
+</span><span id="line-78"></span><span id="origin_lexer"><span class="annot"><span class="annottext">origin_lexer :: Bytes
+</span><a href="SAD.Core.Message.html#origin_lexer"><span class="hs-identifier hs-var hs-var">origin_lexer</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Lexer&quot;</span></span><span>
+</span><span id="line-79"></span><span id="origin_tokenizer"><span class="annot"><span class="annottext">origin_tokenizer :: Bytes
+</span><a href="SAD.Core.Message.html#origin_tokenizer"><span class="hs-identifier hs-var hs-var">origin_tokenizer</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Tokenizer&quot;</span></span><span>
+</span><span id="line-80"></span><span id="origin_reader"><span class="annot"><span class="annottext">origin_reader :: Bytes
+</span><a href="SAD.Core.Message.html#origin_reader"><span class="hs-identifier hs-var hs-var">origin_reader</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Reader&quot;</span></span><span>
+</span><span id="line-81"></span><span>
+</span><span id="line-82"></span><span>
+</span><span id="line-83"></span><span class="hs-comment">-- message kind</span><span>
+</span><span id="line-84"></span><span>
+</span><span id="line-85"></span><span class="hs-keyword">data</span><span> </span><span id="Kind"><span class="annot"><a href="SAD.Core.Message.html#Kind"><span class="hs-identifier hs-var">Kind</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-86"></span><span>  </span><span id="STATE"><span class="annot"><a href="SAD.Core.Message.html#STATE"><span class="hs-identifier hs-var">STATE</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="WRITELN"><span class="annot"><a href="SAD.Core.Message.html#WRITELN"><span class="hs-identifier hs-var">WRITELN</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="INFORMATION"><span class="annot"><a href="SAD.Core.Message.html#INFORMATION"><span class="hs-identifier hs-var">INFORMATION</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="TRACING"><span class="annot"><a href="SAD.Core.Message.html#TRACING"><span class="hs-identifier hs-var">TRACING</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="WARNING"><span class="annot"><a href="SAD.Core.Message.html#WARNING"><span class="hs-identifier hs-var">WARNING</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="LEGACY_FEATURE"><span class="annot"><a href="SAD.Core.Message.html#LEGACY_FEATURE"><span class="hs-identifier hs-var">LEGACY_FEATURE</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="ERROR"><span class="annot"><a href="SAD.Core.Message.html#ERROR"><span class="hs-identifier hs-var">ERROR</span></a></span></span><span>
+</span><span id="line-87"></span><span>
+</span><span id="line-88"></span><span class="annot"><a href="SAD.Core.Message.html#console_kind"><span class="hs-identifier hs-type">console_kind</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#Kind"><span class="hs-identifier hs-type">Kind</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span>
+</span><span id="line-89"></span><span id="console_kind"><span class="annot"><span class="annottext">console_kind :: Kind -&gt; Bytes
+</span><a href="SAD.Core.Message.html#console_kind"><span class="hs-identifier hs-var hs-var">console_kind</span></a></span></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><a href="SAD.Core.Message.html#WARNING"><span class="hs-identifier hs-var">WARNING</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Warning&quot;</span></span><span>
+</span><span id="line-90"></span><span class="annot"><a href="SAD.Core.Message.html#console_kind"><span class="hs-identifier hs-var">console_kind</span></a></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><a href="SAD.Core.Message.html#LEGACY_FEATURE"><span class="hs-identifier hs-var">LEGACY_FEATURE</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Legacy feature&quot;</span></span><span>
+</span><span id="line-91"></span><span class="annot"><a href="SAD.Core.Message.html#console_kind"><span class="hs-identifier hs-var">console_kind</span></a></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><a href="SAD.Core.Message.html#ERROR"><span class="hs-identifier hs-var">ERROR</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;Error&quot;</span></span><span>
+</span><span id="line-92"></span><span class="annot"><a href="SAD.Core.Message.html#console_kind"><span class="hs-identifier hs-var">console_kind</span></a></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;&quot;</span></span><span>
+</span><span id="line-93"></span><span>
+</span><span id="line-94"></span><span class="annot"><a href="SAD.Core.Message.html#pide_kind"><span class="hs-identifier hs-type">pide_kind</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#Kind"><span class="hs-identifier hs-type">Kind</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span>
+</span><span id="line-95"></span><span id="pide_kind"><span class="annot"><span class="annottext">pide_kind :: Kind -&gt; Bytes
+</span><a href="SAD.Core.Message.html#pide_kind"><span class="hs-identifier hs-var hs-var">pide_kind</span></a></span></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><a href="SAD.Core.Message.html#STATE"><span class="hs-identifier hs-var">STATE</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="Isabelle.Naproche.html#output_state_command"><span class="hs-identifier hs-var">Naproche.output_state_command</span></a></span><span>
+</span><span id="line-96"></span><span class="annot"><a href="SAD.Core.Message.html#pide_kind"><span class="hs-identifier hs-var">pide_kind</span></a></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><a href="SAD.Core.Message.html#WRITELN"><span class="hs-identifier hs-var">WRITELN</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="Isabelle.Naproche.html#output_writeln_command"><span class="hs-identifier hs-var">Naproche.output_writeln_command</span></a></span><span>
+</span><span id="line-97"></span><span class="annot"><a href="SAD.Core.Message.html#pide_kind"><span class="hs-identifier hs-var">pide_kind</span></a></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><a href="SAD.Core.Message.html#INFORMATION"><span class="hs-identifier hs-var">INFORMATION</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="Isabelle.Naproche.html#output_information_command"><span class="hs-identifier hs-var">Naproche.output_information_command</span></a></span><span>
+</span><span id="line-98"></span><span class="annot"><a href="SAD.Core.Message.html#pide_kind"><span class="hs-identifier hs-var">pide_kind</span></a></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><a href="SAD.Core.Message.html#TRACING"><span class="hs-identifier hs-var">TRACING</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="Isabelle.Naproche.html#output_tracing_command"><span class="hs-identifier hs-var">Naproche.output_tracing_command</span></a></span><span>
+</span><span id="line-99"></span><span class="annot"><a href="SAD.Core.Message.html#pide_kind"><span class="hs-identifier hs-var">pide_kind</span></a></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><a href="SAD.Core.Message.html#WARNING"><span class="hs-identifier hs-var">WARNING</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="Isabelle.Naproche.html#output_warning_command"><span class="hs-identifier hs-var">Naproche.output_warning_command</span></a></span><span>
+</span><span id="line-100"></span><span class="annot"><a href="SAD.Core.Message.html#pide_kind"><span class="hs-identifier hs-var">pide_kind</span></a></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><a href="SAD.Core.Message.html#LEGACY_FEATURE"><span class="hs-identifier hs-var">LEGACY_FEATURE</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="Isabelle.Naproche.html#output_legacy_feature_command"><span class="hs-identifier hs-var">Naproche.output_legacy_feature_command</span></a></span><span>
+</span><span id="line-101"></span><span class="annot"><a href="SAD.Core.Message.html#pide_kind"><span class="hs-identifier hs-var">pide_kind</span></a></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><a href="SAD.Core.Message.html#ERROR"><span class="hs-identifier hs-var">ERROR</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="Isabelle.Naproche.html#output_error_command"><span class="hs-identifier hs-var">Naproche.output_error_command</span></a></span><span>
+</span><span id="line-102"></span><span>
+</span><span id="line-103"></span><span>
+</span><span id="line-104"></span><span class="hs-comment">-- make formal message</span><span>
+</span><span id="line-105"></span><span>
+</span><span id="line-106"></span><span class="annot"><a href="SAD.Core.Message.html#console_position"><span class="hs-identifier hs-type">console_position</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span>
+</span><span id="line-107"></span><span id="console_position"><span class="annot"><span class="annottext">console_position :: T -&gt; Bytes
+</span><a href="SAD.Core.Message.html#console_position"><span class="hs-identifier hs-var hs-var">console_position</span></a></span></span><span> </span><span id="local-6989586621679232267"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232267"><span class="hs-identifier hs-var">pos</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; [Bytes] -&gt; Bytes
+forall a. StringLike a =&gt; a -&gt; [a] -&gt; a
+</span><a href="Isabelle.Library.html#space_implode"><span class="hs-identifier hs-var">space_implode</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot; &quot;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Maybe Bytes] -&gt; [Bytes]
+forall a. [Maybe a] -&gt; [a]
+</span><span class="hs-identifier hs-var">catMaybes</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Maybe Bytes
+</span><a href="#local-6989586621679232269"><span class="hs-identifier hs-var">file_name</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Maybe Bytes
+</span><a href="#local-6989586621679232270"><span class="hs-identifier hs-var">details</span></a></span><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><span id="line-108"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-109"></span><span>    </span><span id="local-6989586621679232269"><span class="annot"><span class="annottext">file_name :: Maybe Bytes
+</span><a href="#local-6989586621679232269"><span class="hs-identifier hs-var hs-var">file_name</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes
+forall a. StringLike a =&gt; a -&gt; a
+</span><a href="Isabelle.Library.html#quote"><span class="hs-identifier hs-var">quote</span></a></span><span> </span><span class="annot"><span class="annottext">(Bytes -&gt; Bytes) -&gt; Maybe Bytes -&gt; Maybe Bytes
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">T -&gt; Maybe Bytes
+</span><a href="Isabelle.Position.html#file_of"><span class="hs-identifier hs-var">Position.file_of</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232267"><span class="hs-identifier hs-var">pos</span></a></span><span>
+</span><span id="line-110"></span><span>    </span><span id="local-6989586621679232270"><span class="annot"><span class="annottext">details :: Maybe Bytes
+</span><a href="#local-6989586621679232270"><span class="hs-identifier hs-var hs-var">details</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-111"></span><span>      </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">((Bytes, T -&gt; Maybe Int) -&gt; Maybe Bytes)
+-&gt; [(Bytes, T -&gt; Maybe Int)] -&gt; [Bytes]
+forall a b. (a -&gt; Maybe b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">mapMaybe</span></span><span> </span><span class="annot"><span class="annottext">(Bytes, T -&gt; Maybe Int) -&gt; Maybe Bytes
+forall {f :: * -&gt; *}. Functor f =&gt; (Bytes, T -&gt; f Int) -&gt; f Bytes
+</span><a href="#local-6989586621679232286"><span class="hs-identifier hs-var">detail</span></a></span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;line&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">T -&gt; Maybe Int
+</span><a href="Isabelle.Position.html#line_of"><span class="hs-identifier hs-var">Position.line_of</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;column&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">T -&gt; Maybe Int
+</span><a href="Isabelle.Position.html#column_of"><span class="hs-identifier hs-var">Position.column_of</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-112"></span><span>        </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Maybe Bytes
+forall a. Maybe a
+</span><span class="hs-identifier hs-var">Nothing</span></span><span>
+</span><span id="line-113"></span><span>        </span><span id="local-6989586621679232289"><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679232289"><span class="hs-identifier hs-var">ds</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Maybe Bytes
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;(&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">[Bytes] -&gt; Bytes
+forall a. StringLike a =&gt; [a] -&gt; a
+</span><a href="Isabelle.Library.html#commas"><span class="hs-identifier hs-var">commas</span></a></span><span> </span><span class="annot"><span class="annottext">[Bytes]
+</span><a href="#local-6989586621679232289"><span class="hs-identifier hs-var">ds</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;)&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-114"></span><span>    </span><span id="local-6989586621679232286"><span class="annot"><span class="annottext">detail :: (Bytes, T -&gt; f Int) -&gt; f Bytes
+</span><a href="#local-6989586621679232286"><span class="hs-identifier hs-var hs-var">detail</span></a></span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679232296"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232296"><span class="hs-identifier hs-var">a</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679232297"><span class="annot"><span class="annottext">T -&gt; f Int
+</span><a href="#local-6989586621679232297"><span class="hs-identifier hs-var">f</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679232298"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679232298"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232296"><span class="hs-identifier hs-var">a</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot; &quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Bytes
+</span><a href="Isabelle.Value.html#print_int"><span class="hs-identifier hs-var">Value.print_int</span></a></span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679232298"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Bytes) -&gt; f Int -&gt; f Bytes
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">T -&gt; f Int
+</span><a href="#local-6989586621679232297"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232267"><span class="hs-identifier hs-var">pos</span></a></span><span>
+</span><span id="line-115"></span><span>
+</span><span id="line-116"></span><span class="annot"><a href="SAD.Core.Message.html#show_position"><span class="hs-identifier hs-type">show_position</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-117"></span><span id="show_position"><span class="annot"><span class="annottext">show_position :: T -&gt; String
+</span><a href="SAD.Core.Message.html#show_position"><span class="hs-identifier hs-var hs-var">show_position</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; String
+forall a. STRING a =&gt; a -&gt; String
+</span><a href="Isabelle.Library.html#make_string"><span class="hs-identifier hs-var">make_string</span></a></span><span> </span><span class="annot"><span class="annottext">(Bytes -&gt; String) -&gt; (T -&gt; Bytes) -&gt; T -&gt; String
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">T -&gt; Bytes
+</span><a href="SAD.Core.Message.html#console_position"><span class="hs-identifier hs-var">console_position</span></a></span><span>
+</span><span id="line-118"></span><span>
+</span><span id="line-119"></span><span class="annot"><a href="SAD.Core.Message.html#make_message"><span class="hs-identifier hs-type">make_message</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Naproche.Program.html#Context"><span class="hs-identifier hs-type">Program.Context</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#Kind"><span class="hs-identifier hs-type">Kind</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-120"></span><span id="make_message"><span class="annot"><span class="annottext">make_message :: Context -&gt; Kind -&gt; Bytes -&gt; T -&gt; Bytes -&gt; (Bytes, Bytes)
+</span><a href="SAD.Core.Message.html#make_message"><span class="hs-identifier hs-var hs-var">make_message</span></a></span></span><span> </span><span id="local-6989586621679232302"><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679232302"><span class="hs-identifier hs-var">context</span></a></span></span><span> </span><span id="local-6989586621679232303"><span class="annot"><span class="annottext">Kind
+</span><a href="#local-6989586621679232303"><span class="hs-identifier hs-var">kind</span></a></span></span><span> </span><span id="local-6989586621679232304"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232304"><span class="hs-identifier hs-var">origin</span></a></span></span><span> </span><span id="local-6989586621679232305"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232305"><span class="hs-identifier hs-var">pos</span></a></span></span><span> </span><span id="local-6989586621679232306"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232306"><span class="hs-identifier hs-var">text</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-121"></span><span>  </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Context -&gt; Bool
+</span><a href="Naproche.Program.html#is_pide"><span class="hs-identifier hs-var">Program.is_pide</span></a></span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679232302"><span class="hs-identifier hs-var">context</span></a></span><span> </span><span class="hs-keyword">then</span><span>
+</span><span id="line-122"></span><span>    </span><span class="hs-keyword">let</span><span>
+</span><span id="line-123"></span><span>      </span><span id="local-6989586621679232307"><span class="annot"><span class="annottext">k :: Bytes
+</span><a href="#local-6989586621679232307"><span class="hs-identifier hs-var hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Kind -&gt; Bytes
+</span><a href="SAD.Core.Message.html#pide_kind"><span class="hs-identifier hs-var">pide_kind</span></a></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><a href="#local-6989586621679232303"><span class="hs-identifier hs-var">kind</span></a></span><span>
+</span><span id="line-124"></span><span>      </span><span id="local-6989586621679232308"><span class="annot"><span class="annottext">p :: Bytes
+</span><a href="#local-6989586621679232308"><span class="hs-identifier hs-var hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">T -&gt; Bytes
+</span><a href="Isabelle.Position.html#here"><span class="hs-identifier hs-var">Position.here</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Context -&gt; T -&gt; T
+</span><a href="Naproche.Program.html#adjust_position"><span class="hs-identifier hs-var">Program.adjust_position</span></a></span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679232302"><span class="hs-identifier hs-var">context</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232305"><span class="hs-identifier hs-var">pos</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-125"></span><span>      </span><span id="local-6989586621679232318"><span class="annot"><span class="annottext">msg :: Bytes
+</span><a href="#local-6989586621679232318"><span class="hs-identifier hs-var hs-var">msg</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-126"></span><span>        </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes -&gt; Bytes
+forall a. StringLike a =&gt; a -&gt; a -&gt; a -&gt; a
+</span><a href="Isabelle.Library.html#enclose"><span class="hs-identifier hs-var">enclose</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;[&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;]&quot;</span></span><span> </span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bool
+</span><a href="Isabelle.Bytes.html#null"><span class="hs-identifier hs-var">Bytes.null</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232304"><span class="hs-identifier hs-var">origin</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="SAD.Core.Message.html#origin_main"><span class="hs-identifier hs-var">origin_main</span></a></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232304"><span class="hs-identifier hs-var">origin</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span>
+</span><span id="line-127"></span><span>        </span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bool
+</span><a href="Isabelle.Bytes.html#null"><span class="hs-identifier hs-var">Bytes.null</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232308"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot; &quot;</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232308"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;\n&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232306"><span class="hs-identifier hs-var">text</span></a></span><span>
+</span><span id="line-128"></span><span>    </span><span class="hs-keyword">in</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232307"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232318"><span class="hs-identifier hs-var">msg</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-129"></span><span>  </span><span class="hs-keyword">else</span><span>
+</span><span id="line-130"></span><span>    </span><span class="hs-keyword">let</span><span>
+</span><span id="line-131"></span><span>      </span><span id="local-6989586621679232320"><span class="annot"><span class="annottext">k :: Bytes
+</span><a href="#local-6989586621679232320"><span class="hs-identifier hs-var hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Kind -&gt; Bytes
+</span><a href="SAD.Core.Message.html#console_kind"><span class="hs-identifier hs-var">console_kind</span></a></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><a href="#local-6989586621679232303"><span class="hs-identifier hs-var">kind</span></a></span><span>
+</span><span id="line-132"></span><span>      </span><span id="local-6989586621679232321"><span class="annot"><span class="annottext">p :: Bytes
+</span><a href="#local-6989586621679232321"><span class="hs-identifier hs-var hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">T -&gt; Bytes
+</span><a href="SAD.Core.Message.html#console_position"><span class="hs-identifier hs-var">console_position</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232305"><span class="hs-identifier hs-var">pos</span></a></span><span>
+</span><span id="line-133"></span><span>      </span><span id="local-6989586621679232336"><span class="annot"><span class="annottext">msg :: Bytes
+</span><a href="#local-6989586621679232336"><span class="hs-identifier hs-var hs-var">msg</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-134"></span><span>        </span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bool
+</span><a href="Isabelle.Bytes.html#null"><span class="hs-identifier hs-var">Bytes.null</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232304"><span class="hs-identifier hs-var">origin</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;&quot;</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;[&quot;</span></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232304"><span class="hs-identifier hs-var">origin</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;] &quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span>
+</span><span id="line-135"></span><span>        </span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bool
+</span><a href="Isabelle.Bytes.html#null"><span class="hs-identifier hs-var">Bytes.null</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232320"><span class="hs-identifier hs-var">k</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;&quot;</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232320"><span class="hs-identifier hs-var">k</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;: &quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span>
+</span><span id="line-136"></span><span>        </span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bool
+</span><a href="Isabelle.Bytes.html#null"><span class="hs-identifier hs-var">Bytes.null</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232321"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;&quot;</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232321"><span class="hs-identifier hs-var">p</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;\n&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Bytes -&gt; Bytes
+forall a. Semigroup a =&gt; a -&gt; a -&gt; a
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232306"><span class="hs-identifier hs-var">text</span></a></span><span>
+</span><span id="line-137"></span><span>    </span><span class="hs-keyword">in</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bytes
+</span><span class="hs-string">&quot;&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232336"><span class="hs-identifier hs-var">msg</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-138"></span><span>
+</span><span id="line-139"></span><span id="local-6989586621679232121"><span class="annot"><a href="SAD.Core.Message.html#output"><span class="hs-identifier hs-type">output</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Library.html#BYTES"><span class="hs-identifier hs-type">BYTES</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679232121"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#Kind"><span class="hs-identifier hs-type">Kind</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679232121"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-140"></span><span id="output"><span class="annot"><span class="annottext">output :: forall a. BYTES a =&gt; Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#output"><span class="hs-identifier hs-var hs-var">output</span></a></span></span><span> </span><span id="local-6989586621679232351"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232351"><span class="hs-identifier hs-var">origin</span></a></span></span><span> </span><span id="local-6989586621679232352"><span class="annot"><span class="annottext">Kind
+</span><a href="#local-6989586621679232352"><span class="hs-identifier hs-var">kind</span></a></span></span><span> </span><span id="local-6989586621679232353"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232353"><span class="hs-identifier hs-var">pos</span></a></span></span><span> </span><span id="local-6989586621679232354"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679232354"><span class="hs-identifier hs-var">text</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-141"></span><span>  </span><span id="local-6989586621679232355"><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679232355"><span class="hs-identifier hs-var">context</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO Context
+</span><a href="Naproche.Program.html#thread_context"><span class="hs-identifier hs-var">Program.thread_context</span></a></span><span>
+</span><span id="line-142"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679232364"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232364"><span class="hs-identifier hs-var">command</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679232365"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232365"><span class="hs-identifier hs-var">msg</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Context -&gt; Kind -&gt; Bytes -&gt; T -&gt; Bytes -&gt; (Bytes, Bytes)
+</span><a href="SAD.Core.Message.html#make_message"><span class="hs-identifier hs-var">make_message</span></a></span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679232355"><span class="hs-identifier hs-var">context</span></a></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><a href="#local-6989586621679232352"><span class="hs-identifier hs-var">kind</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232351"><span class="hs-identifier hs-var">origin</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232353"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; Bytes
+forall a. BYTES a =&gt; a -&gt; Bytes
+</span><a href="Isabelle.Library.html#make_bytes"><span class="hs-identifier hs-var">make_bytes</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679232354"><span class="hs-identifier hs-var">text</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-143"></span><span>  </span><span class="annot"><span class="annottext">Context -&gt; [Bytes] -&gt; IO ()
+</span><a href="Naproche.Program.html#exchange_message0"><span class="hs-identifier hs-var">Program.exchange_message0</span></a></span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679232355"><span class="hs-identifier hs-var">context</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232364"><span class="hs-identifier hs-var">command</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232365"><span class="hs-identifier hs-var">msg</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-144"></span><span>
+</span><span id="line-145"></span><span id="local-6989586621679232127"><span id="local-6989586621679232128"><span class="annot"><a href="SAD.Core.Message.html#error"><span class="hs-identifier hs-type">error</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Library.html#BYTES"><span class="hs-identifier hs-type">BYTES</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679232127"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Isabelle.Bytes.html#Bytes"><span class="hs-identifier hs-type">Bytes</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679232127"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="#local-6989586621679232128"><span class="hs-identifier hs-type">b</span></a></span></span></span><span>
+</span><span id="line-146"></span><span id="error"><span class="annot"><span class="annottext">error :: forall a b. BYTES a =&gt; Bytes -&gt; T -&gt; a -&gt; IO b
+</span><a href="SAD.Core.Message.html#error"><span class="hs-identifier hs-var hs-var">error</span></a></span></span><span> </span><span id="local-6989586621679232370"><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232370"><span class="hs-identifier hs-var">origin</span></a></span></span><span> </span><span id="local-6989586621679232371"><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232371"><span class="hs-identifier hs-var">pos</span></a></span></span><span> </span><span id="local-6989586621679232372"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679232372"><span class="hs-identifier hs-var">text</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-147"></span><span>  </span><span id="local-6989586621679232373"><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679232373"><span class="hs-identifier hs-var">context</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">IO Context
+</span><a href="Naproche.Program.html#thread_context"><span class="hs-identifier hs-var">Program.thread_context</span></a></span><span>
+</span><span id="line-148"></span><span>  </span><span class="annot"><span class="annottext">Bytes -&gt; IO b
+forall a. Bytes -&gt; IO a
+</span><a href="Naproche.Program.html#error"><span class="hs-identifier hs-var">Program.error</span></a></span><span> </span><span class="annot"><span class="annottext">(Bytes -&gt; IO b) -&gt; Bytes -&gt; IO b
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Bytes, Bytes) -&gt; Bytes
+forall a b. (a, b) -&gt; b
+</span><span class="hs-identifier hs-var">snd</span></span><span> </span><span class="annot"><span class="annottext">((Bytes, Bytes) -&gt; Bytes) -&gt; (Bytes, Bytes) -&gt; Bytes
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Context -&gt; Kind -&gt; Bytes -&gt; T -&gt; Bytes -&gt; (Bytes, Bytes)
+</span><a href="SAD.Core.Message.html#make_message"><span class="hs-identifier hs-var">make_message</span></a></span><span> </span><span class="annot"><span class="annottext">Context
+</span><a href="#local-6989586621679232373"><span class="hs-identifier hs-var">context</span></a></span><span> </span><span class="annot"><span class="annottext">Kind
+</span><a href="SAD.Core.Message.html#ERROR"><span class="hs-identifier hs-var">ERROR</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="#local-6989586621679232370"><span class="hs-identifier hs-var">origin</span></a></span><span> </span><span class="annot"><span class="annottext">T
+</span><a href="#local-6989586621679232371"><span class="hs-identifier hs-var">pos</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; Bytes
+forall a. BYTES a =&gt; a -&gt; Bytes
+</span><a href="Isabelle.Library.html#make_bytes"><span class="hs-identifier hs-var">make_bytes</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679232372"><span class="hs-identifier hs-var">text</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-149"></span><span>
+</span><span id="line-150"></span><span>
+</span><span id="line-151"></span><span class="hs-comment">-- common messages</span><span>
+</span><span id="line-152"></span><span>
+</span><span id="line-153"></span><span id="local-6989586621679232134"><span class="annot"><a href="SAD.Core.Message.html#outputMain"><span class="hs-identifier hs-type">outputMain</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#outputExport"><span class="hs-identifier hs-type">outputExport</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#outputForTheL"><span class="hs-identifier hs-type">outputForTheL</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#outputParser"><span class="hs-identifier hs-type">outputParser</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#outputReasoner"><span class="hs-identifier hs-type">outputReasoner</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-154"></span><span>  </span><span class="annot"><a href="SAD.Core.Message.html#outputSimplifier"><span class="hs-identifier hs-type">outputSimplifier</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#outputThesis"><span class="hs-identifier hs-type">outputThesis</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#outputTokenizer"><span class="hs-identifier hs-type">outputTokenizer</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Library.html#BYTES"><span class="hs-identifier hs-type">BYTES</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679232134"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#Kind"><span class="hs-identifier hs-type">Kind</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679232134"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-155"></span><span id="outputMain"><span class="annot"><span class="annottext">outputMain :: forall a. BYTES a =&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#outputMain"><span class="hs-identifier hs-var hs-var">outputMain</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+forall a. BYTES a =&gt; Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#output"><span class="hs-identifier hs-var">output</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="SAD.Core.Message.html#origin_main"><span class="hs-identifier hs-var">origin_main</span></a></span><span>
+</span><span id="line-156"></span><span id="outputExport"><span class="annot"><span class="annottext">outputExport :: forall a. BYTES a =&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#outputExport"><span class="hs-identifier hs-var hs-var">outputExport</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+forall a. BYTES a =&gt; Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#output"><span class="hs-identifier hs-var">output</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="SAD.Core.Message.html#origin_export"><span class="hs-identifier hs-var">origin_export</span></a></span><span>
+</span><span id="line-157"></span><span id="outputForTheL"><span class="annot"><span class="annottext">outputForTheL :: forall a. BYTES a =&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#outputForTheL"><span class="hs-identifier hs-var hs-var">outputForTheL</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+forall a. BYTES a =&gt; Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#output"><span class="hs-identifier hs-var">output</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="SAD.Core.Message.html#origin_forthel"><span class="hs-identifier hs-var">origin_forthel</span></a></span><span>
+</span><span id="line-158"></span><span id="outputParser"><span class="annot"><span class="annottext">outputParser :: forall a. BYTES a =&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#outputParser"><span class="hs-identifier hs-var hs-var">outputParser</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+forall a. BYTES a =&gt; Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#output"><span class="hs-identifier hs-var">output</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="SAD.Core.Message.html#origin_parser"><span class="hs-identifier hs-var">origin_parser</span></a></span><span>
+</span><span id="line-159"></span><span id="outputReasoner"><span class="annot"><span class="annottext">outputReasoner :: forall a. BYTES a =&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#outputReasoner"><span class="hs-identifier hs-var hs-var">outputReasoner</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+forall a. BYTES a =&gt; Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#output"><span class="hs-identifier hs-var">output</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="SAD.Core.Message.html#origin_reasoner"><span class="hs-identifier hs-var">origin_reasoner</span></a></span><span>
+</span><span id="line-160"></span><span id="outputSimplifier"><span class="annot"><span class="annottext">outputSimplifier :: forall a. BYTES a =&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#outputSimplifier"><span class="hs-identifier hs-var hs-var">outputSimplifier</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+forall a. BYTES a =&gt; Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#output"><span class="hs-identifier hs-var">output</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="SAD.Core.Message.html#origin_simplifier"><span class="hs-identifier hs-var">origin_simplifier</span></a></span><span>
+</span><span id="line-161"></span><span id="outputThesis"><span class="annot"><span class="annottext">outputThesis :: forall a. BYTES a =&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#outputThesis"><span class="hs-identifier hs-var hs-var">outputThesis</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+forall a. BYTES a =&gt; Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#output"><span class="hs-identifier hs-var">output</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="SAD.Core.Message.html#origin_thesis"><span class="hs-identifier hs-var">origin_thesis</span></a></span><span>
+</span><span id="line-162"></span><span id="outputTokenizer"><span class="annot"><span class="annottext">outputTokenizer :: forall a. BYTES a =&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#outputTokenizer"><span class="hs-identifier hs-var hs-var">outputTokenizer</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+forall a. BYTES a =&gt; Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#output"><span class="hs-identifier hs-var">output</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="SAD.Core.Message.html#origin_tokenizer"><span class="hs-identifier hs-var">origin_tokenizer</span></a></span><span>
+</span><span id="line-163"></span><span>
+</span><span id="line-164"></span><span id="local-6989586621679232392"><span class="annot"><a href="SAD.Core.Message.html#outputTranslate"><span class="hs-identifier hs-type">outputTranslate</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Library.html#BYTES"><span class="hs-identifier hs-type">BYTES</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679232392"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#Kind"><span class="hs-identifier hs-type">Kind</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679232392"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-165"></span><span id="outputTranslate"><span class="annot"><span class="annottext">outputTranslate :: forall a. BYTES a =&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#outputTranslate"><span class="hs-identifier hs-var hs-var">outputTranslate</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+forall a. BYTES a =&gt; Bytes -&gt; Kind -&gt; T -&gt; a -&gt; IO ()
+</span><a href="SAD.Core.Message.html#output"><span class="hs-identifier hs-var">output</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="SAD.Core.Message.html#origin_translate"><span class="hs-identifier hs-var">origin_translate</span></a></span><span>
+</span><span id="line-166"></span><span>
+</span><span id="line-167"></span><span id="local-6989586621679232144"><span id="local-6989586621679232145"><span class="annot"><a href="SAD.Core.Message.html#errorExport"><span class="hs-identifier hs-type">errorExport</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#errorParser"><span class="hs-identifier hs-type">errorParser</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#errorLexer"><span class="hs-identifier hs-type">errorLexer</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#errorTokenizer"><span class="hs-identifier hs-type">errorTokenizer</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Core.Message.html#errorReader"><span class="hs-identifier hs-type">errorReader</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Isabelle.Library.html#BYTES"><span class="hs-identifier hs-type">BYTES</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679232144"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Isabelle.Position.html#T"><span class="hs-identifier hs-type">Position.T</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679232144"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="#local-6989586621679232145"><span class="hs-identifier hs-type">b</span></a></span></span></span><span>
+</span><span id="line-168"></span><span id="errorExport"><span class="annot"><span class="annottext">errorExport :: forall a b. BYTES a =&gt; T -&gt; a -&gt; IO b
+</span><a href="SAD.Core.Message.html#errorExport"><span class="hs-identifier hs-var hs-var">errorExport</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; T -&gt; a -&gt; IO b
+forall a b. BYTES a =&gt; Bytes -&gt; T -&gt; a -&gt; IO b
+</span><a href="SAD.Core.Message.html#error"><span class="hs-identifier hs-var">error</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="SAD.Core.Message.html#origin_export"><span class="hs-identifier hs-var">origin_export</span></a></span><span>
+</span><span id="line-169"></span><span id="errorParser"><span class="annot"><span class="annottext">errorParser :: forall a b. BYTES a =&gt; T -&gt; a -&gt; IO b
+</span><a href="SAD.Core.Message.html#errorParser"><span class="hs-identifier hs-var hs-var">errorParser</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; T -&gt; a -&gt; IO b
+forall a b. BYTES a =&gt; Bytes -&gt; T -&gt; a -&gt; IO b
+</span><a href="SAD.Core.Message.html#error"><span class="hs-identifier hs-var">error</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="SAD.Core.Message.html#origin_parser"><span class="hs-identifier hs-var">origin_parser</span></a></span><span>
+</span><span id="line-170"></span><span id="errorLexer"><span class="annot"><span class="annottext">errorLexer :: forall a b. BYTES a =&gt; T -&gt; a -&gt; IO b
+</span><a href="SAD.Core.Message.html#errorLexer"><span class="hs-identifier hs-var hs-var">errorLexer</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; T -&gt; a -&gt; IO b
+forall a b. BYTES a =&gt; Bytes -&gt; T -&gt; a -&gt; IO b
+</span><a href="SAD.Core.Message.html#error"><span class="hs-identifier hs-var">error</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="SAD.Core.Message.html#origin_lexer"><span class="hs-identifier hs-var">origin_lexer</span></a></span><span>
+</span><span id="line-171"></span><span id="errorTokenizer"><span class="annot"><span class="annottext">errorTokenizer :: forall a b. BYTES a =&gt; T -&gt; a -&gt; IO b
+</span><a href="SAD.Core.Message.html#errorTokenizer"><span class="hs-identifier hs-var hs-var">errorTokenizer</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; T -&gt; a -&gt; IO b
+forall a b. BYTES a =&gt; Bytes -&gt; T -&gt; a -&gt; IO b
+</span><a href="SAD.Core.Message.html#error"><span class="hs-identifier hs-var">error</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="SAD.Core.Message.html#origin_tokenizer"><span class="hs-identifier hs-var">origin_tokenizer</span></a></span><span>
+</span><span id="line-172"></span><span id="errorReader"><span class="annot"><span class="annottext">errorReader :: forall a b. BYTES a =&gt; T -&gt; a -&gt; IO b
+</span><a href="SAD.Core.Message.html#errorReader"><span class="hs-identifier hs-var hs-var">errorReader</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bytes -&gt; T -&gt; a -&gt; IO b
+forall a b. BYTES a =&gt; Bytes -&gt; T -&gt; a -&gt; IO b
+</span><a href="SAD.Core.Message.html#error"><span class="hs-identifier hs-var">error</span></a></span><span> </span><span class="annot"><span class="annottext">Bytes
+</span><a href="SAD.Core.Message.html#origin_reader"><span class="hs-identifier hs-var">origin_reader</span></a></span><span>
+</span><span id="line-173"></span></pre></body></html>

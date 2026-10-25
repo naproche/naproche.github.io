@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">-- |</span><span>
+</span><span id="line-2"></span><span class="hs-comment">-- Module      : SAD.Data.Definition</span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- Copyright   : (c) 2001 - 2008, Andrei Paskevich,</span><span>
+</span><span id="line-4"></span><span class="hs-comment">--               (c) 2017 - 2018, Steffen Frerix</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- License     : GPL-3</span><span>
+</span><span id="line-6"></span><span class="hs-comment">--</span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- TODO: Add description.</span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SAD.Data.Definition</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Map</span></span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Formula.html"><span class="hs-identifier">SAD.Data.Formula</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier">Formula</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="SAD.Data.Terms.html#TermId"><span class="hs-identifier">TermId</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Structures.DisTree.html"><span class="hs-identifier">SAD.Data.Structures.DisTree</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="SAD.Data.Structures.DisTree.html#DisTree"><span class="hs-identifier">DisTree</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="SAD.Data.Structures.DisTree.html"><span class="hs-identifier">SAD.Data.Structures.DisTree</span></a></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">DisTree</span></span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">data</span><span> </span><span id="DefType"><span class="annot"><a href="SAD.Data.Definition.html#DefType"><span class="hs-identifier hs-var">DefType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Signature"><span class="annot"><a href="SAD.Data.Definition.html#Signature"><span class="hs-identifier hs-var">Signature</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Definition"><span class="annot"><a href="SAD.Data.Definition.html#Definition"><span class="hs-identifier hs-var">Definition</span></a></span></span><span>
+</span><span id="line-20"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679236556"><span id="local-6989586621679236558"><span class="annot"><span class="annottext">DefType -&gt; DefType -&gt; Bool
+(DefType -&gt; DefType -&gt; Bool)
+-&gt; (DefType -&gt; DefType -&gt; Bool) -&gt; Eq DefType
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: DefType -&gt; DefType -&gt; Bool
+== :: DefType -&gt; DefType -&gt; Bool
+$c/= :: DefType -&gt; DefType -&gt; Bool
+/= :: DefType -&gt; DefType -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679236562"><span id="local-6989586621679236564"><span id="local-6989586621679236568"><span class="annot"><span class="annottext">Int -&gt; DefType -&gt; ShowS
+[DefType] -&gt; ShowS
+DefType -&gt; String
+(Int -&gt; DefType -&gt; ShowS)
+-&gt; (DefType -&gt; String) -&gt; ([DefType] -&gt; ShowS) -&gt; Show DefType
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; DefType -&gt; ShowS
+showsPrec :: Int -&gt; DefType -&gt; ShowS
+$cshow :: DefType -&gt; String
+show :: DefType -&gt; String
+$cshowList :: [DefType] -&gt; ShowS
+showList :: [DefType] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">data</span><span> </span><span id="DefEntry"><span class="annot"><a href="SAD.Data.Definition.html#DefEntry"><span class="hs-identifier hs-var">DefEntry</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="DefEntry"><span class="annot"><a href="SAD.Data.Definition.html#DefEntry"><span class="hs-identifier hs-var">DefEntry</span></a></span></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="defGuards"><span class="annot"><span class="annottext">DefEntry -&gt; [Formula]
+</span><a href="SAD.Data.Definition.html#defGuards"><span class="hs-identifier hs-var hs-var">defGuards</span></a></span></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">]</span><span>    </span><span class="annot"><span class="hs-comment">-- ^ guards of the definitions</span></span><span>
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="defFormula"><span class="annot"><span class="annottext">DefEntry -&gt; Formula
+</span><a href="SAD.Data.Definition.html#defFormula"><span class="hs-identifier hs-var hs-var">defFormula</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>      </span><span class="annot"><span class="hs-comment">-- ^ defining formula</span></span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="defKind"><span class="annot"><span class="annottext">DefEntry -&gt; DefType
+</span><a href="SAD.Data.Definition.html#defKind"><span class="hs-identifier hs-var hs-var">defKind</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Definition.html#DefType"><span class="hs-identifier hs-type">DefType</span></a></span><span>      </span><span class="annot"><span class="hs-comment">-- ^ proper definition or only sig extension</span></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="defTerm"><span class="annot"><span class="annottext">DefEntry -&gt; Formula
+</span><a href="SAD.Data.Definition.html#defTerm"><span class="hs-identifier hs-var hs-var">defTerm</span></a></span></span><span>      </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span>      </span><span class="annot"><span class="hs-comment">-- ^ defined term</span></span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="defEvidence"><span class="annot"><span class="annottext">DefEntry -&gt; [Formula]
+</span><a href="SAD.Data.Definition.html#defEvidence"><span class="hs-identifier hs-var hs-var">defEvidence</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">]</span><span>    </span><span class="annot"><span class="hs-comment">-- ^ evidence from the defining formula</span></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="defTypeLikes"><span class="annot"><span class="annottext">DefEntry -&gt; [[Formula]]
+</span><a href="SAD.Data.Definition.html#defTypeLikes"><span class="hs-identifier hs-var hs-var">defTypeLikes</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">]</span><span class="hs-special">]</span><span>  </span><span class="annot"><span class="hs-comment">-- ^ type-likes of the definition</span></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679236579"><span id="local-6989586621679236591"><span id="local-6989586621679236595"><span class="annot"><span class="annottext">Int -&gt; DefEntry -&gt; ShowS
+[DefEntry] -&gt; ShowS
+DefEntry -&gt; String
+(Int -&gt; DefEntry -&gt; ShowS)
+-&gt; (DefEntry -&gt; String) -&gt; ([DefEntry] -&gt; ShowS) -&gt; Show DefEntry
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; DefEntry -&gt; ShowS
+showsPrec :: Int -&gt; DefEntry -&gt; ShowS
+$cshow :: DefEntry -&gt; String
+show :: DefEntry -&gt; String
+$cshowList :: [DefEntry] -&gt; ShowS
+showList :: [DefEntry] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span>
+</span><span id="line-30"></span><span>
+</span><span id="line-31"></span><span class="annot"><span class="hs-comment">-- | Storage of definitions by term id</span></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">type</span><span> </span><span id="Definitions"><span class="annot"><a href="SAD.Data.Definition.html#Definitions"><span class="hs-identifier hs-var">Definitions</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="SAD.Data.Terms.html#TermId"><span class="hs-identifier hs-type">TermId</span></a></span><span> </span><span class="annot"><a href="SAD.Data.Definition.html#DefEntry"><span class="hs-identifier hs-type">DefEntry</span></a></span><span>
+</span><span id="line-33"></span><span>
+</span><span id="line-34"></span><span class="annot"><span class="hs-comment">-- | Yields information as to what can be unfolded.</span></span><span>
+</span><span id="line-35"></span><span class="annot"><a href="SAD.Data.Definition.html#isDefinition"><span class="hs-identifier hs-type">isDefinition</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Definition.html#DefEntry"><span class="hs-identifier hs-type">DefEntry</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-36"></span><span id="isDefinition"><span class="annot"><span class="annottext">isDefinition :: DefEntry -&gt; Bool
+</span><a href="SAD.Data.Definition.html#isDefinition"><span class="hs-identifier hs-var hs-var">isDefinition</span></a></span></span><span> </span><span id="local-6989586621679236600"><span class="annot"><span class="annottext">DefEntry
+</span><a href="#local-6989586621679236600"><span class="hs-identifier hs-var">entry</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">DefEntry -&gt; DefType
+</span><a href="SAD.Data.Definition.html#defKind"><span class="hs-identifier hs-var">defKind</span></a></span><span> </span><span class="annot"><span class="annottext">DefEntry
+</span><a href="#local-6989586621679236600"><span class="hs-identifier hs-var">entry</span></a></span><span> </span><span class="annot"><span class="annottext">DefType -&gt; DefType -&gt; Bool
+forall a. Eq a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">DefType
+</span><a href="SAD.Data.Definition.html#Definition"><span class="hs-identifier hs-var">Definition</span></a></span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="hs-keyword">type</span><span> </span><span id="Guards"><span class="annot"><a href="SAD.Data.Definition.html#Guards"><span class="hs-identifier hs-var">Guards</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="SAD.Data.Structures.DisTree.html#DisTree"><span class="hs-identifier hs-type">DisTree</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span class="annot"><a href="SAD.Data.Definition.html#isGuard"><span class="hs-identifier hs-type">isGuard</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="SAD.Data.Definition.html#Guards"><span class="hs-identifier hs-type">Guards</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span>
+</span><span id="line-41"></span><span id="isGuard"><span class="annot"><span class="annottext">isGuard :: Formula -&gt; Guards -&gt; Bool
+</span><a href="SAD.Data.Definition.html#isGuard"><span class="hs-identifier hs-var hs-var">isGuard</span></a></span></span><span> </span><span id="local-6989586621679236602"><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679236602"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span id="local-6989586621679236603"><span class="annot"><span class="annottext">Guards
+</span><a href="#local-6989586621679236603"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Formula -&gt; Guards -&gt; [Bool]
+forall a. Formula -&gt; DisTree a -&gt; [a]
+</span><a href="SAD.Data.Structures.DisTree.html#find"><span class="hs-identifier hs-var">DisTree.find</span></a></span><span> </span><span class="annot"><span class="annottext">Formula
+</span><a href="#local-6989586621679236602"><span class="hs-identifier hs-var">f</span></a></span><span> </span><span class="annot"><span class="annottext">Guards
+</span><a href="#local-6989586621679236603"><span class="hs-identifier hs-var">g</span></a></span><span> </span><span class="hs-keyword">of</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">;</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679236605"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679236605"><span class="hs-identifier hs-var">x</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span class="annot"><span class="annottext">[Bool]
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679236605"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-42"></span><span>
+</span><span id="line-43"></span><span class="hs-keyword">data</span><span> </span><span id="Evaluation"><span class="annot"><a href="SAD.Data.Definition.html#Evaluation"><span class="hs-identifier hs-var">Evaluation</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="EV"><span class="annot"><a href="SAD.Data.Definition.html#EV"><span class="hs-identifier hs-var">EV</span></a></span></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-44"></span><span>  </span><span id="evaluationTerm"><span class="annot"><span class="annottext">Evaluation -&gt; Formula
+</span><a href="SAD.Data.Definition.html#evaluationTerm"><span class="hs-identifier hs-var hs-var">evaluationTerm</span></a></span></span><span>       </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">,</span><span>  </span><span class="hs-comment">-- the term to be reduced</span><span>
+</span><span id="line-45"></span><span>  </span><span id="evaluationPositives"><span class="annot"><span class="annottext">Evaluation -&gt; Formula
+</span><a href="SAD.Data.Definition.html#evaluationPositives"><span class="hs-identifier hs-var hs-var">evaluationPositives</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">,</span><span>  </span><span class="hs-comment">-- reduction for positive positions</span><span>
+</span><span id="line-46"></span><span>  </span><span id="evaluationNegatives"><span class="annot"><span class="annottext">Evaluation -&gt; Formula
+</span><a href="SAD.Data.Definition.html#evaluationNegatives"><span class="hs-identifier hs-var hs-var">evaluationNegatives</span></a></span></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">,</span><span>  </span><span class="hs-comment">-- reduction for negative positions</span><span>
+</span><span id="line-47"></span><span>  </span><span id="evaluationConditions"><span class="annot"><span class="annottext">Evaluation -&gt; [Formula]
+</span><a href="SAD.Data.Definition.html#evaluationConditions"><span class="hs-identifier hs-var hs-var">evaluationConditions</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="SAD.Data.Formula.Base.html#Formula"><span class="hs-identifier hs-type">Formula</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-comment">-- conditions</span><span>
+</span><span id="line-48"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span id="local-6989586621679236612"><span id="local-6989586621679236619"><span id="local-6989586621679236623"><span class="annot"><span class="annottext">Int -&gt; Evaluation -&gt; ShowS
+[Evaluation] -&gt; ShowS
+Evaluation -&gt; String
+(Int -&gt; Evaluation -&gt; ShowS)
+-&gt; (Evaluation -&gt; String)
+-&gt; ([Evaluation] -&gt; ShowS)
+-&gt; Show Evaluation
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Evaluation -&gt; ShowS
+showsPrec :: Int -&gt; Evaluation -&gt; ShowS
+$cshow :: Evaluation -&gt; String
+show :: Evaluation -&gt; String
+$cshowList :: [Evaluation] -&gt; ShowS
+showList :: [Evaluation] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span>
+</span><span id="line-49"></span></pre></body></html>
